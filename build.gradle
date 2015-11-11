@@ -1,0 +1,77 @@
+apply from: "http://api.krypt.int/gradle/kryptnostic.gradle"
+
+description = "Kryptnostic Rhizome Template"
+group = "com.kryptnostic"
+ext.projectName = "kryptnostic-rhizome-template"
+
+apply plugin: "application"
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "jacoco"
+apply from: "http://api.krypt.int/gradle/sharedDeployment.gradle"
+
+mainClassName = "com.kryptnostic.metrics.v1.MetricsServer"
+applicationDefaultJvmArgs = ["-Xmx1G","-Xms1G","-server"]
+sourceCompatibility=JavaVersion.VERSION_1_8
+targetCompatibility=JavaVersion.VERSION_1_8
+
+run {
+  if (System.getProperty("exec.args")) {
+    args System.getProperty("exec.args").split()
+  }
+}
+
+repositories {
+  maven {
+    url "http://maven.elasticsearch.org/releases"
+  }
+}
+
+dependencies {  
+    /*
+     * TESTING
+     */
+    testCompile "junit:junit:4.11"
+    testCompile "org.mockito:mockito-all:1.9.5"
+
+    //Hyperdex
+    compile fileTree( dir: "lib/", include: "*.jar")
+
+    if( project.hasProperty('developmentMode') && project.developmentMode ) {
+        logger.quiet(project.name + " using project dependencies.")
+        compile project(":rhizome")
+        compile project(":kryptnostic-mapstores")
+        compile project(":hazelcast-server") 
+        compile project(":heracles:heracles-plugin")
+    } else {
+        logger.quiet(project.name + " using jar dependencies.")
+        compile "com.kryptnostic:rhizome:${rhizome_version}"
+        compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
+        compile "com.kryptnostic:hazelcast-server:${hz_server_version}"
+        compile "com.kryptnostic:heracles-plugin:${heracles_version}"
+    }
+}
+
+test {
+    systemProperty 'java.library.path','lib/centos:lib/macosx:/usr/lib64'
+    jvmArgs '-Djava.library.path=./lib/centos:./lib/macosx:/usr/lib64'
+}
+
+task sourcesJar(type : Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+eclipse {
+    ext.downloadSources = true
+    ext.downloadJavadoc = true
+
+    ext.sourceCompatibility=JavaVersion.VERSION_1_8
+    ext.targetCompatibility=JavaVersion.VERSION_1_8
+}

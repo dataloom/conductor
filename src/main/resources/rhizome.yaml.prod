@@ -1,0 +1,30 @@
+##
+# Rhizome Bootstrap Configuration
+##
+
+# Set to false to disable persistence 
+enable-persistence:  false
+session-clustering-enabled: false
+graphite:
+    host: metrics.krypt.int
+    port: 2003
+    global-prefix: "kryptnostic-service"
+
+hyperdex:
+    coordinators: [athena]
+    port: 1982
+    native-bin-path: "lib/centos:lib/macosx:/usr/lib64"
+    configuration-keyspace: "configurations"
+    healthcheck-keyspace: "healthChecks" 
+
+rethinkdb:
+  hostname: "superman"
+  port: 28015
+
+hazelcast:
+    instance-name: "metrics-prod"
+    group: "metrics-prod"
+    password: "trumpisboss"
+    port: 5703
+    seed-nodes: 
+        - "127.0.0.1"
