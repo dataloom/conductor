@@ -1,4 +1,4 @@
-package com.kryptnostic.metrics.v1.pods;
+package com.kryptnostic.conductor.pods;
 
 import java.util.List;
 
@@ -16,13 +16,13 @@ import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 
 @Configuration
 @ComponentScan(
-    basePackages = "com.kryptnostic.metrics.v1",
+    basePackages = "com.kryptnostic.conductor.controllers",
     includeFilters = @ComponentScan.Filter(
-        value = { org.springframework.stereotype.Controller.class, org.springframework.stereotype.Component.class },
+        value = { org.springframework.stereotype.Controller.class },
         type = FilterType.ANNOTATION ) )
 @EnableMetrics(
     proxyTargetClass = true )
-public class MetricsMvcPod extends WebMvcConfigurationSupport {
+public class ConductorMvcPod extends WebMvcConfigurationSupport {
     @Inject
     private ObjectMapper defaultObjectMapper;
 

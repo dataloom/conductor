@@ -1,4 +1,4 @@
-package com.kryptnostic.metrics.v1;
+package com.kryptnostic.conductor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import com.geekbeast.rhizome.configuration.SimpleConfigurationKey;
 import com.google.common.base.Optional;
 import com.kryptnostic.instrumentation.v1.constants.InstrumentationConstants;
 
-public class MetricsConfiguration implements Configuration {
+public class ConductorConfiguration implements Configuration {
 
     private static final long             serialVersionUID = -3820377783487017980L;
 
@@ -17,7 +17,7 @@ public class MetricsConfiguration implements Configuration {
     private final Optional<String>        elasticsearchUrl;
     private final Optional<String>        elasticsearchCluster;
 
-    public MetricsConfiguration(
+    public ConductorConfiguration(
             @JsonProperty( InstrumentationConstants.ELASTICSEARCH_URL ) Optional<String> elasticsearchUrl,
             @JsonProperty( InstrumentationConstants.ELASTICSEARCH_CLUSTER ) Optional<String> elasticsearchCluster ) {
         this.elasticsearchUrl = elasticsearchUrl;

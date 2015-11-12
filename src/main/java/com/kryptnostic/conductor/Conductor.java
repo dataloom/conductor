@@ -1,4 +1,4 @@
-package com.kryptnostic.metrics.v1;
+package com.kryptnostic.conductor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -11,29 +11,31 @@ import com.geekbeast.rhizome.pods.MetricsPod;
 import com.geekbeast.rhizome.pods.RethinkDbPod;
 import com.geekbeast.rhizome.pods.ServletContainerPod;
 import com.geekbeast.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
-import com.kryptnostic.metrics.v1.pods.MetricsSecurityPod;
-import com.kryptnostic.metrics.v1.pods.MetricsServicesPod;
-import com.kryptnostic.metrics.v1.pods.MetricsServletsPod;
+import com.kryptnostic.conductor.pods.ConductorServicesPod;
+import com.kryptnostic.conductor.pods.ConductorServletsPod;
+import com.kryptnostic.mapstores.pods.SerializersPod;
 import com.kryptnostic.services.v1.pods.RethinkDbMapStoresPod;
 
-public class MetricsServer {
+public class Conductor {
 
     private final Rhizome rhizome;
 
-    public MetricsServer() {
+    public Conductor() {
         this( new Class<?>[] { ConfigurationPod.class, MetricsPod.class, AsyncPod.class, HazelcastPod.class,
                 ServletContainerPod.class, RegistryBasedHazelcastInstanceConfigurationPod.class } );
     }
 
-    public MetricsServer( Class<?>[] defaultPods ) {
-        this( defaultPods, MetricsServletsPod.class,
-                MetricsServicesPod.class,
-                MetricsSecurityPod.class,
+    public Conductor( Class<?>[] defaultPods ) {
+        this( defaultPods,
+                SerializersPod.class,
+                ConductorServletsPod.class,
+                ConductorServicesPod.class,
+                ConductorSecurityPod.class,
                 RethinkDbMapStoresPod.class,
-                RethinkDbPod.class);
+                RethinkDbPod.class );
     }
 
-    public MetricsServer( Class<?>[] defaultPods, Class<?>... pods ) {
+    public Conductor( Class<?>[] defaultPods, Class<?>... pods ) {
         rhizome = new Rhizome( pods ) {
             @Override
             public Class<?>[] getDefaultPods() {
@@ -52,7 +54,7 @@ public class MetricsServer {
     }
 
     public static void main( String[] args ) throws Exception {
-        new MetricsServer().start( args );
+        new Conductor().start( args );
     }
 
     public AnnotationConfigWebApplicationContext getContext() {

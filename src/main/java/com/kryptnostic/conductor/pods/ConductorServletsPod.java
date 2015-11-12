@@ -1,4 +1,4 @@
-package com.kryptnostic.metrics.v1.pods;
+package com.kryptnostic.conductor.pods;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,13 +7,13 @@ import com.geekbeast.rhizome.configuration.servlets.DispatcherServletConfigurati
 import com.google.common.collect.Lists;
 
 @Configuration
-public class MetricsServletsPod {
+public class ConductorServletsPod {
     @Bean
     public DispatcherServletConfiguration restServlet() {
         return new DispatcherServletConfiguration(
                 "app",
-                new String[] { "/v1/*" },
+                new String[] { "/conductor/*" },
                 1,
-                Lists.<Class<?>> newArrayList( MetricsMvcPod.class ) );
+                Lists.<Class<?>> newArrayList( ConductorMvcPod.class ) );
     }
 }

@@ -1,8 +1,8 @@
 apply from: "http://api.krypt.int/gradle/kryptnostic.gradle"
 
-description = "Kryptnostic Rhizome Template"
+description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
-ext.projectName = "kryptnostic-rhizome-template"
+ext.projectName = "kryptnostic-conductor"
 
 apply plugin: "application"
 apply plugin: "java"
@@ -11,7 +11,7 @@ apply plugin: "idea"
 apply plugin: "jacoco"
 apply from: "http://api.krypt.int/gradle/sharedDeployment.gradle"
 
-mainClassName = "com.kryptnostic.metrics.v1.MetricsServer"
+mainClassName = "com.kryptnostic.conductor.Conductor"
 applicationDefaultJvmArgs = ["-Xmx1G","-Xms1G","-server"]
 sourceCompatibility=JavaVersion.VERSION_1_8
 targetCompatibility=JavaVersion.VERSION_1_8
@@ -19,12 +19,6 @@ targetCompatibility=JavaVersion.VERSION_1_8
 run {
   if (System.getProperty("exec.args")) {
     args System.getProperty("exec.args").split()
-  }
-}
-
-repositories {
-  maven {
-    url "http://maven.elasticsearch.org/releases"
   }
 }
 
@@ -48,7 +42,7 @@ dependencies {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
-        compile "com.kryptnostic:hazelcast-server:${hz_server_version}"
+        compile "com.kryptnostic:hazelcast-server:{0.0.0-SNAPSHOT"
         compile "com.kryptnostic:heracles-plugin:${heracles_version}"
     }
 }

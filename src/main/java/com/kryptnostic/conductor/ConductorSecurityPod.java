@@ -1,4 +1,4 @@
-package com.kryptnostic.metrics.v1.pods;
+package com.kryptnostic.conductor;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,11 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @Configuration
 @EnableWebSecurity
-public class MetricsSecurityPod extends WebSecurityConfigurerAdapter {
-
-    public MetricsSecurityPod() {
-        // TODO Auto-generated constructor stub
-    }
+public class ConductorSecurityPod extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure( HttpSecurity http ) throws Exception {
