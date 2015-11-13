@@ -1,10 +1,8 @@
 package com.kryptnostic.conductor.orchestra;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,18 +19,22 @@ class HealthScanEntryProcessor extends AbstractRhizomeEntryProcessor<String, Set
 		
 		Set<ServiceDescriptor> desc = entry.getValue();
 		Set<ServiceStatus> res = new HashSet<>();
+		
 		for(ServiceDescriptor item : desc){
+			
 			String name = item.getName();
 			String host = item.getHost();
 			int port = item.getPort();
 			String path = item.getPath();
+			
 			try {
 				URL url = new URL("http", "host", port, path);
-				HttpURLConnection conn
-				res.add( new ServiceStatus(name, host, port, true));
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				res.add( new ServiceStatus(name, host, port, path, true));
+				conn.disconnect();
 				
 			} catch (IOException e) {
-				res.add(new ServiceStatus(name, host, port, false));
+				res.add(new ServiceStatus(name, host, port, path, false));
 			}
 		}
 		return res;
