@@ -3,6 +3,8 @@ package com.kryptnostic.conductor.orchestra;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,10 +25,10 @@ class HealthScanEntryProcessor extends AbstractRhizomeEntryProcessor<String, Set
 			String name = item.getName();
 			String host = item.getHost();
 			int port = item.getPort();
+			String path = item.getPath();
 			try {
-				Socket socket = new Socket();
-				socket.connect(new InetSocketAddress(host, port), 5000);
-				socket.close();
+				URL url = new URL("http", "host", port, path);
+				HttpURLConnection conn
 				res.add( new ServiceStatus(name, host, port, true));
 				
 			} catch (IOException e) {
