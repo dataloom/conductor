@@ -1,4 +1,4 @@
-package com.kryptnostic.conductor;
+package com.kryptnostic.conductor.pods;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

@@ -11,6 +11,7 @@ import com.geekbeast.rhizome.pods.MetricsPod;
 import com.geekbeast.rhizome.pods.RethinkDbPod;
 import com.geekbeast.rhizome.pods.ServletContainerPod;
 import com.geekbeast.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
+import com.kryptnostic.conductor.pods.ConductorSecurityPod;
 import com.kryptnostic.conductor.pods.ConductorServicesPod;
 import com.kryptnostic.conductor.pods.ConductorServletsPod;
 import com.kryptnostic.mapstores.pods.SerializersPod;
