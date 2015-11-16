@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 import com.hazelcast.core.HazelcastInstance;
@@ -13,6 +14,7 @@ import com.kryptnostic.rhizome.emails.EmailService;
 import jodd.mail.Email;
 import jodd.mail.MailAddress;
 
+@Component
 public class MonitoringService {
 	private final IMap<String, Set<ServiceDescriptor>> services;
 	private final EmailService emailService;
@@ -23,9 +25,9 @@ public class MonitoringService {
 	}
 
 	@Scheduled(fixedRate = 30000)
-	public void scan() {
+	public void check() {
 		@SuppressWarnings("unchecked")
-		Map<String, Set<ServiceStatus>> status = Maps.transformEntries(services.executeOnEntries(new HealthScanEntryProcessor()),
+		Map<String, Set<ServiceStatus>> status = Maps.transformEntries(services.executeOnEntries(new MonitoringServiceEntryProcessor()),
 				(String key, Object value) -> {
 					return (Set<ServiceStatus>) value;
 				});
