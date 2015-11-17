@@ -8,19 +8,27 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import com.kryptnostic.rhizome.emails.EmailService;
 import com.kryptnostic.rhizome.hazelcast.processors.AbstractRhizomeEntryProcessor;
+
+import jodd.mail.Email;
+import jodd.mail.MailAddress;
 
 class MonitoringServiceEntryProcessor extends AbstractRhizomeEntryProcessor<String, Set<ServiceDescriptor>> {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2423765356049257683L;
+	
+	@Inject
+	private EmailService emailService;
 
 	@Override
-	public Set<ServiceStatus> process(Map.Entry<String, Set<ServiceDescriptor>> entry) {
+	public Object process(Map.Entry<String, Set<ServiceDescriptor>> entry) {
 		
 		Set<ServiceDescriptor> desc = entry.getValue();
-		Set<ServiceStatus> res = new HashSet<>();
 		
 		for(ServiceDescriptor item : desc){
 			
@@ -29,14 +37,17 @@ class MonitoringServiceEntryProcessor extends AbstractRhizomeEntryProcessor<Stri
 			try {
 				URL url = new URL(pingBackUrl);
 				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-				res.add( new ServiceStatus(item, true));
 				conn.disconnect();
 				
 			} catch (IOException e) {
-				res.add(new ServiceStatus(item, false));
+				Email email = new Email();
+				MailAddress address = new MailAddress("yao@kryptnostic.com");
+				email.setTo(address);
+				email.addText("Service down: " + item.toString());
+				emailService.sendMessage(email);
 			}
 		}
-		return res;
+		return null;
 	}
 	
 }
