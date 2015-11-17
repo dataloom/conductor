@@ -1,0 +1,6 @@
+smtp-auth: true
+ttls-enable: true
+smtp-host: smtp.gmail.com
+smtp-port: 587
+username: registrar@kryptnostic.com
+password: theriddleofsteel1!

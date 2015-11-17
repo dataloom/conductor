@@ -3,6 +3,8 @@ package com.kryptnostic.conductor.orchestra;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,12 +15,12 @@ import com.kryptnostic.rhizome.emails.EmailService;
 
 import jodd.mail.Email;
 import jodd.mail.MailAddress;
-
 @Component
 public class MonitoringService {
 	private final IMap<String, Set<ServiceDescriptor>> services;
 	private final EmailService emailService;
 
+	@Inject
 	public MonitoringService(HazelcastInstance hazelcast, EmailService emailService) {
 		this.services = hazelcast.getMap("conductorManagedServices");
 		this.emailService = emailService;
@@ -51,5 +53,4 @@ public class MonitoringService {
 			
 		});
 
-	}
-}
+	}}

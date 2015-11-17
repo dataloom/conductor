@@ -11,10 +11,10 @@ import java.util.Set;
 import com.kryptnostic.rhizome.hazelcast.processors.AbstractRhizomeEntryProcessor;
 
 class MonitoringServiceEntryProcessor extends AbstractRhizomeEntryProcessor<String, Set<ServiceDescriptor>> {
-	 
-
-	private static final long 				serialVersionUID = 5810253239672565698L;
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2423765356049257683L;
 
 	@Override
 	public Set<ServiceStatus> process(Map.Entry<String, Set<ServiceDescriptor>> entry) {

@@ -1,5 +1,7 @@
 package com.kryptnostic.conductor.pods;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 
 import org.springframework.context.annotation.Bean;
@@ -9,6 +11,7 @@ import com.geekbeast.rhizome.configuration.service.ConfigurationService;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
 import com.kryptnostic.kodex.v1.serialization.jackson.KodexObjectMapperFactory;
+import com.kryptnostic.rhizome.emails.EmailService;
 
 public class ConductorServicesPod {
 
@@ -26,6 +29,11 @@ public class ConductorServicesPod {
     @Bean
     public ServiceRegistrationService getServiceRegistrationService() {
     	return new ServiceRegistrationService(hazelcastInstance);
+    }
+    
+    @Bean
+    public EmailService emailService() throws IOException {
+    	return new EmailService(config);
     }
     
 }
