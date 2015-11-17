@@ -31,7 +31,6 @@ public class ConductorController implements ConductorApi {
 	@ResponseStatus(HttpStatus.OK)
 	public void checkHealth() {
 		// no op
-
 	}
 
 }
