@@ -38,11 +38,13 @@ dependencies {
         compile project(":kryptnostic-mapstores")
         compile project(":hazelcast-server") 
         compile project(":heracles:heracles-plugin")
+        compile project(":kryptnostic-conductor-client")
     } else {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
-        compile "com.kryptnostic:hazelcast-server:{0.0.0-SNAPSHOT"
+        compile "com.kryptnostic:kryptnostic-conductor-client:v0.0.1"
+        compile "com.kryptnostic:hazelcast-server:${hazelcast_version}"
         compile "com.kryptnostic:heracles-plugin:${heracles_version}"
     }
 }
