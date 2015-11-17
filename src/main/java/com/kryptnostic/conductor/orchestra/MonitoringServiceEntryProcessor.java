@@ -3,8 +3,6 @@ package com.kryptnostic.conductor.orchestra;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,14 +10,13 @@ import javax.inject.Inject;
 
 import com.kryptnostic.rhizome.emails.EmailService;
 import com.kryptnostic.rhizome.hazelcast.processors.AbstractRhizomeEntryProcessor;
+import com.kryptnostic.conductor.orchestra.NameConstants;
 
 import jodd.mail.Email;
 import jodd.mail.MailAddress;
 
 class MonitoringServiceEntryProcessor extends AbstractRhizomeEntryProcessor<String, Set<ServiceDescriptor>> {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 2423765356049257683L;
 	
 	@Inject
@@ -32,7 +29,7 @@ class MonitoringServiceEntryProcessor extends AbstractRhizomeEntryProcessor<Stri
 		
 		for(ServiceDescriptor item : desc){
 			
-			String pingBackUrl = item.getPingbackUrl();
+			String pingBackUrl = item.getServicePingbackUrl();
 			
 			try {
 				URL url = new URL(pingBackUrl);
@@ -41,8 +38,7 @@ class MonitoringServiceEntryProcessor extends AbstractRhizomeEntryProcessor<Stri
 				
 			} catch (IOException e) {
 				Email email = new Email();
-				MailAddress address = new MailAddress("yao@kryptnostic.com");
-				email.setTo(address);
+				email.setTo(new MailAddress(NameConstants.REPORT_EMAIL_ADDRESS));
 				email.addText("Service down: " + item.toString());
 				emailService.sendMessage(email);
 			}
