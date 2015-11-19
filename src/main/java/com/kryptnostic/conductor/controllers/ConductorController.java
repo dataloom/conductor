@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.kryptnostic.conductor.orchestra.ConductorApi;
-import com.kryptnostic.conductor.orchestra.ServiceDescriptor;
 import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
+import com.kryptnostic.conductor.v1.objects.ServiceDescriptor;
 
 @Controller
 @RequestMapping(ConductorApi.CONTROLLER)
