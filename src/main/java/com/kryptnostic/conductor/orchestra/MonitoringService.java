@@ -11,7 +11,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.kryptnostic.conductor.v1.NameConstants;
 import com.kryptnostic.conductor.v1.objects.ServiceDescriptorSet;
-import com.kryptnostic.conductor.v1processors.MonitoringServiceEntryProcessor;
+import com.kryptnostic.conductor.v1.processors.MonitoringServiceEntryProcessor;
 
 @Component
 public class MonitoringService {
