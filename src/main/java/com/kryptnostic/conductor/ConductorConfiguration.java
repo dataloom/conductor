@@ -19,7 +19,7 @@ public class ConductorConfiguration implements Configuration {
 
     public ConductorConfiguration(
             @JsonProperty( InstrumentationConstants.ELASTICSEARCH_URL ) Optional<String> elasticsearchUrl,
-            @JsonProperty( InstrumentationConstants.ELASTICSEARCH_CLUSTER ) Optional<String> elasticsearchCluster ) {
+            @JsonProperty( InstrumentationConstants.ELASTICSEARCH_CLUSTER ) Optional<String> elasticsearchCluster) {
         this.elasticsearchUrl = elasticsearchUrl;
         this.elasticsearchCluster = elasticsearchCluster;
     }

@@ -15,16 +15,18 @@ import com.kryptnostic.conductor.v1.processors.MonitoringServiceEntryProcessor;
 
 @Component
 public class MonitoringService {
-	private final IMap<String, ServiceDescriptorSet> services;
-	private final String hazelcastInstanceName;
-	@Inject
-	public MonitoringService(HazelcastInstance hazelcast) {
-		this.services = hazelcast.getMap(NameConstants.CONDUCTOR_MANAGED_SERVICES);
-		this.hazelcastInstanceName = hazelcast.getName();
-	}
+    private final IMap<String, ServiceDescriptorSet> services;
+    private final String                             hazelcastInstanceName;
 
-	@Scheduled(fixedRate = 30000)
-	public void check() throws IOException {
-		services.executeOnEntries(new MonitoringServiceEntryProcessor(hazelcastInstanceName));
-	}
+    @Inject
+    public MonitoringService( HazelcastInstance hazelcast ) {
+        this.services = hazelcast.getMap( NameConstants.CONDUCTOR_MANAGED_SERVICES );
+        this.hazelcastInstanceName = hazelcast.getName();
+    }
+
+    @Scheduled(
+        fixedRate = 30000 )
+    public void check() throws IOException {
+        services.executeOnEntries( new MonitoringServiceEntryProcessor( hazelcastInstanceName ) );
+    }
 }

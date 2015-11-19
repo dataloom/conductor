@@ -12,16 +12,16 @@ import com.kryptnostic.kodex.v1.serialization.jackson.KodexObjectMapperFactory;
 public class ConductorServicesPod {
 
     @Inject
-    private HazelcastInstance    hazelcastInstance;
+    private HazelcastInstance hazelcastInstance;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return KodexObjectMapperFactory.getObjectMapper();
     }
-    
+
     @Bean
     public ServiceRegistrationService getServiceRegistrationService() {
-    	return new ServiceRegistrationService(hazelcastInstance);
+        return new ServiceRegistrationService( hazelcastInstance );
     }
-    
+
 }

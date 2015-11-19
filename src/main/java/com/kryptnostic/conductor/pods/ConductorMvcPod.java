@@ -16,11 +16,12 @@ import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 
 @Configuration
 @ComponentScan(
-    basePackages = {"com.kryptnostic.conductor.controllers", "com.kryptnostic.conductor.orchestra"},
+    basePackages = { "com.kryptnostic.conductor.controllers", "com.kryptnostic.conductor.orchestra" },
     includeFilters = @ComponentScan.Filter(
         value = { org.springframework.stereotype.Controller.class },
         type = FilterType.ANNOTATION ) )
-@EnableMetrics(proxyTargetClass = true )
+@EnableMetrics(
+    proxyTargetClass = true )
 public class ConductorMvcPod extends WebMvcConfigurationSupport {
     @Inject
     private ObjectMapper defaultObjectMapper;

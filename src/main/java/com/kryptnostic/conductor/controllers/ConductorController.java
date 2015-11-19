@@ -14,23 +14,26 @@ import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
 import com.kryptnostic.conductor.v1.objects.ServiceDescriptor;
 
 @Controller
-@RequestMapping(ConductorApi.CONTROLLER)
+@RequestMapping( ConductorApi.CONTROLLER )
 public class ConductorController implements ConductorApi {
 
-	@Inject
-	private ServiceRegistrationService srs;
+    @Inject
+    private ServiceRegistrationService srs;
 
-	@RequestMapping(value = CONTROLLER + REGISTRATION, method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	public void setRegistration(@RequestBody ServiceDescriptor desc) {
-		srs.register(desc);
-	}
+    @Override
+    @RequestMapping(
+        value = CONTROLLER + REGISTRATION,
+        method = RequestMethod.POST )
+    @ResponseStatus( HttpStatus.OK )
+    public void setRegistration( @RequestBody ServiceDescriptor desc ) {
+        srs.register( desc );
+    }
 
-	@Override
-	@RequestMapping(value = CONTROLLER + HEALTH, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
-	public void checkHealth() {
-		// no op
-	}
+    @Override
+    @RequestMapping(
+        value = CONTROLLER + HEALTH,
+        method = RequestMethod.GET )
+    @ResponseStatus( HttpStatus.OK )
+    public void checkHealth() {}
 
 }
