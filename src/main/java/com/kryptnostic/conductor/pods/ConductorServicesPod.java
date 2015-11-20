@@ -27,7 +27,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public ConductorConfiguration reportEmailAddress() throws IOException {
+    public ConductorConfiguration getConductorConfiguration() throws IOException {
         return config.getConfiguration( ConductorConfiguration.class );
     }
 
