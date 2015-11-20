@@ -18,7 +18,6 @@ import com.kryptnostic.mapstores.pods.SerializersPod;
 import com.kryptnostic.services.v1.pods.RethinkDbMapStoresPod;
 
 public class Conductor {
-
     private final Rhizome rhizome;
 
     public Conductor() {
