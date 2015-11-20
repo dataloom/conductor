@@ -18,7 +18,6 @@ import com.kryptnostic.mapstores.pods.SerializersPod;
 import com.kryptnostic.services.v1.pods.RethinkDbMapStoresPod;
 
 public class Conductor {
-
     private final Rhizome rhizome;
 
     public Conductor() {
@@ -27,7 +26,8 @@ public class Conductor {
     }
 
     public Conductor( Class<?>[] defaultPods ) {
-        this( defaultPods,
+        this(
+                defaultPods,
                 SerializersPod.class,
                 ConductorServletsPod.class,
                 ConductorServicesPod.class,
@@ -37,9 +37,9 @@ public class Conductor {
     }
 
     public Conductor( Class<?>[] defaultPods, Class<?>... pods ) {
-        rhizome = new Rhizome( pods ) {
+        rhizome = new Rhizome( pods) {
             @Override
-            public Class<?>[] getDefaultPods() {
+            public Class<?>[] getDefaultPods( ) {
                 return defaultPods;
             }
         };

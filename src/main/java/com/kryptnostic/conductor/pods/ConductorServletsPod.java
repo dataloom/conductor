@@ -11,9 +11,10 @@ public class ConductorServletsPod {
     @Bean
     public DispatcherServletConfiguration restServlet() {
         return new DispatcherServletConfiguration(
-                "app",
+                "conductor",
                 new String[] { "/conductor/*" },
                 1,
                 Lists.<Class<?>> newArrayList( ConductorMvcPod.class ) );
     }
+
 }

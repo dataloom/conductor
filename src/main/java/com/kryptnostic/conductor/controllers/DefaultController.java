@@ -33,4 +33,5 @@ public class DefaultController {
         logger.error( "Controller: {} Error: {}", this.getClass().getName(), ex.getMessage() );
         return new BasicResponse<String>( ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false );
     }
+
 }
