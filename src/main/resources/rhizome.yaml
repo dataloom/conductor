@@ -5,10 +5,10 @@
 # Set to false to disable persistence 
 enable-persistence:  false
 session-clustering-enabled: false
-graphite:
-    host: metrics.krypt.int
-    port: 2003
-    global-prefix: "kryptnostic-service"
+#graphite:
+#    host: metrics.krypt.int
+#    port: 2003
+#    global-prefix: "kryptnostic-service"
 
 #hyperdex:
 #    coordinators: [spiderman]
@@ -17,14 +17,14 @@ graphite:
 #    configuration-keyspace: "configurations"
 #    healthcheck-keyspace: "healthChecks"
 
-rethinkdb:
-    hostname: "localhost"
-    port: 28015
+#rethinkdb:
+#    hostname: "localhost"
+#    port: 28015
 
 hazelcast:
-    instance-name: "metrics-local"
-    group: "metrics-local"
+    instance-name: "conductor-local"
+    group: "conductor"
     password: "trumpisboss"
-    port: 5703
+    port: 5704
     seed-nodes: 
         - "127.0.0.1"

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.geekbeast.rhizome.configuration.Configuration;
 import com.geekbeast.rhizome.configuration.ConfigurationKey;
 import com.geekbeast.rhizome.configuration.SimpleConfigurationKey;
-import com.google.common.base.Optional;
 
 public class ConductorConfiguration implements Configuration {
-    private static final long             serialVersionUID           = 1L;
+
+    private static final long             serialVersionUID           = -3847142110887587615L;
     private static final ConfigurationKey key                        = new SimpleConfigurationKey( "conductor.yaml" );
     private static final String           REPORT_EMAIL_ADDRESS_FIELD = "reportEmailAddress";
 
@@ -17,8 +17,8 @@ public class ConductorConfiguration implements Configuration {
 
     @JsonCreator
     public ConductorConfiguration(
-            @JsonProperty( REPORT_EMAIL_ADDRESS_FIELD ) Optional<String> reportEmailAddress) {
-        this.reportEmailAddress = reportEmailAddress.or( "yao@kryptnostic.com" );
+            @JsonProperty( REPORT_EMAIL_ADDRESS_FIELD ) String reportEmailAddress) {
+        this.reportEmailAddress = reportEmailAddress;
     }
 
     @JsonProperty( REPORT_EMAIL_ADDRESS_FIELD )
