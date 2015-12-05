@@ -16,6 +16,7 @@ import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
 import com.kryptnostic.conductor.v1.objects.ServiceDescriptor;
 
 @Controller
+@RequestMapping( ConductorApi.CONTROLLER )
 public class ConductorController extends DefaultController implements ConductorApi {
 
     @Inject
