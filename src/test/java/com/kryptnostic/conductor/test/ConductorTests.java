@@ -27,7 +27,7 @@ public class ConductorTests {
 
     private final static Logger                       logger            = LoggerFactory
                                                                                 .getLogger( ConductorTests.class );
-    private static final String                       pingbackUrl       = "http://localhost:8085/conductor/health";
+    private static final String                       pingbackUrl       = "http://localhost:8085/conductor/monitoring/health";
     private static Conductor                          conductor         = null;
     private static ServiceRegistrationService         srs               = null;
     private static IMap<String, ServiceDescriptorSet> services          = null;

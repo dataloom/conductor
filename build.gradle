@@ -47,8 +47,8 @@ dependencies {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
-        compile "com.kryptnostic:kryptnostic-conductor-client:v0.0.1"
-        compile "com.kryptnostic:hazelcast-server:${hazelcast_version}"
+        compile "com.kryptnostic:kryptnostic-conductor-client:${conductor_client_version}"
+        compile "com.kryptnostic:hazelcast-server:${hz_server_version}"
     }
 }
 

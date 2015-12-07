@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
@@ -16,7 +15,6 @@ import com.kryptnostic.conductor.v1.objects.ServiceDescriptorSet;
 import com.kryptnostic.conductor.v1.processors.MonitoringServiceEntryProcessor;
 import com.kryptnostic.mapstores.v1.constants.HazelcastNames.Maps;
 
-@Service
 public class MonitoringService {
 
     private final IMap<String, ServiceDescriptorSet> services;
