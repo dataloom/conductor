@@ -7,9 +7,12 @@ import javax.inject.Inject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekbeast.rhizome.configuration.service.ConfigurationService;
+import com.geekbeast.rhizome.registries.ObjectMapperRegistry;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.ConductorConfiguration;
+import com.kryptnostic.conductor.orchestra.MonitoringService;
 import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
 
 @Configuration
@@ -19,7 +22,12 @@ public class ConductorServicesPod {
     private HazelcastInstance    hazelcastInstance;
 
     @Inject
-    private ConfigurationService config;
+    private ConfigurationService configurationService;
+
+    @Bean
+    public ObjectMapper defaultObjectMapper() {
+        return ObjectMapperRegistry.getJsonMapper();
+    }
 
     @Bean
     public ServiceRegistrationService getServiceRegistrationService() {
@@ -28,7 +36,11 @@ public class ConductorServicesPod {
 
     @Bean
     public ConductorConfiguration getConductorConfiguration() throws IOException {
-        return config.getConfiguration( ConductorConfiguration.class );
+        return configurationService.getConfiguration( ConductorConfiguration.class );
     }
 
+    @Bean
+    public MonitoringService monitoringService() throws IOException {
+        return new MonitoringService( hazelcastInstance, getConductorConfiguration() );
+    }
 }

@@ -2,4 +2,4 @@ Kryptnostic-Conductor
 =======================
 
 
-Server for periodically checking services' health.
+Distributed Configuration and Deployment Services.

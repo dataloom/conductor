@@ -1,4 +1,7 @@
-apply from: "http://api.krypt.int/gradle/kryptnostic.gradle"
+/*
+*	Kryptnostic conductor service
+* 	version is defined in kryptnostic-gradles/kryptnostic.gradle
+*/
 
 description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
@@ -9,6 +12,8 @@ apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "jacoco"
+
+apply from: "http://api.krypt.int/gradle/kryptnostic.gradle"
 apply from: "http://api.krypt.int/gradle/sharedDeployment.gradle"
 
 mainClassName = "com.kryptnostic.conductor.Conductor"
@@ -37,15 +42,13 @@ dependencies {
         compile project(":rhizome")
         compile project(":kryptnostic-mapstores")
         compile project(":hazelcast-server") 
-        compile project(":heracles:heracles-plugin")
         compile project(":kryptnostic-conductor-client")
     } else {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
-        compile "com.kryptnostic:kryptnostic-conductor-client:v0.0.1"
-        compile "com.kryptnostic:hazelcast-server:${hazelcast_version}"
-        compile "com.kryptnostic:heracles-plugin:${heracles_version}"
+        compile "com.kryptnostic:kryptnostic-conductor-client:${conductor_client_version}"
+        compile "com.kryptnostic:hazelcast-server:${hz_server_version}"
     }
 }
 
