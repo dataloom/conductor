@@ -30,7 +30,8 @@ dependencies {
     /*
      * TESTING
      */
-    testCompile "org.mockito:mockito-all:1.9.5"
+     testCompile "junit:junit:junit_version"
+     testCompile "org.mockito:mockito-all:${mockito_version}"
 
     if( project.hasProperty('developmentMode') && project.developmentMode ) {
         logger.quiet(project.name + " using project dependencies.")
