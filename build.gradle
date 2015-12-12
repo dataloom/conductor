@@ -30,7 +30,7 @@ dependencies {
     /*
      * TESTING
      */
-     testCompile "junit:junit:junit_version"
+     testCompile "junit:junit:${junit_version}"
      testCompile "org.mockito:mockito-all:${mockito_version}"
 
     if( project.hasProperty('developmentMode') && project.developmentMode ) {
