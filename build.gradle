@@ -14,7 +14,6 @@ apply plugin: "idea"
 apply plugin: "jacoco"
 
 apply from: "http://api.krypt.int/gradle/kryptnostic.gradle"
-apply from: "http://api.krypt.int/gradle/sharedDeployment.gradle"
 
 mainClassName = "com.kryptnostic.conductor.Conductor"
 applicationDefaultJvmArgs = ["-Xmx1G","-Xms1G","-server"]
@@ -31,24 +30,19 @@ dependencies {
     /*
      * TESTING
      */
-    testCompile "junit:junit:4.11"
-    testCompile "org.mockito:mockito-all:1.9.5"
-
-    //Hyperdex
-    compile fileTree( dir: "lib/", include: "*.jar")
+     testCompile "junit:junit:${junit_version}"
+     testCompile "org.mockito:mockito-all:${mockito_version}"
 
     if( project.hasProperty('developmentMode') && project.developmentMode ) {
         logger.quiet(project.name + " using project dependencies.")
         compile project(":rhizome")
         compile project(":kryptnostic-mapstores")
-        compile project(":hazelcast-server") 
         compile project(":kryptnostic-conductor-client")
     } else {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
         compile "com.kryptnostic:kryptnostic-conductor-client:${conductor_client_version}"
-        compile "com.kryptnostic:hazelcast-server:${hz_server_version}"
     }
 }
 

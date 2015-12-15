@@ -18,14 +18,14 @@ import com.kryptnostic.mapstores.v1.constants.HazelcastNames.Maps;
 public class MonitoringService {
 
     private final IMap<String, ServiceDescriptorSet> services;
-    private final String                             hazelcastInstanceName;
+    private final HazelcastInstance                  hazelcastInstance;
     private final String                             reportEmailAddress;
     private final static Logger                      logger = LoggerFactory.getLogger( MonitoringService.class );
 
     @Inject
     public MonitoringService( HazelcastInstance hazelcast, ConductorConfiguration conductorConfig ) {
         this.services = hazelcast.getMap( Maps.CONDUCTOR_MANAGED_SERVICES );
-        this.hazelcastInstanceName = hazelcast.getName();
+        this.hazelcastInstance = hazelcast;
         this.reportEmailAddress = conductorConfig.getReportEmailAddress();
     }
 
@@ -33,7 +33,7 @@ public class MonitoringService {
         fixedRate = 30000 )
     public void check() throws IOException {
         logger.info( "doing check" );
-        services.executeOnEntries( new MonitoringServiceEntryProcessor( hazelcastInstanceName, reportEmailAddress ) );
+        services.executeOnEntries( new MonitoringServiceEntryProcessor( hazelcastInstance, reportEmailAddress ) );
     }
 
 }
