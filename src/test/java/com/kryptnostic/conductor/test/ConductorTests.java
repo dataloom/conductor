@@ -30,6 +30,7 @@ public class ConductorTests {
     private static IMap<String, ServiceDescriptorSet> services          = null;
     private static ServiceDescriptor                  serviceDescriptor = null;
     private static HazelcastInstance                  hazelcastInstance = null;
+    private static MonitoringService                  monitoringService = null;
 
     @BeforeClass
     public static void initTests() throws Exception {
