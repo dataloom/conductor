@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.geekbeast.rhizome.configuration.service.ConfigurationService;
-import com.geekbeast.rhizome.registries.ObjectMapperRegistry;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.ConductorConfiguration;
 import com.kryptnostic.conductor.orchestra.MonitoringService;
 import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
+import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
+import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 
 @Configuration
 public class ConductorServicesPod {
