@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.hazelcast.core.HazelcastInstance;
@@ -20,7 +18,6 @@ public class MonitoringService {
     private final IMap<String, ServiceDescriptorSet> services;
     private final HazelcastInstance                  hazelcastInstance;
     private final String                             reportEmailAddress;
-    private final static Logger                      logger = LoggerFactory.getLogger( MonitoringService.class );
 
     @Inject
     public MonitoringService( HazelcastInstance hazelcast, ConductorConfiguration conductorConfig ) {
@@ -32,7 +29,6 @@ public class MonitoringService {
     @Scheduled(
         fixedRate = 30000 )
     public void check() throws IOException {
-        logger.info( "doing check" );
         services.executeOnEntries( new MonitoringServiceEntryProcessor( hazelcastInstance, reportEmailAddress ) );
     }
 
