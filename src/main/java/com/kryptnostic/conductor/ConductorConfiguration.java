@@ -8,9 +8,9 @@ import com.kryptnostic.rhizome.configuration.ConfigurationKey;
 import com.kryptnostic.rhizome.configuration.SimpleConfigurationKey;
 
 public class ConductorConfiguration implements Configuration {
-
     private static final long             serialVersionUID           = -3847142110887587615L;
     private static final ConfigurationKey key                        = new SimpleConfigurationKey( "conductor.yaml" );
+
     private static final String           REPORT_EMAIL_ADDRESS_FIELD = "reportEmailAddress";
 
     private final String                  reportEmailAddress;
