@@ -5,20 +5,18 @@
 # Set to false to disable persistence 
 enable-persistence:  false
 session-clustering-enabled: false
+graphite:
+    host: metrics.krypt.int
+    port: 2003
+    global-prefix: "kryptnostic-conductor"
 
 rethinkdb:
-    hostname: "localhost"
+    hostname: "athena"
     port: 28015
 
-cassandra:
-    keyspace: "kryptnostic"
-    replication-factor: 2
-    seed-nodes:
-        - "127.0.0.1"
-        
 hazelcast:
     server: false
-    group: "local"
-    password: "trumpisboss"
+    group: "prod"
+    password: "paynoattentiontothemanbehindthecurtain"
     seed-nodes: 
         - "127.0.0.1"
