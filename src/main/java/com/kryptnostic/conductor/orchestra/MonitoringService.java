@@ -16,20 +16,18 @@ import com.kryptnostic.mapstores.v1.constants.HazelcastNames.Maps;
 public class MonitoringService {
 
     private final IMap<String, ServiceDescriptorSet> services;
-    private final HazelcastInstance                  hazelcastInstance;
     private final String                             reportEmailAddress;
 
     @Inject
     public MonitoringService( HazelcastInstance hazelcast, ConductorConfiguration conductorConfig ) {
         this.services = hazelcast.getMap( Maps.CONDUCTOR_MANAGED_SERVICES );
-        this.hazelcastInstance = hazelcast;
         this.reportEmailAddress = conductorConfig.getReportEmailAddress();
     }
 
     @Scheduled(
         fixedRate = 30000 )
     public void check() throws IOException {
-        services.executeOnEntries( new MonitoringServiceEntryProcessor( hazelcastInstance, reportEmailAddress ) );
+        services.executeOnEntries( new MonitoringServiceEntryProcessor( reportEmailAddress ) );
     }
 
 }
