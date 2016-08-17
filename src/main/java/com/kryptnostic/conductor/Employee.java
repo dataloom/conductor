@@ -51,6 +51,17 @@ public class Employee {
         this.dept = dept;
         this.salary = CONVERTER.parse( salary ).intValue();
     }
+    
+    public Employee(
+            String name,
+            String title,
+            String dept,
+             int salary ) {
+        this.name = name;
+        this.title = title;
+        this.dept = dept;
+        this.salary = salary;
+    }
 
     @JsonProperty( "name" )
     public String getName() {
