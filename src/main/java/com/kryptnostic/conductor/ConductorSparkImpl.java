@@ -37,6 +37,7 @@ public class ConductorSparkImpl implements ConductorSparkApi {
                 e.getAs( "title" ),
                 e.getAs( "salary" ) ) ).collect();
         highlyPaidEmps.forEach( e -> logger.info( e ) );
+        
         return Lists.newArrayList( emps.javaRDD().map( e -> new Employee(
                 e.getAs( "name" ),
                 e.getAs( "dept" ),
