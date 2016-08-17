@@ -17,7 +17,7 @@ cassandra:
         - "127.0.0.1"
         
 hazelcast:
-    server: false
+    server: true
     group: "local"
     password: "trumpisboss"
     seed-nodes: 

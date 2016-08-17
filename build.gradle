@@ -26,12 +26,27 @@ run {
   }
 }
 
+configurations {
+    provided
+}
+
+sourceSets {
+    main.compileClasspath += configurations.provided
+    test.compileClasspath += configurations.provided
+    test.runtimeClasspath += configurations.provided
+}
+
+ext.spark_version='1.6.0'
+ext.spark_cassandra_connector_version='1.6.0-M1'
+ext.jackson_version='2.6.5'
 dependencies {  
-    /*
-     * TESTING
-     */
-     testCompile "junit:junit:${junit_version}"
-     testCompile "org.mockito:mockito-all:${mockito_version}"
+    compile  "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${jackson_version}"
+    compile "com.datastax.spark:spark-cassandra-connector-java_2.11:${spark_cassandra_connector_version}"
+    compile "org.apache.spark:spark-core_2.11:${spark_version}"
+    compile "org.apache.spark:spark-sql_2.11:${spark_version}"
+    compile "org.apache.spark:spark-mllib_2.11:${spark_version}"
+    compile "org.apache.spark:spark-graphx_2.11:${spark_version}"
+    compile "org.apache.spark:spark-streaming_2.11:${spark_version}"
 
     if( project.hasProperty('developmentMode') && project.developmentMode ) {
         logger.quiet(project.name + " using project dependencies.")
@@ -44,6 +59,12 @@ dependencies {
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
         compile "com.kryptnostic:kryptnostic-conductor-client:${conductor_client_version}"
     }
+    /*
+     * TESTING
+     */
+     testCompile "junit:junit:${junit_version}"
+     testCompile "org.mockito:mockito-all:${mockito_version}"
+
 }
 
 test {
@@ -68,3 +89,5 @@ eclipse {
     ext.sourceCompatibility=JavaVersion.VERSION_1_8
     ext.targetCompatibility=JavaVersion.VERSION_1_8
 }
+
+eclipse.classpath.plusConfigurations += [configurations.provided] 
