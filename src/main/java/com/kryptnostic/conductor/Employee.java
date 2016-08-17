@@ -1,6 +1,7 @@
 package com.kryptnostic.conductor;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -14,7 +15,9 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 @JsonPropertyOrder( { "name", "title", "dept", "salary" } )
-public class Employee {
+public class Employee implements Serializable {
+    private static final long serialVersionUID = 8066356339798185695L;
+
     public static class EmployeeCsvReader {
         private static final transient CsvMapper mapper = new CsvMapper();
         private static final transient CsvSchema schema = mapper.schemaFor( Employee.class );
