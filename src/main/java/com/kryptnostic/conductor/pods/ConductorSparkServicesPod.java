@@ -16,7 +16,7 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 
 @Configuration
-public class ConductorServicesPod {
+public class ConductorSparkServicesPod {
 
     @Inject
     private HazelcastInstance    hazelcastInstance;
@@ -28,19 +28,5 @@ public class ConductorServicesPod {
     public ObjectMapper defaultObjectMapper() {
         return ObjectMapperRegistry.getJsonMapper();
     }
-
-    @Bean
-    public ServiceRegistrationService getServiceRegistrationService() {
-        return new ServiceRegistrationService( hazelcastInstance );
-    }
-
-    @Bean
-    public ConductorConfiguration getConductorConfiguration() throws IOException {
-        return configurationService.getConfiguration( ConductorConfiguration.class );
-    }
-
-    @Bean
-    public MonitoringService monitoringService() throws IOException {
-        return new MonitoringService( hazelcastInstance, getConductorConfiguration() );
-    }
+    
 }

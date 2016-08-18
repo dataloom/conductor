@@ -13,7 +13,7 @@ import org.springframework.beans.BeansException;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.kryptnostic.conductor.Conductor;
+import com.kryptnostic.conductor.ConductorOld;
 import com.kryptnostic.conductor.orchestra.MonitoringService;
 import com.kryptnostic.conductor.orchestra.ServiceRegistrationService;
 import com.kryptnostic.conductor.v1.objects.ServiceDescriptor;
@@ -25,7 +25,7 @@ public class ConductorTests {
     private final static Logger                       logger            = LoggerFactory
                                                                                 .getLogger( ConductorTests.class );
     private static final String                       pingbackUrl       = "http://localhost:8085/conductor/monitoring/health";
-    private static Conductor                          conductor         = null;
+    private static ConductorOld                          conductor         = null;
     private static ServiceRegistrationService         srs               = null;
     private static IMap<String, ServiceDescriptorSet> services          = null;
     private static ServiceDescriptor                  serviceDescriptor = null;

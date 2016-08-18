@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.kryptnostic.conductor.ConductorConfiguration;
+import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.v1.objects.ServiceDescriptorSet;
 import com.kryptnostic.conductor.v1.processors.MonitoringServiceEntryProcessor;
 import com.kryptnostic.mapstores.v1.constants.HazelcastNames.Maps;
