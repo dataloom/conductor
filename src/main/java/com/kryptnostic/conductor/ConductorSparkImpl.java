@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.kryptnostic.conductor.rpc.ConductorSparkApi;
+import com.kryptnostic.conductor.rpc.Employee;
 
 public class ConductorSparkImpl implements ConductorSparkApi {
     private static final Logger    logger = LoggerFactory.getLogger( ConductorSparkImpl.class );

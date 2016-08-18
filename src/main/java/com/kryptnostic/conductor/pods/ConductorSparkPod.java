@@ -5,8 +5,8 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.kryptnostic.conductor.ConductorSparkApi;
 import com.kryptnostic.conductor.ConductorSparkImpl;
+import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 
 @Configuration
 public class ConductorSparkPod {

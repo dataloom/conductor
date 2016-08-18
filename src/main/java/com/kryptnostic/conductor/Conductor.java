@@ -6,13 +6,15 @@ import java.util.concurrent.Future;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
-import com.kryptnostic.conductor.pods.ConductorStreamSerializers;
+import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
+import com.kryptnostic.conductor.rpc.ConductorCall;
+import com.kryptnostic.conductor.rpc.Employee;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 
 public class Conductor extends RhizomeApplicationServer {
     public Conductor() {
         super();
-        intercrop( ConductorSparkPod.class, ConductorStreamSerializers.class );
+        intercrop( ConductorSparkPod.class, ConductorStreamSerializersPod.class );
     }
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
