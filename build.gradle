@@ -3,6 +3,10 @@
 * 	version is defined in kryptnostic-gradles/kryptnostic.gradle
 */
 
+plugins {
+    id 'com.palantir.docker' version '0.8.0'
+}
+
 description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
 ext.projectName = "kryptnostic-conductor"
@@ -13,6 +17,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "jacoco"
 
+apply from: "http://api.krypt.int/gradle/docker.gradle"
 apply from: "http://api.krypt.int/gradle/kryptnostic.gradle"
 
 mainClassName = "com.kryptnostic.conductor.Conductor"
