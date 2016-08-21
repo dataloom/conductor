@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.LambdaStreamSerializer;
+import com.kryptnostic.conductor.rpc.serializers.CallableStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.EmployeeStreamSerializer;
 
@@ -15,13 +16,19 @@ public class ConductorStreamSerializersPod {
     @Inject
     private ConductorSparkApi api;
 
-    @Bean 
+    @Bean
     public LambdaStreamSerializer lss() {
         return new LambdaStreamSerializer();
     }
+
     @Bean
     public ConductorCallStreamSerializer ccss() {
         return new ConductorCallStreamSerializer( api );
+    }
+
+    @Bean
+    public CallableStreamSerializer css() {
+        return new CallableStreamSerializer();
     }
 
     @Bean

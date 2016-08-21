@@ -1,26 +1,42 @@
 package com.kryptnostic.conductor.pods;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.kryptnostic.conductor.ConductorSparkImpl;
+import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
+import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
+import com.kryptnostic.sparks.ConductorSparkImpl;
 
 @Configuration
 public class ConductorSparkPod {
+    // TODO: Hack to avoid circular dependency... need to move Spark Jars config into rhizome.yaml
+    ConductorConfiguration conductorConfiguration = ConfigurationService.StaticLoader
+            .loadConfiguration( ConductorConfiguration.class );
+    String[]           sparkMasters           = new String[]{  "mjolnir:7077" , "mjolnir.local:7077", "localhost:7077" };
+
     @Bean
     public SparkConf sparkConf() {
-        return new SparkConf().setAppName( "Kryptnostic Spark Datastore" )
-                .setMaster( "local" );
+        StringBuilder sparkMasterUrlBuilder = new StringBuilder( "spark://" );
+        for( int i = 0 ;i < sparkMasters.length ; ) {
+            sparkMasterUrlBuilder.append(sparkMasters[i]).append(i++ == sparkMasters.length ? "" : ",");
+        }
+
+        return new SparkConf().setAppName( "Kryptnostic Spark Conductor" )
+                .setMaster( sparkMasterUrlBuilder.toString())
+                .setJars( conductorConfiguration.getSparkJars() );
     }
-    
+
     @Bean
     public JavaSparkContext javaSparkContext() {
         return new JavaSparkContext( sparkConf() );
     }
-    
+
     @Bean
     public ConductorSparkApi api() {
         return new ConductorSparkImpl( javaSparkContext() );
