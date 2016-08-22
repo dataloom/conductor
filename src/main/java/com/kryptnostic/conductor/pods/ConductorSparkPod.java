@@ -1,8 +1,5 @@
 package com.kryptnostic.conductor.pods;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.springframework.context.annotation.Bean;
