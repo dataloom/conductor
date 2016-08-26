@@ -30,9 +30,9 @@ public class Conductor extends RhizomeApplicationServer {
         Conductor c = new Conductor();
         c.sprout();
         HazelcastInstance hazelcast = c.getContext().getBean( HazelcastInstance.class );
-        Future<List<Employee>> emps = hazelcast.getExecutorService( "default" ).submit( Lambdas.getEmployees() );
+//        Future<List<Employee>> emps = hazelcast.getExecutorService( "default" ).submit( Lambdas.getEmployees() );
 
-        System.out.println( "Received back " + emps.get().size() + " employees");
+//        System.out.println( "Received back " + emps.get().size() + " employees");
     }
 
     public static VoidFunction<String> bullshit() {
