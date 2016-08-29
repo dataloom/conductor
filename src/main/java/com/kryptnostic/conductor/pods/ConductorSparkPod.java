@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
+import com.kryptnostic.conductor.rpc.odata.DatastoreConstants;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.SparkAuthorizationManager;
@@ -38,6 +39,9 @@ public class ConductorSparkPod {
 
     @Bean
     public ConductorSparkApi api() {
-        return new ConductorSparkImpl( javaSparkContext(), new SparkAuthorizationManager() );
+        return new ConductorSparkImpl(
+                DatastoreConstants.KEYSPACE,
+                javaSparkContext(),
+                new SparkAuthorizationManager() );
     }
 }
