@@ -57,13 +57,13 @@ dependencies {
         compile project(":rhizome")
         compile project(":kryptnostic-mapstores")
         compile project(":kryptnostic-conductor-client")
-        //compile project(":kindling")
+        compile project(":kindling")
     } else {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
         compile "com.kryptnostic:kryptnostic-mapstores:${mapstores_version}"
         compile "com.kryptnostic:kryptnostic-conductor-client:${conductor_client_version}"
-        //compile "com.kryptnostic:kindling:${kindling_version}"
+        compile "com.kryptnostic:kindling:${kindling_version}"
     }
     /*
      * TESTING
@@ -76,16 +76,6 @@ dependencies {
 test {
     systemProperty 'java.library.path','lib/centos:lib/macosx:/usr/lib64'
     jvmArgs '-Djava.library.path=./lib/centos:./lib/macosx:/usr/lib64'
-}
-
-task sourcesJar(type : Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn:javadoc) {
-  classifier = 'javadoc'
-  from javadoc.destinationDir
 }
 
 eclipse {
