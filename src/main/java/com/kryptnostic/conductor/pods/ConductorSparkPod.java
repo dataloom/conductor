@@ -1,7 +1,12 @@
 package com.kryptnostic.conductor.pods;
 
+import com.datastax.spark.connector.japi.CassandraJavaUtil;
+import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
+import com.google.common.base.Optional;
+import com.kryptnostic.rhizome.datacenter.DockerInfoService;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.cassandra.CassandraSQLContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +34,9 @@ public class ConductorSparkPod {
 
         return new SparkConf().setAppName( "Kryptnostic Spark Conductor" )
                 .setMaster( sparkMasterUrlBuilder.toString() )
-                .setJars( conductorConfiguration.getSparkJars() );
+                .setJars( conductorConfiguration.getSparkJars() )
+                .set("spark.cassdra.connection.host",
+                        DockerInfoService.getContainerIPsWithTag( "cassandra", Optional.of( "host" ) ).iterator().next() );
     }
 
     @Bean
@@ -38,10 +45,22 @@ public class ConductorSparkPod {
     }
 
     @Bean
+    public CassandraSQLContext cassandraSQLContext() {
+        return new CassandraSQLContext(javaSparkContext().sc());
+    }
+
+    @Bean
+    public SparkContextJavaFunctions sparkContextJavaFunctions() {
+        return CassandraJavaUtil.javaFunctions( javaSparkContext() );
+    }
+
+    @Bean
     public ConductorSparkApi api() {
         return new ConductorSparkImpl(
                 DatastoreConstants.KEYSPACE,
                 javaSparkContext(),
+                cassandraSQLContext(),
+                sparkContextJavaFunctions(),
                 new SparkAuthorizationManager() );
     }
 }
