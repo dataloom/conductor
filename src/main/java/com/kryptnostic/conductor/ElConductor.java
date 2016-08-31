@@ -1,26 +1,11 @@
 package com.kryptnostic.conductor;
 
-import java.util.List;
-
-import com.datastax.spark.connector.japi.CassandraJavaUtil;
-import com.google.common.base.Optional;
-import com.kryptnostic.conductor.rpc.QueryResult;
-import com.kryptnostic.rhizome.datacenter.DockerInfoService;
-import com.kryptnostic.sparks.ConductorSparkImpl;
-import com.kryptnostic.sparks.SparkAuthorizationManager;
-import com.kryptnostic.types.services.EdmManager;
-import com.kryptnostic.types.services.EdmService;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.DataFrame;
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.cassandra.CassandraSQLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.kryptnostic.conductor.rpc.Employee;
 
 public class ElConductor {
     private static final Logger logger = LoggerFactory.getLogger( ElConductor.class );
