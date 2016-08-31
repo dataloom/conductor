@@ -17,6 +17,7 @@ import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.SparkAuthorizationManager;
 
 import javax.inject.Inject;
+import java.util.stream.Collectors;
 
 @Configuration
 public class ConductorSparkPod {
@@ -39,7 +40,9 @@ public class ConductorSparkPod {
         return new SparkConf().setAppName("Kryptnostic Spark Conductor")
                 .setMaster(sparkMasterUrlBuilder.toString())
                 .setJars(conductorConfiguration.getSparkJars())
-                .set("spark.cassdra.connection.host", cassandraConfiguration.getCassandraSeedNodes().iterator().next().getHostAddress() );
+                .set( "spark.cassandra.connection.host", cassandraConfiguration.getCassandraSeedNodes().stream()
+                        .map( host -> host.getHostAddress() ).collect(Collectors.joining( "," ) ) )
+                .set( "spark.cassandra.connection.port", Integer.toString( 9042 ) );
     }
 
     @Bean
