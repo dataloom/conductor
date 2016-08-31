@@ -17,6 +17,7 @@ import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.SparkAuthorizationManager;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -33,10 +34,8 @@ public class ConductorSparkPod {
     @Bean
     public SparkConf sparkConf() {
         StringBuilder sparkMasterUrlBuilder = new StringBuilder("spark://");
-        for (int i = 0; i < sparkMasters.length; ) {
-            sparkMasterUrlBuilder.append(sparkMasters[i]).append(i++ == sparkMasters.length ? "" : ",");
-        }
-
+        String sparkMastersAsString = Arrays.asList( sparkMasters ).stream().collect( Collectors.joining( "," ) );
+        sparkMasterUrlBuilder.append( sparkMastersAsString );
         return new SparkConf().setAppName("Kryptnostic Spark Conductor")
                 .setMaster(sparkMasterUrlBuilder.toString())
                 .setJars(conductorConfiguration.getSparkJars())
