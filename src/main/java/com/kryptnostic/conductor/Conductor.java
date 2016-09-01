@@ -5,6 +5,7 @@ import com.kryptnostic.conductor.pods.ConductorSparkPod;
 import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
 import com.kryptnostic.conductor.rpc.Lambdas;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
+import com.kryptnostic.rhizome.pods.CassandraPod;
 import org.apache.spark.api.java.function.VoidFunction;
 import com.kryptnostic.conductor.rpc.Employee;
 
@@ -23,7 +24,7 @@ import java.util.concurrent.Future;
 public class Conductor extends RhizomeApplicationServer {
     public Conductor() {
         super();
-        intercrop( ConductorSparkPod.class, ConductorStreamSerializersPod.class );
+        intercrop( ConductorSparkPod.class, ConductorStreamSerializersPod.class, CassandraPod.class );
     }
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
