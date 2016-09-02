@@ -24,39 +24,39 @@ import java.util.stream.Collectors;
 public class ConductorSparkPod {
     // TODO: Hack to avoid circular dependency... need to move Spark Jars config into rhizome.yaml
     ConductorConfiguration conductorConfiguration = ConfigurationService.StaticLoader
-            .loadConfiguration(ConductorConfiguration.class);
-    String[] sparkMasters = new String[]{"mjolnir:7077", "mjolnir.local:7077",
-            "localhost:7077"};
+            .loadConfiguration( ConductorConfiguration.class );
+    String[]               sparkMasters           = new String[] { "mjolnir:7077", "mjolnir.local:7077",
+            "localhost:7077" };
 
     @Inject
     private CassandraConfiguration cassandraConfiguration;
 
     @Bean
     public SparkConf sparkConf() {
-        StringBuilder sparkMasterUrlBuilder = new StringBuilder("spark://");
+        StringBuilder sparkMasterUrlBuilder = new StringBuilder( "spark://" );
         String sparkMastersAsString = Arrays.asList( sparkMasters ).stream().collect( Collectors.joining( "," ) );
         sparkMasterUrlBuilder.append( sparkMastersAsString );
-        return new SparkConf().setAppName("Kryptnostic Spark Conductor")
-                .setMaster(sparkMasterUrlBuilder.toString())
-                .setJars(conductorConfiguration.getSparkJars())
+        return new SparkConf().setAppName( "Kryptnostic Spark Conductor" )
+                .setMaster( sparkMasterUrlBuilder.toString() )
+                .setJars( conductorConfiguration.getSparkJars() )
                 .set( "spark.cassandra.connection.host", cassandraConfiguration.getCassandraSeedNodes().stream()
-                        .map( host -> host.getHostAddress() ).collect(Collectors.joining( "," ) ) )
+                        .map( host -> host.getHostAddress() ).collect( Collectors.joining( "," ) ) )
                 .set( "spark.cassandra.connection.port", Integer.toString( 9042 ) );
     }
 
     @Bean
     public JavaSparkContext javaSparkContext() {
-        return new JavaSparkContext(sparkConf());
+        return new JavaSparkContext( sparkConf() );
     }
 
     @Bean
     public CassandraSQLContext cassandraSQLContext() {
-        return new CassandraSQLContext(javaSparkContext().sc());
+        return new CassandraSQLContext( javaSparkContext().sc() );
     }
 
     @Bean
     public SparkContextJavaFunctions sparkContextJavaFunctions() {
-        return CassandraJavaUtil.javaFunctions(javaSparkContext());
+        return CassandraJavaUtil.javaFunctions( javaSparkContext() );
     }
 
     @Bean
@@ -66,6 +66,6 @@ public class ConductorSparkPod {
                 javaSparkContext(),
                 cassandraSQLContext(),
                 sparkContextJavaFunctions(),
-                new SparkAuthorizationManager());
+                new SparkAuthorizationManager() );
     }
 }
