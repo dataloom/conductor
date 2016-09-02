@@ -5,6 +5,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.datastax.driver.core.Session;
+import com.datastax.driver.mapping.MappingManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.datastore.services.CassandraTableManager;
+import com.kryptnostic.datastore.services.EdmManager;
+import com.kryptnostic.datastore.services.EdmService;
+import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.cassandra.CassandraSQLContext;
@@ -24,13 +32,44 @@ import com.kryptnostic.sparks.SparkAuthorizationManager;
 @Configuration
 public class ConductorSparkPod {
     // TODO: Hack to avoid circular dependency... need to move Spark Jars config into rhizome.yaml
-    ConductorConfiguration         conductorConfiguration = ConfigurationService.StaticLoader
+    ConductorConfiguration conductorConfiguration = ConfigurationService.StaticLoader
             .loadConfiguration( ConductorConfiguration.class );
-    String[]                       sparkMasters           = new String[] { "mjolnir:7077", "mjolnir.local:7077",
+    String[]               sparkMasters           = new String[] { "mjolnir:7077", "mjolnir.local:7077",
             "localhost:7077" };
 
     @Inject
     private CassandraConfiguration cassandraConfiguration;
+
+    @Inject
+    private Session session;
+
+    @Inject
+    private HazelcastInstance hazelcastInstance;
+
+    @Bean
+    public ObjectMapper defaultObjectMapper() {
+        return ObjectMapperRegistry.getJsonMapper();
+    }
+
+    @Bean
+    public MappingManager mappingManager() {
+        return new MappingManager( session );
+    }
+
+    @Bean
+    public CassandraTableManager tableManager() {
+        return new CassandraTableManager(
+                hazelcastInstance,
+                DatastoreConstants.KEYSPACE,
+                session,
+                mappingManager()
+        );
+    }
+
+    @Bean
+    public EdmManager dataModelService() {
+        return new EdmService( session, mappingManager(), tableManager() );
+    }
 
     @Bean
     public SparkConf sparkConf() {
@@ -67,6 +106,8 @@ public class ConductorSparkPod {
                 javaSparkContext(),
                 cassandraSQLContext(),
                 sparkContextJavaFunctions(),
+                tableManager(),
+                dataModelService(),
                 new SparkAuthorizationManager() );
     }
 }
