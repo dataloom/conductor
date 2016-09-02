@@ -1,31 +1,32 @@
 package com.kryptnostic.conductor.pods;
 
-import com.datastax.spark.connector.japi.CassandraJavaUtil;
-import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
-import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.cassandra.CassandraSQLContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.datastax.spark.connector.japi.CassandraJavaUtil;
+import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.odata.DatastoreConstants;
+import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.SparkAuthorizationManager;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 @Configuration
 public class ConductorSparkPod {
     // TODO: Hack to avoid circular dependency... need to move Spark Jars config into rhizome.yaml
-    ConductorConfiguration conductorConfiguration = ConfigurationService.StaticLoader
+    ConductorConfiguration         conductorConfiguration = ConfigurationService.StaticLoader
             .loadConfiguration( ConductorConfiguration.class );
-    String[]               sparkMasters           = new String[] { "mjolnir:7077", "mjolnir.local:7077",
+    String[]                       sparkMasters           = new String[] { "mjolnir:7077", "mjolnir.local:7077",
             "localhost:7077" };
 
     @Inject
