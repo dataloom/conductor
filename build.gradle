@@ -12,10 +12,6 @@ plugins {
 * 	version is defined in kryptnostic-gradles/kryptnostic.gradle
 */
 
-plugins {
-    id 'com.palantir.docker' version '0.8.0'
-}
-
 description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
 ext.projectName = "kryptnostic-conductor"
