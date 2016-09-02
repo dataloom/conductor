@@ -1,20 +1,16 @@
 plugins {
-    id "application"
-    id "java"
-    id "eclipse"
-    id "idea"
-    id "jacoco"
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+  id 'com.palantir.docker' version '0.8.0'
+  id "application"
+  id "java"
+  id "eclipse"
+  id "idea"
+  id "jacoco"
+  id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 /*
 *	Kryptnostic conductor service
 * 	version is defined in kryptnostic-gradles/kryptnostic.gradle
 */
-
-plugins {
-    id 'com.palantir.docker' version '0.8.0'
-}
-
 description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
 ext.projectName = "kryptnostic-conductor"
@@ -43,7 +39,7 @@ sourceSets {
     test.runtimeClasspath += configurations.provided
 }
 
-dependencies {  
+dependencies {
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${jackson_version}"
     compile "com.datastax.spark:spark-cassandra-connector-java_2.10:${spark_cassandra_connector_version}"
     compile "org.apache.spark:spark-core_2.10:${spark_version}"
@@ -51,7 +47,7 @@ dependencies {
     compile "org.apache.spark:spark-mllib_2.10:${spark_version}"
     compile "org.apache.spark:spark-graphx_2.10:${spark_version}"
     compile "org.apache.spark:spark-streaming_2.10:${spark_version}"
-    
+
     if( project.hasProperty('developmentMode') && project.developmentMode ) {
         logger.quiet(project.name + " using project dependencies.")
         compile project(":rhizome")
@@ -70,7 +66,6 @@ dependencies {
      */
      testCompile "junit:junit:${junit_version}"
      testCompile "org.mockito:mockito-all:${mockito_version}"
-
 }
 
 test {
