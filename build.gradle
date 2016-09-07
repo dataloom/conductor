@@ -29,6 +29,8 @@ run {
   }
 }
 
+run.args = ["cassandra"]
+
 configurations {
     provided
 }
