@@ -1,40 +1,39 @@
 package com.kryptnostic.conductor;
 
-import com.hazelcast.core.HazelcastInstance;
-import com.kryptnostic.conductor.pods.ConductorSparkPod;
-import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
-import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
-import com.kryptnostic.rhizome.pods.CassandraPod;
-import org.apache.spark.api.java.function.VoidFunction;
-
-import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 
+import com.kryptnostic.conductor.pods.ConductorSparkPod;
+import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
+import com.kryptnostic.mapstores.pods.BaseSerializersPod;
+import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
+import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
+import com.kryptnostic.rhizome.pods.CassandraPod;
+import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
+
 /**
- * This class will not run unless ./gradlew :kindling:clean :kindling:build :kindling:shadow --daemon  has been run in super project.
- * You must also download Spark 1.6.2 w/ Hadoop and have a master and slave running locally.
- * Finally you must make sure to update {@link ConductorSparkPod} with your spark master URL.
+ * This class will not run unless ./gradlew :kindling:clean :kindling:build :kindling:shadow --daemon has been run in
+ * super project. You must also download Spark 1.6.2 w/ Hadoop and have a master and slave running locally. Finally you
+ * must make sure to update {@link ConductorSparkPod} with your spark master URL.
  *
  * @author Matthew Tamayo-Rios &lt;matthew@kryptnostic.com&gt;
  */
 public class Conductor extends RhizomeApplicationServer {
+    public static final Class<?>[] rhizomePods   = new Class<?>[] {
+            CassandraPod.class,
+            BaseSerializersPod.class,
+            RegistryBasedHazelcastInstanceConfigurationPod.class };
+
+    public static final Class<?>[] conductorPods = new Class<?>[] {
+            ConductorSparkPod.class,
+            ConductorStreamSerializersPod.class,
+            CassandraPod.class
+    };
+
     public Conductor() {
-        super();
-        intercrop( ConductorSparkPod.class,
-                ConductorStreamSerializersPod.class,
-                CassandraPod.class );
+        super( Pods.concatenate( RhizomeApplicationServer.defaultPods, rhizomePods, conductorPods ) );
     }
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
-        Conductor c = new Conductor();
-        c.sprout();
-        HazelcastInstance hazelcast = c.getContext().getBean( HazelcastInstance.class );
-        //        Future<List<Employee>> emps = hazelcast.getExecutorService( "default" ).submit( Lambdas.getEmployees() );
-
-        //        System.out.println( "Received back " + emps.get().size() + " employees");
-    }
-
-    public static VoidFunction<String> bullshit() {
-        return (VoidFunction<String> & Serializable) l -> System.out.println( l );
+        new Conductor().sprout( args );
     }
 }
