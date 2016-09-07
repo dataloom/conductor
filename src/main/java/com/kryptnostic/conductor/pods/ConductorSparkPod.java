@@ -38,7 +38,7 @@ public class ConductorSparkPod {
     ConductorConfiguration         conductorConfiguration = ConfigurationService.StaticLoader
             .loadConfiguration( ConductorConfiguration.class );
     String[]                       sparkMasters           = new String[] { "mjolnir:7077", "mjolnir.local:7077",
-            "localhost:7077" };
+            "localhost:7077", "cassandra:7077"};
 
     @Inject
     private CassandraConfiguration cassandraConfiguration;
