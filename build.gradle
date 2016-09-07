@@ -18,7 +18,7 @@ ext.projectName = "kryptnostic-conductor"
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptnostic.gradle"
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/docker.gradle"
 
-mainClassName = "com.kryptnostic.conductor.ElConductor"
+mainClassName = "com.kryptnostic.conductor.Conductor"
 applicationDefaultJvmArgs = ["-Xmx1G","-Xms1G","-server"]
 sourceCompatibility=JavaVersion.VERSION_1_8
 targetCompatibility=JavaVersion.VERSION_1_8
