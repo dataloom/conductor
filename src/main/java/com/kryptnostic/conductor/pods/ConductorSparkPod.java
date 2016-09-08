@@ -14,13 +14,11 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
-import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.odata.DatastoreConstants;
 import com.kryptnostic.datastore.services.CassandraTableManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
-import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import com.kryptnostic.sparks.ConductorSparkImpl;
@@ -29,9 +27,6 @@ import com.kryptnostic.sparks.SparkAuthorizationManager;
 @Configuration
 @Import( SparkPod.class )
 public class ConductorSparkPod {
-    // TODO: Hack to avoid circular dependency... need to move Spark Jars config into rhizome.yaml
-    ConductorConfiguration         conductorConfiguration = ConfigurationService.StaticLoader
-            .loadConfiguration( ConductorConfiguration.class );
 
     @Inject
     private Session                session;
