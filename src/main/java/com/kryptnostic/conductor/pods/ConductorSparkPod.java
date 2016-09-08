@@ -78,6 +78,8 @@ public class ConductorSparkPod {
                 javaSparkContext,
                 cassandraSQLContext(),
                 sparkContextJavaFunctions(),
+                tableManager(),
+                dataModelService(),
                 new SparkAuthorizationManager() );
     }
 }
