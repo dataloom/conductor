@@ -18,3 +18,11 @@ hazelcast:
     password: "trumpisboss"
     seed-nodes: 
         - "conductor"
+
+spark:
+    appName: "Kryptnostic Spark Conductor"
+    port: 7077
+    jars:
+        - "./jars"
+    master:
+        - "spark"
