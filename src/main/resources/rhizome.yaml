@@ -18,3 +18,12 @@ hazelcast:
     password: "trumpisboss"
     seed-nodes: 
         - "conductor"
+
+spark:
+    appName: "Kryptnostic Spark Conductor"
+    port: 7077
+    jars:
+      - "../kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
+      - "./kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
+    master:
+        - "spark"
