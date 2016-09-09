@@ -20,7 +20,7 @@ hazelcast:
         - "conductor"
 
 spark:
-    appName: "Kryptnostic Spark Conductor"
+    appname: "Kryptnostic Spark Conductor"
     port: 7077
     jars:
       - "../kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
