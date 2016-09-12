@@ -35,5 +35,6 @@ public class Conductor extends RhizomeApplicationServer {
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
         new Conductor().sprout( args );
+        System.out.println( "WE DID IT!\n\n\n\n\n MISSION ACCOMPLISHED!!!" );
     }
 }
