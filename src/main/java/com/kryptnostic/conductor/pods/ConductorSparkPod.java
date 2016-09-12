@@ -2,6 +2,7 @@ package com.kryptnostic.conductor.pods;
 
 import javax.inject.Inject;
 
+import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.cassandra.CassandraSQLContext;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,11 @@ public class ConductorSparkPod {
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return ObjectMapperRegistry.getJsonMapper();
+    }
+
+    @Bean
+    public FullQualifiedNameTypeCodec fullQualifiedNameTypeCodec() {
+        return new FullQualifiedNameTypeCodec();
     }
 
     @Bean
