@@ -69,7 +69,7 @@ public class ConductorSparkPod {
 
     @Bean
     public SQLContext cassandraSQLContext() {
-        return new SQLContext( javaSparkContext.sc() );
+        return SQLContext.getOrCreate( javaSparkContext.sc() );
     }
 
     @Bean
