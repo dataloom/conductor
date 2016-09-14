@@ -15,8 +15,6 @@ ADD $NAME-$VERSION.tgz /opt
 COPY rhizome.yaml /opt
 COPY rhizome.yaml.prod /opt
 
-RUN ls -la /opt
-
 RUN cd /opt/$NAME-$VERSION/lib \
   && mv /opt/rhizome.yaml$TARGET ./rhizome.yaml \
   && jar vfu $NAME-$VERSION.jar rhizome.yaml \
