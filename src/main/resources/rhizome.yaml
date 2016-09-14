@@ -26,4 +26,4 @@ spark:
       - "../kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
       - "./kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
     master:
-        - "spark"
+        - "local[2]"
