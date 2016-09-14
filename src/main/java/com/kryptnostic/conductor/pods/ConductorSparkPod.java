@@ -2,9 +2,8 @@ package com.kryptnostic.conductor.pods;
 
 import javax.inject.Inject;
 
-import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.cassandra.CassandraSQLContext;
+import org.apache.spark.sql.SQLContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -15,6 +14,7 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.odata.DatastoreConstants;
 import com.kryptnostic.datastore.services.CassandraTableManager;
@@ -68,8 +68,8 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public CassandraSQLContext cassandraSQLContext() {
-        return new CassandraSQLContext( javaSparkContext.sc() );
+    public SQLContext cassandraSQLContext() {
+        return SQLContext.getOrCreate( javaSparkContext.sc() );
     }
 
     @Bean
