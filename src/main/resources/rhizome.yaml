@@ -10,14 +10,14 @@ cassandra:
     keyspace: "sparks"
     replication-factor: 2
     seed-nodes:
-        - "cassandra"
+        - "localhost"
 
 hazelcast:
     server: true
     group: "local"
     password: "trumpisboss"
     seed-nodes: 
-        - "conductor"
+        - "localhost"
 
 spark:
     appname: "Kryptnostic Spark Conductor"
@@ -26,4 +26,5 @@ spark:
       - "../kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
       - "./kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
     master:
-        - "local[2]"
+        - "local"
+#        - "local[2]"

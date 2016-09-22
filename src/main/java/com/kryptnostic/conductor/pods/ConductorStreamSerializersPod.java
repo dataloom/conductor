@@ -2,6 +2,8 @@ package com.kryptnostic.conductor.pods;
 
 import javax.inject.Inject;
 
+import com.datastax.driver.core.Session;
+import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +18,10 @@ public class ConductorStreamSerializersPod {
     @Inject
     private ConductorSparkApi api;
 
+    @Inject
+
+    private Session session;
+
     @Bean
     public LambdaStreamSerializer lss() {
         return new LambdaStreamSerializer();
@@ -27,12 +33,7 @@ public class ConductorStreamSerializersPod {
     }
 
     @Bean
-    public CallableStreamSerializer css() {
-        return new CallableStreamSerializer();
-    }
-
-    @Bean
-    public EmployeeStreamSerializer ess() {
-        return new EmployeeStreamSerializer();
+    public QueryResultStreamSerializer qrss() {
+        return new QueryResultStreamSerializer( session );
     }
 }
