@@ -1,21 +1,14 @@
 package com.kryptnostic.conductor.pods;
 
-import javax.inject.Inject;
-
+import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.LambdaStreamSerializer;
-import com.kryptnostic.conductor.rpc.serializers.CallableStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
-import com.kryptnostic.conductor.rpc.serializers.EmployeeStreamSerializer;
 
 @Configuration
 public class ConductorStreamSerializersPod {
-    @Inject
-    private ConductorSparkApi api;
-
     @Bean
     public LambdaStreamSerializer lss() {
         return new LambdaStreamSerializer();
@@ -23,16 +16,11 @@ public class ConductorStreamSerializersPod {
 
     @Bean
     public ConductorCallStreamSerializer ccss() {
-        return new ConductorCallStreamSerializer( api );
+        return new ConductorCallStreamSerializer( null );
     }
 
     @Bean
-    public CallableStreamSerializer css() {
-        return new CallableStreamSerializer();
-    }
-
-    @Bean
-    public EmployeeStreamSerializer ess() {
-        return new EmployeeStreamSerializer();
+    public QueryResultStreamSerializer qrss() {
+        return new QueryResultStreamSerializer( null );
     }
 }
