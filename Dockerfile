@@ -1,8 +1,7 @@
 FROM openjdk:8u102-jdk
 
-RUN apt-get install wget \
-    && wget https://github.com/jwilder/dockerize/releases/download/v0.2.0/dockerize-linux-amd64-v0.2.0.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.2.0.tar.gz
+RUN wget https://kodex.im/kindling/kindling-0.0.0-SNAPSHOT-all.jar \
+  && mv kindling-0.0.0-SNAPSHOT-all.jar /jars
 
 ARG IMAGE_NAME
 ARG IMG_VER
@@ -20,6 +19,7 @@ RUN cd /opt/$NAME-$VERSION/lib \
   && jar vfu $NAME-$VERSION.jar rhizome.yaml \
   && rm /opt/rhizome.yaml*
 
-CMD dockerize -wait tcp://cassandra:9042 -timeout 300s; /opt/$NAME-$VERSION/bin/$NAME cassandra spark
+RUN mkdir -p /sparkWorkingDir && \
+  mkdir -p /spark-warehouse
 
-EXPOSE 5701
+CMD /opt/$NAME-$VERSION/bin/$NAME cassandra spark
