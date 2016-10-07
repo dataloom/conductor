@@ -7,6 +7,10 @@ enable-persistence:  false
 session-clustering-enabled: false
 
 cassandra:
+    provider: "aws"
+    region: "us-west-2"
+    node-tag-key: "cassandra-node-type"
+    node-tag-value: "seed"
     keyspace: "sparks"
     replication-factor: 2
     seed-nodes:
@@ -23,8 +27,12 @@ spark:
     appname: "Kryptnostic Spark Conductor"
     port: 7077
     local: false
+    provider: "aws"
+    region: "us-west-2"
+    node-tag-key: "spark-node-type"
+    node-tag-value: "MASTER"
     jars:
-      - "../kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
-      - "./kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
+      - "/kindling/kindling-0.0.0-SNAPSHOT-all.jar"
+      - "/jars/kindling-0.0.0-SNAPSHOT-all.jar"
     master:
         - "superman"
