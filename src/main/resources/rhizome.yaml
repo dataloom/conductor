@@ -15,7 +15,7 @@ cassandra:
 hazelcast:
     server: true
     group: "local"
-    password: "trumpisboss"
+    password: "kryptodoge4life"
     seed-nodes: 
         - "conductor"
 
