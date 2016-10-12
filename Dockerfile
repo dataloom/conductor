@@ -22,4 +22,6 @@ RUN cd /opt/$NAME-$VERSION/lib \
 RUN mkdir -p /sparkWorkingDir && \
   mkdir -p /spark-warehouse
 
+EXPOSE 8080 5701 9890
+
 CMD /opt/$NAME-$VERSION/bin/$NAME cassandra spark
