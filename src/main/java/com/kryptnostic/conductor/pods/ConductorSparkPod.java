@@ -71,7 +71,6 @@ public class ConductorSparkPod {
     @Bean
     public CassandraTableManager tableManager() {
         return new CassandraTableManager(
-                hazelcastInstance,
                 DatastoreConstants.KEYSPACE,
                 session,
                 mappingManager() );
