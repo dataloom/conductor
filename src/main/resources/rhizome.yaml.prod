@@ -26,7 +26,7 @@ hazelcast:
 spark:
     appname: "Kryptnostic Spark Conductor"
     port: 7077
-    local: false
+    local: true
     provider: "aws"
     region: "us-west-2"
     node-tag-key: "spark-node-type"
@@ -35,4 +35,4 @@ spark:
       - "/kindling/kindling-0.0.0-SNAPSHOT-all.jar"
       - "/jars/kindling-0.0.0-SNAPSHOT-all.jar"
     master:
-        - "superman"
+        - "local[8]"
