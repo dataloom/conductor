@@ -16,6 +16,7 @@ import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import com.kryptnostic.datastore.services.CassandraTableManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
+import com.kryptnostic.datastore.services.PermissionsService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import com.kryptnostic.sparks.ConductorSparkImpl;
@@ -77,8 +78,13 @@ public class ConductorSparkPod {
     }
 
     @Bean
+    public PermissionsService permissionsService() {
+        return new PermissionsService( session, tableManager() );
+    }
+    
+    @Bean
     public EdmManager dataModelService() {
-        return new EdmService( session, mappingManager(), tableManager() );
+        return new EdmService( session, mappingManager(), tableManager(), permissionsService() );
     }
 
     @Bean
