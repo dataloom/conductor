@@ -9,12 +9,12 @@ ARG ENV
 
 ENV VERSION=${IMG_VER:-v1.0.0} NAME=${IMAGE_NAME:-derpName} TARGET=${ENV}
 
-ADD $NAME-$VERSION.tgz /opt
+ADD $NAME.tgz /opt
 
 COPY rhizome.yaml /opt
 COPY rhizome.yaml.prod /opt
 
-RUN cd /opt/$NAME-$VERSION/lib \
+RUN cd /opt/$NAME/lib \
   && mv /opt/rhizome.yaml$TARGET ./rhizome.yaml \
   && jar vfu $NAME-$VERSION.jar rhizome.yaml \
   && rm /opt/rhizome.yaml*
@@ -24,4 +24,4 @@ RUN mkdir -p /sparkWorkingDir && \
 
 EXPOSE 8080 5701 9890
 
-CMD /opt/$NAME-$VERSION/bin/$NAME cassandra spark
+CMD /opt/$NAME/bin/$NAME cassandra spark
