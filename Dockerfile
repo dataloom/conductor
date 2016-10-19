@@ -24,4 +24,4 @@ RUN mkdir -p /sparkWorkingDir && \
 
 EXPOSE 8080 5701 9890
 
-CMD ["/opt/conductor/bin/kryptnostic-conductor", "cassandra", "spark"]
+CMD dockerize -wait tcp://cassandra:9042 -timeout 300s; /opt/conductor/bin/kryptnostic-conductor cassandra spark
