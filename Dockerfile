@@ -9,14 +9,14 @@ ARG ENV
 
 ENV VERSION=${IMG_VER:-v1.0.0} NAME=${IMAGE_NAME:-derpName} TARGET=${ENV}
 
-ADD $NAME.tgz /opt
+ADD conductor.tgz /opt
 
 COPY rhizome.yaml /opt
 COPY rhizome.yaml.prod /opt
 
-RUN cd /opt/$NAME/lib \
+RUN cd /opt/conductor/lib \
   && mv /opt/rhizome.yaml$TARGET ./rhizome.yaml \
-  && jar vfu $NAME-$VERSION.jar rhizome.yaml \
+  && jar vfu kryptnostic-conductor-$VERSION.jar rhizome.yaml \
   && rm /opt/rhizome.yaml*
 
 RUN mkdir -p /sparkWorkingDir && \
@@ -24,4 +24,4 @@ RUN mkdir -p /sparkWorkingDir && \
 
 EXPOSE 8080 5701 9890
 
-CMD /opt/$NAME/bin/$NAME cassandra spark
+CMD ["/opt/conductor/bin/kryptnostic-conductor", "cassandra", "spark"]
