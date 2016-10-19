@@ -79,7 +79,7 @@ public class ConductorSparkPod {
 
     @Bean
     public PermissionsService permissionsService() {
-        return new PermissionsService( session, tableManager() );
+        return new PermissionsService( session, mappingManager(), tableManager() );
     }
     
     @Bean
