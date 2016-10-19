@@ -3,27 +3,25 @@ FROM openjdk:8u102-jdk
 RUN wget https://kodex.im/kindling/kindling-0.0.0-SNAPSHOT-all.jar \
   && mv kindling-0.0.0-SNAPSHOT-all.jar /jars
 
-EXPOSE 8080 5701 9890
+ARG IMAGE_NAME
+ARG IMG_VER
+ARG ENV
 
-WORKDIR /codeBuild
+ENV VERSION=${IMG_VER:-v1.0.0} NAME=${IMAGE_NAME:-derpName} TARGET=${ENV}
 
-COPY . ./
+ADD $NAME-$VERSION.tgz /opt
 
-RUN git fetch --depth=10000
+COPY rhizome.yaml /opt
+COPY rhizome.yaml.prod /opt
 
-RUN ./gradlew distTar; cp src/main/resources/rhizome.yaml.prod /opt/rhizome.yaml; mv build/distributions/conductor.tgz /opt
-
-ADD conductor-$VERSION.tgz /opt
-
-RUN tar -xzvf /opt/conductor.tgz -C /opt \
-  && cd /opt/conductor/lib \
-  && mv /opt/rhizome.yaml ./rhizome.yaml \
-  && DSVER=`ls | grep conductor` \
-  && jar vfu $DSVER rhizome.yaml \
-  && rm /opt/rhizome.yaml \
-  && rm -rf /codeBuild
+RUN cd /opt/$NAME-$VERSION/lib \
+  && mv /opt/rhizome.yaml$TARGET ./rhizome.yaml \
+  && jar vfu $NAME-$VERSION.jar rhizome.yaml \
+  && rm /opt/rhizome.yaml*
 
 RUN mkdir -p /sparkWorkingDir && \
   mkdir -p /spark-warehouse
 
-CMD ["/opt/conductor/bin/conductor", "cassandra", "spark"]
+EXPOSE 8080 5701 9890
+
+CMD /opt/$NAME-$VERSION/bin/$NAME cassandra spark
