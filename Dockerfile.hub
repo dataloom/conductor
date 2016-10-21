@@ -13,8 +13,6 @@ RUN git fetch --depth=10000
 
 RUN ./gradlew distTar; cp src/main/resources/rhizome.yaml.prod /opt/rhizome.yaml; mv build/distributions/conductor.tgz /opt
 
-ADD conductor-$VERSION.tgz /opt
-
 RUN tar -xzvf /opt/conductor.tgz -C /opt \
   && cd /opt/conductor/lib \
   && mv /opt/rhizome.yaml ./rhizome.yaml \
