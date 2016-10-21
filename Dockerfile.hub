@@ -18,7 +18,6 @@ RUN tar -xzvf /opt/conductor.tgz -C /opt \
   && mv /opt/rhizome.yaml ./rhizome.yaml \
   && DSVER=`ls | grep conductor` \
   && jar vfu $DSVER rhizome.yaml \
-  && rm /opt/rhizome.yaml \
   && rm -rf /codeBuild
 
 RUN mkdir -p /sparkWorkingDir && \
