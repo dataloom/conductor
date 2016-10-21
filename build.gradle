@@ -12,7 +12,11 @@ plugins {
 */
 description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
-ext.projectName = "kryptnostic-conductor"
+ext.projectName = "conductor"
+
+distTar {
+  archiveName "conductor.tgz"
+}
 
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptnostic.gradle"
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/docker.gradle"
