@@ -17,6 +17,7 @@ import com.kryptnostic.datastore.services.CassandraTableManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.datastore.services.PermissionsService;
+import com.kryptnostic.datastore.services.ActionAuthorizationService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import com.kryptnostic.sparks.ConductorSparkImpl;
@@ -83,8 +84,13 @@ public class ConductorSparkPod {
     }
     
     @Bean
+    public ActionAuthorizationService authzService() {
+        return new ActionAuthorizationService( permissionsService() );
+    }
+    
+    @Bean
     public EdmManager dataModelService() {
-        return new EdmService( session, mappingManager(), tableManager(), permissionsService() );
+        return new EdmService( session, mappingManager(), tableManager(), authzService(), permissionsService() );
     }
 
     @Bean
