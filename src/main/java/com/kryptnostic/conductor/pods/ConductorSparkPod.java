@@ -106,7 +106,8 @@ public class ConductorSparkPod {
                 sparkContextJavaFunctions(),
                 tableManager(),
                 dataModelService(),
-                new SparkAuthorizationManager());
+                new SparkAuthorizationManager(),
+                authzService() );
         ccss.setConductorSparkApi( api );
         return api;
     }
