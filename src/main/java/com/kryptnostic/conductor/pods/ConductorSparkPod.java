@@ -8,6 +8,7 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.odata.DatastoreConstants;
@@ -17,6 +18,7 @@ import com.kryptnostic.datastore.services.CassandraTableManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.datastore.services.PermissionsService;
+import com.kryptnostic.datastore.Permission;
 import com.kryptnostic.datastore.services.ActionAuthorizationService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
@@ -27,6 +29,9 @@ import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -56,6 +61,11 @@ public class ConductorSparkPod {
     }
 
     @Bean
+    public TypeCodec<Set<String>> setStringCodec() {
+        return TypeCodec.set( TypeCodec.varchar() );
+    }
+    
+    @Bean
     public FullQualifiedNameTypeCodec fullQualifiedNameTypeCodec() {
         return new FullQualifiedNameTypeCodec();
     }
@@ -63,6 +73,16 @@ public class ConductorSparkPod {
     @Bean
     public TypeCodec<EdmPrimitiveTypeKind> edmPrimitiveTypeKindTypeCodec() {
         return new EnumNameCodec<EdmPrimitiveTypeKind>( EdmPrimitiveTypeKind.class );
+    }
+    
+    @Bean
+    public EnumNameCodec<Permission> permissionCodec(){
+        return new EnumNameCodec<>( Permission.class);
+    }
+    
+    @Bean
+    public TypeCodec<EnumSet<Permission>> enumSetPermissionCodec(){
+        return new EnumSetTypeCodec<Permission>( permissionCodec() );
     }
 
     @Bean
