@@ -110,7 +110,7 @@ public class ConductorSparkPod {
     
     @Bean
     public EdmManager dataModelService() {
-        return new EdmService( session, mappingManager(), tableManager(), authzService(), permissionsService() );
+        return new EdmService( session, mappingManager(), tableManager(), permissionsService() );
     }
 
     @Bean
