@@ -26,13 +26,15 @@ applicationDefaultJvmArgs = ["-Xmx1G","-Xms1G","-server"]
 sourceCompatibility=JavaVersion.VERSION_1_8
 targetCompatibility=JavaVersion.VERSION_1_8
 
+/*
 run {
   if (System.getProperty("exec.args")) {
     args System.getProperty("exec.args").split()
   }
 }
+*/
 
-run.args = ["cassandra", "spark"]
+run.args = ["cassandra", "spark","local"]
 
 configurations {
     provided
