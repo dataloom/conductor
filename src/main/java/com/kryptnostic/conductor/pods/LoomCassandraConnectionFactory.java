@@ -12,7 +12,7 @@ public class LoomCassandraConnectionFactory implements CassandraConnectionFactor
     private static final long serialVersionUID = 4167984603461650295L;
 
     static {
-        SparkPod.CASSANDRA_CONNECTION_FACTORY_CLASS = LoomCassandraConnectionFactory.class.getCanonicalName();
+        configureSparkPod();
     }
 
     @Override
@@ -25,6 +25,10 @@ public class LoomCassandraConnectionFactory implements CassandraConnectionFactor
     @Override
     public Set<String> properties() {
         return (Set<String>) scala.collection.immutable.Set$.MODULE$.empty();
+    }
+    
+    public static void configureSparkPod() {
+        SparkPod.CASSANDRA_CONNECTION_FACTORY_CLASS = LoomCassandraConnectionFactory.class.getCanonicalName();
     }
 
 }

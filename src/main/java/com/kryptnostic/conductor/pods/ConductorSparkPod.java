@@ -32,6 +32,9 @@ import javax.inject.Inject;
 @Configuration
 @Import( SparkPod.class )
 public class ConductorSparkPod {
+    static {
+        LoomCassandraConnectionFactory.configureSparkPod();
+    }
 
     @Inject
     private Session session;
