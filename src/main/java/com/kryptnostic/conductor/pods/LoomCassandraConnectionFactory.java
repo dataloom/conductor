@@ -17,7 +17,7 @@ public class LoomCassandraConnectionFactory implements CassandraConnectionFactor
 
     @Override
     public Cluster createCluster( CassandraConnectorConf ccf ) {
-        return Preconditions.checkNotNull( SparkPod.getCluster(),
+        return Preconditions.checkNotNull( SparkPod.getCluster().get(),
                 "This is a hack that must be initialized before being used in a session using the CassandraPod" );
     }
 
@@ -26,7 +26,7 @@ public class LoomCassandraConnectionFactory implements CassandraConnectionFactor
     public Set<String> properties() {
         return (Set<String>) scala.collection.immutable.Set$.MODULE$.empty();
     }
-    
+
     public static void configureSparkPod() {
         SparkPod.CASSANDRA_CONNECTION_FACTORY_CLASS = LoomCassandraConnectionFactory.class.getCanonicalName();
     }
