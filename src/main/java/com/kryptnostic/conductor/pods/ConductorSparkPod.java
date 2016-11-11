@@ -1,5 +1,8 @@
 package com.kryptnostic.conductor.pods;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -17,14 +20,18 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.odata.DatastoreConstants;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
+import com.kryptnostic.datastore.Permission;
+import com.kryptnostic.datastore.services.ActionAuthorizationService;
 import com.kryptnostic.datastore.services.CassandraTableManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
+import com.kryptnostic.datastore.services.PermissionsService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import com.kryptnostic.sparks.ConductorSparkImpl;
@@ -59,6 +66,11 @@ public class ConductorSparkPod {
     }
 
     @Bean
+    public TypeCodec<Set<String>> setStringCodec() {
+        return TypeCodec.set( TypeCodec.varchar() );
+    }
+    
+    @Bean
     public FullQualifiedNameTypeCodec fullQualifiedNameTypeCodec() {
         return new FullQualifiedNameTypeCodec();
     }
@@ -66,6 +78,16 @@ public class ConductorSparkPod {
     @Bean
     public TypeCodec<EdmPrimitiveTypeKind> edmPrimitiveTypeKindTypeCodec() {
         return new EnumNameCodec<EdmPrimitiveTypeKind>( EdmPrimitiveTypeKind.class );
+    }
+    
+    @Bean
+    public EnumNameCodec<Permission> permissionCodec(){
+        return new EnumNameCodec<>( Permission.class);
+    }
+    
+    @Bean
+    public TypeCodec<EnumSet<Permission>> enumSetPermissionCodec(){
+        return new EnumSetTypeCodec<Permission>( permissionCodec() );
     }
 
     @Bean
@@ -82,8 +104,18 @@ public class ConductorSparkPod {
     }
 
     @Bean
+    public PermissionsService permissionsService() {
+        return new PermissionsService( session, mappingManager(), tableManager() );
+    }
+    
+    @Bean
+    public ActionAuthorizationService authzService() {
+        return new ActionAuthorizationService( permissionsService() );
+    }
+    
+    @Bean
     public EdmManager dataModelService() {
-        return new EdmService( session, mappingManager(), tableManager() );
+        return new EdmService( session, mappingManager(), tableManager(), permissionsService() );
     }
 
     @Bean
