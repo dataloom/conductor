@@ -69,7 +69,7 @@ public class ConductorSparkPod {
     public TypeCodec<Set<String>> setStringCodec() {
         return TypeCodec.set( TypeCodec.varchar() );
     }
-    
+
     @Bean
     public FullQualifiedNameTypeCodec fullQualifiedNameTypeCodec() {
         return new FullQualifiedNameTypeCodec();
@@ -79,14 +79,14 @@ public class ConductorSparkPod {
     public TypeCodec<EdmPrimitiveTypeKind> edmPrimitiveTypeKindTypeCodec() {
         return new EnumNameCodec<EdmPrimitiveTypeKind>( EdmPrimitiveTypeKind.class );
     }
-    
+
     @Bean
-    public EnumNameCodec<Permission> permissionCodec(){
-        return new EnumNameCodec<>( Permission.class);
+    public EnumNameCodec<Permission> permissionCodec() {
+        return new EnumNameCodec<>( Permission.class );
     }
-    
+
     @Bean
-    public TypeCodec<EnumSet<Permission>> enumSetPermissionCodec(){
+    public TypeCodec<EnumSet<Permission>> enumSetPermissionCodec() {
         return new EnumSetTypeCodec<Permission>( permissionCodec() );
     }
 
@@ -98,6 +98,7 @@ public class ConductorSparkPod {
     @Bean
     public CassandraTableManager tableManager() {
         return new CassandraTableManager(
+                hazelcastInstance,
                 DatastoreConstants.KEYSPACE,
                 session,
                 mappingManager() );
@@ -107,15 +108,15 @@ public class ConductorSparkPod {
     public PermissionsService permissionsService() {
         return new PermissionsService( session, mappingManager(), tableManager() );
     }
-    
+
     @Bean
     public ActionAuthorizationService authzService() {
         return new ActionAuthorizationService( permissionsService() );
     }
-    
+
     @Bean
     public EdmManager dataModelService() {
-        return new EdmService( session, mappingManager(), tableManager(), permissionsService() );
+        return new EdmService( session, hazelcastInstance, mappingManager(), tableManager(), permissionsService() );
     }
 
     @Bean
