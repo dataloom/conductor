@@ -1,9 +1,10 @@
 package com.kryptnostic.conductor.pods;
 
-import java.util.Set;
+import java.util.EnumSet;
 
 import javax.inject.Inject;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.dataloom.authorization.AceKey;
@@ -20,11 +21,12 @@ public class ConductorMapstoresPod {
     @Inject
     private Session session;
 
-    public SelfRegisteringMapStore<AceKey, Set<Permission>> permissionMapstore() {
+    @Bean
+    public SelfRegisteringMapStore<AceKey, EnumSet<Permission>> permissionMapstore() {
         return new PermissionMapstore(
                 session,
                 new CassandraTableBuilder( DatastoreConstants.KEYSPACE, PermissionMapstore.MAP_NAME )
-                        .partitionKey( CommonColumns.SECURABLE_OBJECT_TYPE, CommonColumns.SECURABLE_OBJECTID )
+                        .partitionKey( CommonColumns.ACL_KEYS )
                         .clusteringColumns( CommonColumns.PRINCIPAL_TYPE, CommonColumns.PRINCIPAL_ID )
                         .columns( CommonColumns.PERMISSIONS ) );
     }

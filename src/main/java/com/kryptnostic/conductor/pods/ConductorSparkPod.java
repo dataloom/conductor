@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import com.dataloom.authorization.AclKey;
 import com.dataloom.authorization.requests.Permission;
 import com.dataloom.edm.internal.DatastoreConstants;
 import com.datastax.driver.core.Session;
@@ -22,6 +23,7 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.conductor.codecs.AclKeyTypeCodec;
 import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
@@ -68,6 +70,11 @@ public class ConductorSparkPod {
     @Bean
     public TypeCodec<Set<String>> setStringCodec() {
         return TypeCodec.set( TypeCodec.varchar() );
+    }
+
+    @Bean
+    public TypeCodec<AclKey> aclKeyCodec() {
+        return new AclKeyTypeCodec();
     }
 
     @Bean

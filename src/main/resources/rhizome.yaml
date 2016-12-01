@@ -7,7 +7,7 @@ enable-persistence:  false
 session-clustering-enabled: false
 
 cassandra:
-    ssl-enabled: true
+    ssl-enabled: false
     keyspace: "sparks"
     replication-factor: 2
     seed-nodes:
@@ -23,8 +23,5 @@ hazelcast:
 spark:
     appname: "Kryptnostic Spark Conductor"
     port: 7077
-    jars:
-      - "../kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
-      - "./kindling/build/libs/kindling-0.0.0-SNAPSHOT-all.jar"
     master:
         - "local[2]"
