@@ -17,6 +17,8 @@ import com.dataloom.edm.internal.DatastoreConstants;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TypeCodec;
 import com.datastax.driver.extras.codecs.enums.EnumNameCodec;
+import com.datastax.driver.extras.codecs.joda.LocalDateCodec;
+import com.datastax.driver.extras.codecs.joda.LocalTimeCodec;
 import com.datastax.driver.mapping.MappingManager;
 import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
@@ -24,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
+import com.kryptnostic.conductor.codecs.TimestampDateTimeTypeCodec;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
@@ -63,31 +66,6 @@ public class ConductorSparkPod {
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return ObjectMapperRegistry.getJsonMapper();
-    }
-
-    @Bean
-    public TypeCodec<Set<String>> setStringCodec() {
-        return TypeCodec.set( TypeCodec.varchar() );
-    }
-    
-    @Bean
-    public FullQualifiedNameTypeCodec fullQualifiedNameTypeCodec() {
-        return new FullQualifiedNameTypeCodec();
-    }
-
-    @Bean
-    public TypeCodec<EdmPrimitiveTypeKind> edmPrimitiveTypeKindTypeCodec() {
-        return new EnumNameCodec<EdmPrimitiveTypeKind>( EdmPrimitiveTypeKind.class );
-    }
-    
-    @Bean
-    public EnumNameCodec<Permission> permissionCodec(){
-        return new EnumNameCodec<>( Permission.class);
-    }
-    
-    @Bean
-    public TypeCodec<EnumSet<Permission>> enumSetPermissionCodec(){
-        return new EnumSetTypeCodec<Permission>( permissionCodec() );
     }
 
     @Bean
