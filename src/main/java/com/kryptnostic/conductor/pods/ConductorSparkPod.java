@@ -98,22 +98,17 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public MappingManager mappingManager() {
-        return new MappingManager( session );
-    }
-
-    @Bean
     public CassandraTableManager tableManager() {
         return new CassandraTableManager(
                 hazelcastInstance,
                 DatastoreConstants.KEYSPACE,
-                session,
-                mappingManager() );
+                session
+                );
     }
 
     @Bean
     public PermissionsService permissionsService() {
-        return new PermissionsService( session, mappingManager(), tableManager() );
+        return new PermissionsService( session,  tableManager() );
     }
 
     @Bean
