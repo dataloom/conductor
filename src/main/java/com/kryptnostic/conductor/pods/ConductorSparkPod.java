@@ -13,12 +13,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.dataloom.authorization.AclKey;
+import com.dataloom.authorization.AuthorizationManager;
+import com.dataloom.authorization.AuthorizationQueryService;
+import com.dataloom.authorization.HazelcastAuthorizationService;
 import com.dataloom.authorization.requests.Permission;
 import com.dataloom.edm.internal.DatastoreConstants;
+import com.dataloom.edm.properties.CassandraTypeManager;
+import com.dataloom.edm.schemas.SchemaQueryService;
+import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
+import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TypeCodec;
 import com.datastax.driver.extras.codecs.enums.EnumNameCodec;
-import com.datastax.driver.mapping.MappingManager;
 import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,11 +35,9 @@ import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
-import com.kryptnostic.datastore.services.ActionAuthorizationService;
-import com.kryptnostic.datastore.services.CassandraTableManager;
+import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
-import com.kryptnostic.datastore.services.PermissionsService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import com.kryptnostic.sparks.ConductorSparkImpl;
@@ -97,28 +101,46 @@ public class ConductorSparkPod {
         return new EnumSetTypeCodec<Permission>( permissionCodec() );
     }
 
+
     @Bean
-    public CassandraTableManager tableManager() {
-        return new CassandraTableManager(
-                hazelcastInstance,
-                DatastoreConstants.KEYSPACE,
-                session
-                );
+    public AuthorizationQueryService authorizationQueryService() {
+        return new AuthorizationQueryService( session, hazelcastInstance );
     }
 
     @Bean
-    public PermissionsService permissionsService() {
-        return new PermissionsService( session,  tableManager() );
+    public AuthorizationManager authorizationManager() {
+        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService() );
     }
 
     @Bean
-    public ActionAuthorizationService authzService() {
-        return new ActionAuthorizationService( permissionsService() );
+    public SchemaQueryService schemaQueryService() {
+        return new CassandraSchemaQueryService(DatastoreConstants.KEYSPACE, session );
     }
-
+    @Bean
+    public CassandraEntitySetManager entitySetManager() {
+        return new CassandraEntitySetManager( session, DatastoreConstants.KEYSPACE );
+    }
+    
+    @Bean
+    public HazelcastSchemaManager schemaManager() {
+        return new HazelcastSchemaManager( DatastoreConstants.KEYSPACE, hazelcastInstance, schemaQueryService() );
+    }
+    
+    @Bean
+    public CassandraTypeManager entityTypeManager() {
+        return new CassandraTypeManager( DatastoreConstants.KEYSPACE, session );
+    }
+    
     @Bean
     public EdmManager dataModelService() {
-        return new EdmService( session, hazelcastInstance, mappingManager(), tableManager(), permissionsService() );
+        return new EdmService(
+                DatastoreConstants.KEYSPACE,
+                session,
+                hazelcastInstance,
+                authorizationManager(),
+                entitySetManager(),
+                entityTypeManager(),
+                schemaManager() );
     }
 
     @Bean
@@ -132,7 +154,6 @@ public class ConductorSparkPod {
                 DatastoreConstants.KEYSPACE,
                 sparkSession,
                 sparkContextJavaFunctions(),
-                tableManager(),
                 dataModelService(),
                 new SparkAuthorizationManager(),
                 hazelcastInstance );
