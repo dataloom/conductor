@@ -12,9 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.dataloom.authorization.AclKey;
+import com.dataloom.authorization.AclKeyPathFragment;
 import com.dataloom.authorization.AuthorizationManager;
 import com.dataloom.authorization.AuthorizationQueryService;
+import com.dataloom.authorization.HazelcastAclKeyReservationService;
 import com.dataloom.authorization.HazelcastAuthorizationService;
 import com.dataloom.authorization.requests.Permission;
 import com.dataloom.edm.internal.DatastoreConstants;
@@ -22,6 +23,7 @@ import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
 import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
+import com.dataloom.mappers.ObjectMappers;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TypeCodec;
 import com.datastax.driver.extras.codecs.enums.EnumNameCodec;
@@ -39,7 +41,6 @@ import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.rhizome.pods.SparkPod;
-import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.LoomCassandraConnectionFactory;
 import com.kryptnostic.sparks.SparkAuthorizationManager;
@@ -68,7 +69,7 @@ public class ConductorSparkPod {
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
-        return ObjectMapperRegistry.getJsonMapper();
+        return ObjectMappers.getJsonMapper();
     }
 
     @Bean
@@ -77,7 +78,7 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public TypeCodec<AclKey> aclKeyCodec() {
+    public TypeCodec<AclKeyPathFragment> aclKeyCodec() {
         return new AclKeyTypeCodec();
     }
 
@@ -132,11 +133,17 @@ public class ConductorSparkPod {
     }
     
     @Bean
+    public HazelcastAclKeyReservationService aclKeyReservationService() {
+        return new HazelcastAclKeyReservationService( hazelcastInstance );
+    }
+    
+    @Bean
     public EdmManager dataModelService() {
         return new EdmService(
                 DatastoreConstants.KEYSPACE,
                 session,
                 hazelcastInstance,
+                aclKeyReservationService(),
                 authorizationManager(),
                 entitySetManager(),
                 entityTypeManager(),

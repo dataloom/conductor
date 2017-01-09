@@ -7,11 +7,11 @@ import javax.inject.Inject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
-import com.kryptnostic.rhizome.registries.ObjectMapperRegistry;
 
 @Configuration
 public class ConductorServicesPod {
@@ -24,7 +24,7 @@ public class ConductorServicesPod {
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
-        return ObjectMapperRegistry.getJsonMapper();
+        return ObjectMappers.getJsonMapper();
     }
 
     @Bean
