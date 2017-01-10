@@ -17,7 +17,7 @@ import com.dataloom.authorization.AuthorizationManager;
 import com.dataloom.authorization.AuthorizationQueryService;
 import com.dataloom.authorization.HazelcastAclKeyReservationService;
 import com.dataloom.authorization.HazelcastAuthorizationService;
-import com.dataloom.authorization.requests.Permission;
+import com.dataloom.authorization.Permission;
 import com.dataloom.edm.internal.DatastoreConstants;
 import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
@@ -43,7 +43,6 @@ import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.LoomCassandraConnectionFactory;
-import com.kryptnostic.sparks.SparkAuthorizationManager;
 
 @Configuration
 @Import( SparkPod.class )
@@ -162,7 +161,6 @@ public class ConductorSparkPod {
                 sparkSession,
                 sparkContextJavaFunctions(),
                 dataModelService(),
-                new SparkAuthorizationManager(),
                 hazelcastInstance );
         ccss.setConductorSparkApi( api );
         return api;

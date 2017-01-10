@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.dataloom.authorization.AceKey;
+import com.dataloom.authorization.Permission;
 import com.dataloom.authorization.mapstores.PermissionMapstore;
-import com.dataloom.authorization.requests.Permission;
 import com.datastax.driver.core.Session;
 import com.kryptnostic.rhizome.mapstores.SelfRegisteringMapStore;
 
