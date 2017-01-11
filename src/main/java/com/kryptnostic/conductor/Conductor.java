@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
 import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
+import com.kryptnostic.datastore.cassandra.CassandraTablesPod;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
 import com.kryptnostic.rhizome.pods.CassandraPod;
@@ -24,7 +25,8 @@ public class Conductor extends RhizomeApplicationServer {
     public static final Class<?>[] conductorPods = new Class<?>[] {
             ConductorSparkPod.class,
             ConductorStreamSerializersPod.class,
-            CassandraPod.class
+            CassandraPod.class,
+            CassandraTablesPod.class
     };
 
     public Conductor() {
