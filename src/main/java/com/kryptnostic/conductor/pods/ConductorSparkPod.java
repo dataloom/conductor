@@ -33,6 +33,7 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.conductor.codecs.AclKeyPathFragmentTypeCodec;
 import com.kryptnostic.conductor.codecs.AclKeyTypeCodec;
 import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
@@ -87,7 +88,7 @@ public class ConductorSparkPod {
 
     @Bean
     public TypeCodec<AclKeyPathFragment> aclKeyCodec() {
-        return new AclKeyTypeCodec();
+        return new AclKeyPathFragmentTypeCodec();
     }
 
     @Bean
@@ -110,7 +111,6 @@ public class ConductorSparkPod {
         return new EnumSetTypeCodec<Permission>( permissionCodec() );
     }
 
-
     @Bean
     public AuthorizationQueryService authorizationQueryService() {
         return new AuthorizationQueryService( session, hazelcastInstance );
@@ -123,28 +123,29 @@ public class ConductorSparkPod {
 
     @Bean
     public SchemaQueryService schemaQueryService() {
-        return new CassandraSchemaQueryService(DatastoreConstants.KEYSPACE, session );
+        return new CassandraSchemaQueryService( DatastoreConstants.KEYSPACE, session );
     }
+
     @Bean
     public CassandraEntitySetManager entitySetManager() {
-        return new CassandraEntitySetManager( session, DatastoreConstants.KEYSPACE );
+        return new CassandraEntitySetManager( DatastoreConstants.KEYSPACE, session, authorizationManager() );
     }
-    
+
     @Bean
     public HazelcastSchemaManager schemaManager() {
         return new HazelcastSchemaManager( DatastoreConstants.KEYSPACE, hazelcastInstance, schemaQueryService() );
     }
-    
+
     @Bean
     public CassandraTypeManager entityTypeManager() {
         return new CassandraTypeManager( DatastoreConstants.KEYSPACE, session );
     }
-    
+
     @Bean
     public HazelcastAclKeyReservationService aclKeyReservationService() {
         return new HazelcastAclKeyReservationService( hazelcastInstance );
     }
-    
+
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
