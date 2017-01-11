@@ -31,6 +31,7 @@ import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
+import com.kryptnostic.conductor.codecs.AclKeyPathFragmentTypeCodec;
 import com.kryptnostic.conductor.codecs.AclKeyTypeCodec;
 import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
@@ -78,7 +79,7 @@ public class ConductorSparkPod {
 
     @Bean
     public TypeCodec<AclKeyPathFragment> aclKeyCodec() {
-        return new AclKeyTypeCodec();
+        return new AclKeyPathFragmentTypeCodec();
     }
 
     @Bean
