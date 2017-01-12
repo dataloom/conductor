@@ -72,36 +72,6 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public TypeCodec<Set<String>> setStringCodec() {
-        return TypeCodec.set( TypeCodec.varchar() );
-    }
-
-    @Bean
-    public TypeCodec<AclKeyPathFragment> aclKeyCodec() {
-        return new AclKeyPathFragmentTypeCodec();
-    }
-
-    @Bean
-    public FullQualifiedNameTypeCodec fullQualifiedNameTypeCodec() {
-        return new FullQualifiedNameTypeCodec();
-    }
-
-    @Bean
-    public TypeCodec<EdmPrimitiveTypeKind> edmPrimitiveTypeKindTypeCodec() {
-        return new EnumNameCodec<EdmPrimitiveTypeKind>( EdmPrimitiveTypeKind.class );
-    }
-
-    @Bean
-    public EnumNameCodec<Permission> permissionCodec() {
-        return new EnumNameCodec<>( Permission.class );
-    }
-
-    @Bean
-    public TypeCodec<EnumSet<Permission>> enumSetPermissionCodec() {
-        return new EnumSetTypeCodec<Permission>( permissionCodec() );
-    }
-
-    @Bean
     public AuthorizationQueryService authorizationQueryService() {
         return new AuthorizationQueryService( session, hazelcastInstance );
     }
