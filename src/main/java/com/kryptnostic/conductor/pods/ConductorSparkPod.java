@@ -36,6 +36,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.codecs.AclKeyPathFragmentTypeCodec;
 import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
+import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
@@ -43,7 +44,6 @@ import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
-import com.kryptnostic.kindling.search.ElasticsearchConfiguration;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.pods.SparkPod;
@@ -162,15 +162,11 @@ public class ConductorSparkPod {
     public SparkContextJavaFunctions sparkContextJavaFunctions() {
         return CassandraJavaUtil.javaFunctions( sparkSession.sparkContext() );
     }
-    
-    @Bean
-    public ElasticsearchConfiguration kindlingConfiguration() throws IOException {
-    	return configurationService.getConfiguration( ElasticsearchConfiguration.class );
-    }
-    
+
+
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
-    	return new ConductorElasticsearchImpl( kindlingConfiguration() );
+    	return new ConductorElasticsearchImpl( configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
     }
 
     @Bean
