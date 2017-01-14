@@ -12,11 +12,15 @@ plugins {
 */
 description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
-ext.projectName = "conductor"
 
 distTar {
   archiveName "conductor.tgz"
 }
+
+ext.projectName = "conductor"
+ext.scmUrl = 'scm:git:https://github.com/dataloom/conductor.git'
+ext.connectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
+ext.developerConnectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptnostic.gradle"
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/docker.gradle"
