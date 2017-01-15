@@ -1,5 +1,7 @@
 package com.kryptnostic.conductor.pods;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -34,12 +36,16 @@ import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.codecs.AclKeyPathFragmentTypeCodec;
 import com.kryptnostic.conductor.codecs.EnumSetTypeCodec;
 import com.kryptnostic.conductor.codecs.FullQualifiedNameTypeCodec;
+import com.kryptnostic.conductor.rpc.ConductorConfiguration;
+import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
+import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
+import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.LoomCassandraConnectionFactory;
@@ -65,6 +71,9 @@ public class ConductorSparkPod {
 
     @Inject
     private ConductorCallStreamSerializer ccss;
+    
+    @Inject
+    private ConfigurationService          configurationService;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -124,14 +133,21 @@ public class ConductorSparkPod {
         return CassandraJavaUtil.javaFunctions( sparkSession.sparkContext() );
     }
 
+
     @Bean
-    public ConductorSparkApi api() {
+    public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
+    	return new ConductorElasticsearchImpl( configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
+    }
+
+    @Bean
+    public ConductorSparkApi api() throws UnknownHostException, IOException {
         ConductorSparkApi api = new ConductorSparkImpl(
                 DatastoreConstants.KEYSPACE,
                 sparkSession,
                 sparkContextJavaFunctions(),
                 dataModelService(),
-                hazelcastInstance );
+                hazelcastInstance,
+                elasticsearchApi() );
         ccss.setConductorSparkApi( api );
         return api;
     }

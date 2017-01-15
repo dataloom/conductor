@@ -40,8 +40,19 @@ run {
 
 run.args = ["cassandra", "spark","local"]
 
+repositories {
+    mavenLocal()
+    maven {
+    	url "http://conjars.org/repo/"
+    }
+}
+
 configurations {
     provided
+}
+
+configurations.all {
+	exclude module: 'slf4j-log4j12'
 }
 
 sourceSets {
