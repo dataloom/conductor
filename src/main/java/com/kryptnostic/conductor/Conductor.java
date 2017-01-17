@@ -2,6 +2,7 @@ package com.kryptnostic.conductor;
 
 import java.util.concurrent.ExecutionException;
 
+import com.dataloom.hazelcast.pods.MapstoresPod;
 import com.kryptnostic.conductor.codecs.pods.TypeCodecsPod;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
 import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
@@ -28,7 +29,8 @@ public class Conductor extends RhizomeApplicationServer {
             TypeCodecsPod.class,
             ConductorStreamSerializersPod.class,
             CassandraPod.class,
-            CassandraTablesPod.class
+            CassandraTablesPod.class,
+            MapstoresPod.class
     };
 
     public Conductor() {
