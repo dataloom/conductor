@@ -35,6 +35,7 @@ import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
+import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.sparks.ConductorSparkImpl;
@@ -46,6 +47,9 @@ public class ConductorSparkPod {
     static {
         LoomCassandraConnectionFactory.configureSparkPod();
     }
+
+    @Inject
+    private CassandraConfiguration        cassandraConfiguration;
 
     @Inject
     private Session                       session;
@@ -61,7 +65,7 @@ public class ConductorSparkPod {
 
     @Inject
     private ConductorCallStreamSerializer ccss;
-    
+
     @Inject
     private ConfigurationService          configurationService;
 
@@ -72,7 +76,7 @@ public class ConductorSparkPod {
 
     @Bean
     public AuthorizationQueryService authorizationQueryService() {
-        return new AuthorizationQueryService( session, hazelcastInstance );
+        return new AuthorizationQueryService( cassandraConfiguration.getKeyspace(), session, hazelcastInstance );
     }
 
     @Bean
@@ -123,10 +127,10 @@ public class ConductorSparkPod {
         return CassandraJavaUtil.javaFunctions( sparkSession.sparkContext() );
     }
 
-
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
-    	return new ConductorElasticsearchImpl( configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
+        return new ConductorElasticsearchImpl(
+                configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
     }
 
     @Bean
