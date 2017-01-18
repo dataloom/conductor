@@ -40,13 +40,6 @@ run {
 
 run.args = ["cassandra", "spark","local"]
 
-repositories {
-    mavenLocal()
-    maven {
-    	url "http://conjars.org/repo/"
-    }
-}
-
 configurations {
     provided
 }
