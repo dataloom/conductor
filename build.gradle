@@ -26,11 +26,26 @@ apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptn
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/docker.gradle"
 
 mainClassName = "com.kryptnostic.conductor.Conductor"
-applicationDefaultJvmArgs = ["-Xmx1G","-Xms1G","-server"]
+
+def CONDUCTOR_XMS = "$System.env.CONDUCTOR_XMS"
+def CONDUCTOR_XMX = "$System.env.CONDUCTOR_XMX"
+
+if( CONDUCTOR_XMS == 'null' || CONDUCTOR_XMS == null || CONDUCTOR_XMS == "" ) {
+    CONDUCTOR_XMS = '-Xms1g'
+}
+
+if( CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "" ) {
+    CONDUCTOR_XMX = '-Xms4g'
+}
+
+println "Using java args for running ${projectName}: Xms=" + CONDUCTOR_XMS + ",Xmx=" + CONDUCTOR_XMX + " -server"
+
+applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server"]
 sourceCompatibility=JavaVersion.VERSION_1_8
 targetCompatibility=JavaVersion.VERSION_1_8
 
-/*
+/*cd ..
+gw
 run {
   if (System.getProperty("exec.args")) {
     args System.getProperty("exec.args").split()
@@ -39,13 +54,6 @@ run {
 */
 
 run.args = ["cassandra", "spark","local"]
-
-repositories {
-    mavenLocal()
-    maven {
-    	url "http://conjars.org/repo/"
-    }
-}
 
 configurations {
     provided
