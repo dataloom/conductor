@@ -29,7 +29,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
-import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
@@ -62,9 +61,6 @@ public class ConductorSparkPod {
 
     @Inject
     private SparkSession                  sparkSession;
-
-    @Inject
-    private ConductorCallStreamSerializer ccss;
 
     @Inject
     private ConfigurationService          configurationService;
@@ -142,7 +138,6 @@ public class ConductorSparkPod {
                 dataModelService(),
                 hazelcastInstance,
                 elasticsearchApi() );
-        ccss.setConductorSparkApi( api );
         return api;
     }
 
