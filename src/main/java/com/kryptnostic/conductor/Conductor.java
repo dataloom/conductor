@@ -6,7 +6,7 @@ import com.dataloom.hazelcast.pods.IMapObjectStreamSerializersPod;
 import com.dataloom.hazelcast.pods.MapstoresPod;
 import com.kryptnostic.conductor.codecs.pods.TypeCodecsPod;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
-import com.kryptnostic.conductor.pods.ConductorStreamSerializersPod;
+import com.kryptnostic.conductor.rpc.SharedStreamSerializersPod;
 import com.kryptnostic.datastore.cassandra.CassandraTablesPod;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
@@ -28,8 +28,8 @@ public class Conductor extends RhizomeApplicationServer {
     public static final Class<?>[] conductorPods = new Class<?>[] {
             ConductorSparkPod.class,
             TypeCodecsPod.class,
-            ConductorStreamSerializersPod.class,
             IMapObjectStreamSerializersPod.class,
+            SharedStreamSerializersPod.class,
             CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class
@@ -41,6 +41,5 @@ public class Conductor extends RhizomeApplicationServer {
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
         new Conductor().sprout( args );
-        System.out.println( "WE DID IT!\n\n\n\n\n MISSION ACCOMPLISHED!!!" );
     }
 }
