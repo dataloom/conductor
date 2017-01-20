@@ -1,14 +1,12 @@
 package com.kryptnostic.conductor.pods;
 
-import java.util.EnumSet;
-
 import javax.inject.Inject;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.dataloom.authorization.AceKey;
-import com.dataloom.authorization.Permission;
+import com.dataloom.authorization.DelegatedPermissionEnumSet;
 import com.dataloom.authorization.mapstores.PermissionMapstore;
 import com.datastax.driver.core.Session;
 import com.kryptnostic.rhizome.mapstores.SelfRegisteringMapStore;
@@ -19,7 +17,7 @@ public class ConductorMapstoresPod {
     private Session session;
 
     @Bean
-    public SelfRegisteringMapStore<AceKey, EnumSet<Permission>> permissionMapstore() {
+    public SelfRegisteringMapStore<AceKey, DelegatedPermissionEnumSet> permissionMapstore() {
         return new PermissionMapstore( session );
     }
 }
