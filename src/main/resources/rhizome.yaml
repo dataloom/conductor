@@ -24,4 +24,4 @@ spark:
     appname: "Kryptnostic Spark Conductor"
     port: 7077
     master:
-        - "local[2]"
+        - "local[8]"
