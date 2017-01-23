@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import com.dataloom.mail.config.MailServiceRequirements;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,4 +32,6 @@ public class ConductorServicesPod {
     public ConductorConfiguration getConductorConfiguration() throws IOException {
         return configurationService.getConfiguration( ConductorConfiguration.class );
     }
+
+
 }

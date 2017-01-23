@@ -2,6 +2,8 @@ package com.kryptnostic.conductor.pods;
 
 import javax.inject.Inject;
 
+import com.dataloom.hazelcast.HazelcastQueue;
+import com.dataloom.mail.config.MailServiceRequirements;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,5 +25,9 @@ public class ConductorSparkServicesPod {
     public ObjectMapper defaultObjectMapper() {
         return ObjectMappers.getJsonMapper();
     }
-    
+
+    @Bean
+    public MailServiceRequirements mailServiceRequirements() {
+        return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
+    }
 }
