@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.dataloom.hazelcast.pods.MapstoresPod;
 import com.dataloom.hazelcast.pods.SharedStreamSerializersPod;
+import com.dataloom.mail.services.MailService;
 import com.kryptnostic.conductor.codecs.pods.TypeCodecsPod;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
 import com.kryptnostic.datastore.cassandra.CassandraTablesPod;
@@ -40,5 +41,11 @@ public class Conductor extends RhizomeApplicationServer {
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
         new Conductor().sprout( args );
+    }
+
+    @Override
+    public void sprout( String... activeProfiles ) {
+        super.sprout( activeProfiles );
+        getContext().getBean( MailService.class ).processEmailRequestsQueue();
     }
 }
