@@ -25,6 +25,7 @@ import com.datastax.driver.core.Session;
 import com.datastax.spark.connector.japi.CassandraJavaUtil;
 import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
@@ -64,6 +65,9 @@ public class ConductorSparkPod {
 
     @Inject
     private ConfigurationService          configurationService;
+    
+    @Inject
+    private EventBus eventBus;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -77,7 +81,7 @@ public class ConductorSparkPod {
 
     @Bean
     public AuthorizationManager authorizationManager() {
-        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService() );
+        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
     }
 
     @Bean
