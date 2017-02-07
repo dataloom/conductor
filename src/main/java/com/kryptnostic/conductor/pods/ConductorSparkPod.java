@@ -11,8 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import com.dataloom.authorization.AbstractSecurableObjectResolveTypeService;
 import com.dataloom.authorization.AuthorizationManager;
 import com.dataloom.authorization.AuthorizationQueryService;
+import com.dataloom.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
 import com.dataloom.authorization.HazelcastAclKeyReservationService;
 import com.dataloom.authorization.HazelcastAuthorizationService;
 import com.dataloom.edm.internal.DatastoreConstants;
@@ -82,6 +84,11 @@ public class ConductorSparkPod {
     @Bean
     public AuthorizationManager authorizationManager() {
         return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+    }
+    
+    @Bean
+    public AbstractSecurableObjectResolveTypeService securableObjectTypes() {
+        return new HazelcastAbstractSecurableObjectResolveTypeService( hazelcastInstance );
     }
 
     @Bean
