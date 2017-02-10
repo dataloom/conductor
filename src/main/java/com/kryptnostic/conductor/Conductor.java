@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.dataloom.hazelcast.pods.MapstoresPod;
 import com.dataloom.hazelcast.pods.SharedStreamSerializersPod;
+import com.dataloom.mail.pods.MailServicePod;
 import com.dataloom.mail.services.MailService;
 import com.kryptnostic.conductor.codecs.pods.TypeCodecsPod;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
@@ -49,6 +50,7 @@ public class Conductor extends RhizomeApplicationServer {
             TypeCodecsPod.class,
             SharedStreamSerializersPod.class,
             PlasmaCoupling.class,
+            MailServicePod.class,
             CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class
