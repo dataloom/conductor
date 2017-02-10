@@ -1,11 +1,3 @@
-plugins {
-  id 'com.palantir.docker' version '0.8.0'
-  id "application"
-  id "java"
-  id "eclipse"
-  id "idea"
-  id "jacoco"
-}
 /*
  * Copyright (C) 2017. Kryptnostic, Inc (dba Loom)
  *
@@ -24,6 +16,15 @@ plugins {
  *
  * You can contact the owner of the copyright at support@thedataloom.com
  */
+
+plugins {
+  id 'com.palantir.docker' version '0.8.0'
+  id "application"
+  id "java"
+  id "eclipse"
+  id "idea"
+  id "jacoco"
+}
 
 /*
 *	Kryptnostic conductor service
