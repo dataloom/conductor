@@ -25,6 +25,9 @@ import java.net.UnknownHostException;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import com.dataloom.hazelcast.HazelcastQueue;
+import com.dataloom.mail.config.MailServiceRequirements;
+import com.hazelcast.core.IQueue;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -135,6 +138,11 @@ public class ConductorSparkPod {
         return new HazelcastAclKeyReservationService( hazelcastInstance );
     }
 
+    @Bean
+    public MailServiceRequirements mailServiceRequirements() {
+        return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
+    }
+    
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
