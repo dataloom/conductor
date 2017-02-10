@@ -82,13 +82,13 @@ dependencies {
     if( project.hasProperty('developmentMode') && project.developmentMode ) {
         logger.quiet(project.name + " using project dependencies.")
         compile project(":rhizome")
-        compile project(":kryptnostic-conductor-client")
+        compile project(":conductor-client")
         compile project(":kindling")
         compile project(":courier")
     } else {
         logger.quiet(project.name + " using jar dependencies.")
         compile "com.kryptnostic:rhizome:${rhizome_version}"
-        compile "com.kryptnostic:kryptnostic-conductor-client:${conductor_client_version}"
+        compile "com.kryptnostic:conductor-client:${conductor_client_version}"
         compile "com.kryptnostic:kindling:${kindling_version}"
         compile "com.kryptnostic:courier:${courier_version}"
     }
