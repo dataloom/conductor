@@ -57,7 +57,7 @@ public class Conductor extends RhizomeApplicationServer {
     };
 
     public Conductor() {
-        super( Pods.concatenate( RhizomeApplicationServer.defaultPods, rhizomePods, conductorPods ) );
+        super( Pods.concatenate( RhizomeApplicationServer.DEFAULT_PODS, rhizomePods, conductorPods ) );
     }
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {

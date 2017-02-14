@@ -29,9 +29,9 @@ import org.springframework.context.annotation.Configuration;
 
 import com.dataloom.authorization.AceKey;
 import com.dataloom.authorization.DelegatedPermissionEnumSet;
-import com.dataloom.authorization.SecurableObjectType;
-import com.dataloom.authorization.mapstores.SecurableObjectTypeMapstore;
 import com.dataloom.authorization.mapstores.PermissionMapstore;
+import com.dataloom.authorization.mapstores.SecurableObjectTypeMapstore;
+import com.dataloom.authorization.securable.SecurableObjectType;
 import com.datastax.driver.core.Session;
 import com.kryptnostic.rhizome.mapstores.SelfRegisteringMapStore;
 

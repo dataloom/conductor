@@ -24,8 +24,8 @@ import javax.inject.Inject;
 
 import org.springframework.context.annotation.Configuration;
 
+import com.dataloom.hazelcast.serializers.ConductorCallStreamSerializer;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
-import com.kryptnostic.conductor.rpc.serializers.ConductorCallStreamSerializer;
 
 @Configuration
 public class PlasmaCoupling {

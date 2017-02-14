@@ -25,9 +25,6 @@ import java.net.UnknownHostException;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import com.dataloom.hazelcast.HazelcastQueue;
-import com.dataloom.mail.config.MailServiceRequirements;
-import com.hazelcast.core.IQueue;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +41,9 @@ import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
 import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
+import com.dataloom.hazelcast.HazelcastQueue;
+import com.dataloom.hazelcast.serializers.QueryResultStreamSerializer;
+import com.dataloom.mail.config.MailServiceRequirements;
 import com.dataloom.mappers.ObjectMappers;
 import com.datastax.driver.core.Session;
 import com.datastax.spark.connector.japi.CassandraJavaUtil;
@@ -54,7 +54,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
-import com.kryptnostic.conductor.rpc.serializers.QueryResultStreamSerializer;
 import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
@@ -142,7 +141,7 @@ public class ConductorSparkPod {
     public MailServiceRequirements mailServiceRequirements() {
         return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
     }
-    
+
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
