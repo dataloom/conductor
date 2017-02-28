@@ -25,19 +25,28 @@ import javax.inject.Inject;
 import org.springframework.context.annotation.Configuration;
 
 import com.dataloom.hazelcast.serializers.ConductorCallStreamSerializer;
+import com.dataloom.hazelcast.serializers.ConductorElasticsearchCallStreamSerializer;
+import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
 import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 
 @Configuration
 public class PlasmaCoupling {
     @Inject
-    private ConductorSparkApi             api;
+    private ConductorSparkApi                          api;
 
     @Inject
-    private ConductorCallStreamSerializer ccss;
+    private ConductorCallStreamSerializer              ccss;
+
+    @Inject
+    private ConductorElasticsearchApi                  elasticsearchApi;
+
+    @Inject
+    private ConductorElasticsearchCallStreamSerializer cecss;
 
     @PostConstruct
     public void connect() {
         ccss.setConductorSparkApi( api );
+        cecss.setConductorElasticsearchApi( elasticsearchApi );
     }
 
 }

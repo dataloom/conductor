@@ -161,21 +161,20 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
-        return new ConductorElasticsearchImpl(
-                configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
-    }
-
-    @Bean
     public ConductorSparkApi api() throws UnknownHostException, IOException {
         ConductorSparkApi api = new ConductorSparkImpl(
                 DatastoreConstants.KEYSPACE,
                 sparkSession,
                 sparkContextJavaFunctions(),
                 dataModelService(),
-                hazelcastInstance,
-                elasticsearchApi() );
+                hazelcastInstance );
         return api;
+    }
+    
+    @Bean
+    public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
+        return new ConductorElasticsearchImpl(
+                configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
     }
 
     @PostConstruct
