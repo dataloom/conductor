@@ -61,6 +61,7 @@ import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.core.Cutting;
+import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.LoomCassandraConnectionFactory;
@@ -165,7 +166,8 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public ConductorSparkApi api() throws UnknownHostException, IOException {
+    public ConductorSparkApi api() throws UnknownHostException, IOException, InterruptedException {
+        cutting.addPods( CassandraPod.class );
         ConductorSparkApi api = new ConductorSparkImpl(
                 DatastoreConstants.KEYSPACE,
                 sparkSession,
