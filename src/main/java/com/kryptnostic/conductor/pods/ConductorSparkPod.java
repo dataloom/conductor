@@ -60,6 +60,8 @@ import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
+import com.kryptnostic.rhizome.core.Cutting;
+import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.SparkPod;
 import com.kryptnostic.sparks.ConductorSparkImpl;
 import com.kryptnostic.sparks.LoomCassandraConnectionFactory;
@@ -72,25 +74,28 @@ public class ConductorSparkPod {
     }
 
     @Inject
-    private CassandraConfiguration        cassandraConfiguration;
+    private CassandraConfiguration      cassandraConfiguration;
 
     @Inject
-    private Session                       session;
+    private Session                     session;
 
     @Inject
-    private QueryResultStreamSerializer   qrss;
+    private QueryResultStreamSerializer qrss;
 
     @Inject
-    private HazelcastInstance             hazelcastInstance;
+    private HazelcastInstance           hazelcastInstance;
 
     @Inject
-    private SparkSession                  sparkSession;
+    private SparkSession                sparkSession;
 
     @Inject
-    private ConfigurationService          configurationService;
-    
+    private ConfigurationService        configurationService;
+
     @Inject
-    private EventBus eventBus;
+    private EventBus                    eventBus;
+
+    @Inject
+    private Cutting                     cutting;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -106,7 +111,7 @@ public class ConductorSparkPod {
     public AuthorizationManager authorizationManager() {
         return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
     }
-    
+
     @Bean
     public AbstractSecurableObjectResolveTypeService securableObjectTypes() {
         return new HazelcastAbstractSecurableObjectResolveTypeService( hazelcastInstance );
@@ -161,16 +166,18 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public ConductorSparkApi api() throws UnknownHostException, IOException {
+    public ConductorSparkApi api() throws UnknownHostException, IOException, InterruptedException {
+        cutting.addPods( CassandraPod.class );
         ConductorSparkApi api = new ConductorSparkImpl(
                 DatastoreConstants.KEYSPACE,
                 sparkSession,
                 sparkContextJavaFunctions(),
                 dataModelService(),
-                hazelcastInstance );
+                hazelcastInstance,
+                cutting );
         return api;
     }
-    
+
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
         return new ConductorElasticsearchImpl(
