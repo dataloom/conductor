@@ -63,15 +63,10 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.core.Cutting;
 import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.SparkPod;
-import com.kryptnostic.sparks.ConductorSparkImpl;
-import com.kryptnostic.sparks.LoomCassandraConnectionFactory;
 
 @Configuration
 @Import( SparkPod.class )
 public class ConductorSparkPod {
-    static {
-        LoomCassandraConnectionFactory.configureSparkPod();
-    }
 
     @Inject
     private CassandraConfiguration      cassandraConfiguration;
@@ -163,19 +158,6 @@ public class ConductorSparkPod {
     @Bean
     public SparkContextJavaFunctions sparkContextJavaFunctions() {
         return CassandraJavaUtil.javaFunctions( sparkSession.sparkContext() );
-    }
-
-    @Bean
-    public ConductorSparkApi api() throws UnknownHostException, IOException, InterruptedException {
-        cutting.addPods( CassandraPod.class );
-        ConductorSparkApi api = new ConductorSparkImpl(
-                DatastoreConstants.KEYSPACE,
-                sparkSession,
-                sparkContextJavaFunctions(),
-                dataModelService(),
-                hazelcastInstance,
-                cutting );
-        return api;
     }
 
     @Bean
