@@ -32,12 +32,6 @@ import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 @Configuration
 public class PlasmaCoupling {
     @Inject
-    private ConductorSparkApi                          api;
-
-    @Inject
-    private ConductorCallStreamSerializer              ccss;
-
-    @Inject
     private ConductorElasticsearchApi                  elasticsearchApi;
 
     @Inject
@@ -45,8 +39,6 @@ public class PlasmaCoupling {
 
     @PostConstruct
     public void connect() {
-        ccss.setConductorSparkApi( api );
         cecss.setConductorElasticsearchApi( elasticsearchApi );
     }
-
 }
