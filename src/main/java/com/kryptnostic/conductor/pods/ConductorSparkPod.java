@@ -154,12 +154,7 @@ public class ConductorSparkPod {
                 entityTypeManager(),
                 schemaManager() );
     }
-
-    @Bean
-    public SparkContextJavaFunctions sparkContextJavaFunctions() {
-        return CassandraJavaUtil.javaFunctions( sparkSession.sparkContext() );
-    }
-
+    
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
         return new ConductorElasticsearchImpl(
