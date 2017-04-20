@@ -19,23 +19,7 @@
 
 package com.kryptnostic.conductor.pods;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.apache.spark.sql.SparkSession;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-
-import com.dataloom.authorization.AbstractSecurableObjectResolveTypeService;
-import com.dataloom.authorization.AuthorizationManager;
-import com.dataloom.authorization.AuthorizationQueryService;
-import com.dataloom.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
-import com.dataloom.authorization.HazelcastAclKeyReservationService;
-import com.dataloom.authorization.HazelcastAuthorizationService;
+import com.dataloom.authorization.*;
 import com.dataloom.edm.internal.DatastoreConstants;
 import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
@@ -46,14 +30,11 @@ import com.dataloom.hazelcast.serializers.QueryResultStreamSerializer;
 import com.dataloom.mail.config.MailServiceRequirements;
 import com.dataloom.mappers.ObjectMappers;
 import com.datastax.driver.core.Session;
-import com.datastax.spark.connector.japi.CassandraJavaUtil;
-import com.datastax.spark.connector.japi.SparkContextJavaFunctions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
-import com.kryptnostic.conductor.rpc.ConductorSparkApi;
 import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
@@ -61,8 +42,16 @@ import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.core.Cutting;
-import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.SparkPod;
+import org.apache.spark.sql.SparkSession;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 @Configuration
 @Import( SparkPod.class )
@@ -154,7 +143,7 @@ public class ConductorSparkPod {
                 entityTypeManager(),
                 schemaManager() );
     }
-    
+
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
         return new ConductorElasticsearchImpl(
