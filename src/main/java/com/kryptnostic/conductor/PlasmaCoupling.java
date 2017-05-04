@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.dataloom.data.DatasourceManager;
 import com.dataloom.hazelcast.serializers.ConductorElasticsearchCallStreamSerializer;
-import com.dataloom.neuron.audit.AuditEntitySet;
+import com.dataloom.neuron.audit.AuditEntitySetUtils;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
 import com.kryptnostic.datastore.services.EdmManager;
 
@@ -52,6 +52,6 @@ public class PlasmaCoupling {
 
     @PostConstruct
     public void initializeAuditEntitySet() {
-        AuditEntitySet.initialize( dataSourceManager, entityDataModelManager );
+        AuditEntitySetUtils.initialize( dataSourceManager, entityDataModelManager );
     }
 }
