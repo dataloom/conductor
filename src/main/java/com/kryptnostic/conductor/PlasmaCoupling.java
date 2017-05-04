@@ -24,21 +24,34 @@ import javax.inject.Inject;
 
 import org.springframework.context.annotation.Configuration;
 
-import com.dataloom.hazelcast.serializers.ConductorCallStreamSerializer;
+import com.dataloom.data.DatasourceManager;
 import com.dataloom.hazelcast.serializers.ConductorElasticsearchCallStreamSerializer;
+import com.dataloom.neuron.audit.AuditEntitySet;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
-import com.kryptnostic.conductor.rpc.ConductorSparkApi;
+import com.kryptnostic.datastore.services.EdmManager;
 
 @Configuration
 public class PlasmaCoupling {
+
     @Inject
-    private ConductorElasticsearchApi                  elasticsearchApi;
+    private ConductorElasticsearchApi elasticsearchApi;
 
     @Inject
     private ConductorElasticsearchCallStreamSerializer cecss;
 
+    @Inject
+    private DatasourceManager dataSourceManager;
+
+    @Inject
+    private EdmManager entityDataModelManager;
+
     @PostConstruct
     public void connect() {
         cecss.setConductorElasticsearchApi( elasticsearchApi );
+    }
+
+    @PostConstruct
+    public void initializeAuditEntitySet() {
+        AuditEntitySet.initialize( dataSourceManager, entityDataModelManager );
     }
 }
