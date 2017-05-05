@@ -20,6 +20,7 @@
 package com.kryptnostic.conductor.pods;
 
 import com.dataloom.authorization.*;
+import com.dataloom.data.DatasourceManager;
 import com.dataloom.edm.internal.DatastoreConstants;
 import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
@@ -129,6 +130,11 @@ public class ConductorSparkPod {
     @Bean
     public MailServiceRequirements mailServiceRequirements() {
         return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
+    }
+
+    @Bean
+    public DatasourceManager dataSourceManager() {
+        return new DatasourceManager( session, hazelcastInstance );
     }
 
     @Bean
