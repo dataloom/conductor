@@ -18,7 +18,6 @@
  */
 
 plugins {
-  id 'com.palantir.docker' version '0.8.0'
   id "application"
   id "java"
   id "eclipse"
@@ -43,7 +42,6 @@ ext.connectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 ext.developerConnectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptnostic.gradle"
-apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/docker.gradle"
 
 mainClassName = "com.kryptnostic.conductor.Conductor"
 
