@@ -30,6 +30,8 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import java.io.IOException;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +39,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class ConductorServicesPod {
+    private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
     @Inject
     private HazelcastInstance hazelcastInstance;
@@ -58,16 +61,22 @@ public class ConductorServicesPod {
     @Bean( name = "conductorConfiguration" )
     @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
     public ConductorConfiguration getLocalConductorConfiguration() throws IOException {
-        return configurationService.getConfiguration( ConductorConfiguration.class );
+        ConductorConfiguration config =  configurationService.getConfiguration( ConductorConfiguration.class );
+        logger.info("Using local conductor configuration: {}", config );
+        return config;
     }
 
     @Bean( name = "conductorConfiguration" )
     @Profile( Profiles.AWS_CONFIGURATION_PROFILE )
     public ConductorConfiguration getAwsConductorConfiguration() throws IOException {
-        return ResourceConfigurationLoader.loadConfigurationFromS3( s3,
+
+        ConductorConfiguration config =   ResourceConfigurationLoader.loadConfigurationFromS3( s3,
                 awsLaunchConfig.getBucket(),
                 awsLaunchConfig.getFolder(),
                 ConductorConfiguration.class );
+
+        logger.info("Using aws conductor configuration: {}", config );
+        return config;
     }
 
 }
