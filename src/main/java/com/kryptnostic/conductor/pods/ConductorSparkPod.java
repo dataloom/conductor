@@ -19,7 +19,12 @@
 
 package com.kryptnostic.conductor.pods;
 
-import com.dataloom.authorization.*;
+import com.dataloom.authorization.AbstractSecurableObjectResolveTypeService;
+import com.dataloom.authorization.AuthorizationManager;
+import com.dataloom.authorization.AuthorizationQueryService;
+import com.dataloom.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
+import com.dataloom.authorization.HazelcastAclKeyReservationService;
+import com.dataloom.authorization.HazelcastAuthorizationService;
 import com.dataloom.edm.internal.DatastoreConstants;
 import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
@@ -40,46 +45,44 @@ import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
-import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.core.Cutting;
 import com.kryptnostic.rhizome.pods.SparkPod;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.net.UnknownHostException;
 
 @Configuration
 @Import( SparkPod.class )
 public class ConductorSparkPod {
 
     @Inject
-    private CassandraConfiguration      cassandraConfiguration;
+    private CassandraConfiguration cassandraConfiguration;
 
     @Inject
-    private Session                     session;
+    private Session session;
 
     @Inject
     private QueryResultStreamSerializer qrss;
 
     @Inject
-    private HazelcastInstance           hazelcastInstance;
+    private HazelcastInstance hazelcastInstance;
 
     @Inject
-    private SparkSession                sparkSession;
+    private SparkSession sparkSession;
 
     @Inject
-    private ConfigurationService        configurationService;
+    private ConductorConfiguration conductorConfiguration;
 
     @Inject
-    private EventBus                    eventBus;
+    private EventBus eventBus;
 
     @Inject
-    private Cutting                     cutting;
+    private Cutting cutting;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -146,8 +149,7 @@ public class ConductorSparkPod {
 
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
-        return new ConductorElasticsearchImpl(
-                configurationService.getConfiguration( ConductorConfiguration.class ).getSearchConfiguration() );
+        return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
     }
 
     @PostConstruct
