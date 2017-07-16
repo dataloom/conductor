@@ -55,13 +55,14 @@ public class ConductorServicesPod {
         return ObjectMappers.getJsonMapper();
     }
 
-    @Bean
-    @Profile( Profiles.AWS_CONFIGURATION_PROFILE )
+    @Bean( name = "conductorConfiguration" )
+    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
     public ConductorConfiguration getLocalConductorConfiguration() throws IOException {
         return configurationService.getConfiguration( ConductorConfiguration.class );
     }
 
-    @Bean
+    @Bean( name = "conductorConfiguration" )
+    @Profile( Profiles.AWS_CONFIGURATION_PROFILE )
     public ConductorConfiguration getAwsConductorConfiguration() throws IOException {
         return ResourceConfigurationLoader.loadConfigurationFromS3( s3,
                 awsLaunchConfig.getBucket(),
