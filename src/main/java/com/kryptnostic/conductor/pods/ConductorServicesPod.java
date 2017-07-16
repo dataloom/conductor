@@ -19,28 +19,36 @@
 
 package com.kryptnostic.conductor.pods;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
-
-import com.dataloom.mail.config.MailServiceRequirements;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
+import com.amazonaws.services.s3.AmazonS3;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
+import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
+import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
+import com.openlattice.ResourceConfigurationLoader;
+import java.io.IOException;
+import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class ConductorServicesPod {
 
     @Inject
-    private HazelcastInstance    hazelcastInstance;
+    private HazelcastInstance hazelcastInstance;
 
     @Inject
     private ConfigurationService configurationService;
+
+    @Autowired( required = false )
+    private AmazonS3 s3;
+
+    @Autowired( required = false )
+    private AmazonLaunchConfiguration awsLaunchConfig;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -48,9 +56,17 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public ConductorConfiguration getConductorConfiguration() throws IOException {
+    @Profile( Profiles.AWS_CONFIGURATION_PROFILE )
+    public ConductorConfiguration getLocalConductorConfiguration() throws IOException {
         return configurationService.getConfiguration( ConductorConfiguration.class );
     }
 
+    @Bean
+    public ConductorConfiguration getAwsConductorConfiguration() throws IOException {
+        return ResourceConfigurationLoader.loadConfigurationFromS3( s3,
+                awsLaunchConfig.getBucket(),
+                awsLaunchConfig.getFolder(),
+                ConductorConfiguration.class );
+    }
 
 }
