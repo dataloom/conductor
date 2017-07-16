@@ -64,16 +64,15 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 run {
     if (C_ARGS != null) {
-        println "C_ARGS = " + C_ARGS
         args C_ARGS.split()
     } else if (System.getProperty("exec.args") != null) {
         args System.getProperty("exec.args").split()
     } else {
         args ["cassandra", "spark", "local"]
     }
-
-    println "Enable profiles: " + Arrays.toString(args)
 }
+
+println "Enable profiles: " + Arrays.toString(run.args)
 
 configurations {
     provided
