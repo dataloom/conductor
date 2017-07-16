@@ -43,8 +43,6 @@ ext.developerConnectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 
 apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptnostic.gradle"
 
-mainClassName = "com.kryptnostic.conductor.Conductor"
-
 def CONDUCTOR_XMS = "$System.env.CONDUCTOR_XMS"
 def CONDUCTOR_XMX = "$System.env.CONDUCTOR_XMX"
 def C_ARGS = "$System.env.CONDUCTOR_ARGS"
@@ -59,17 +57,19 @@ if (CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "") {
 
 println "Using java args for running ${projectName}: Xms=" + CONDUCTOR_XMS + ",Xmx=" + CONDUCTOR_XMX + " -server"
 
+mainClassName = "com.kryptnostic.conductor.Conductor"
 applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server"]
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 run {
     if (C_ARGS != null) {
+        println "C_ARGS = " + C_ARGS
         args C_ARGS.split()
     } else if (System.getProperty("exec.args") != null) {
         args System.getProperty("exec.args").split()
     } else {
-        args = ["cassandra", "spark", "local"]
+        args ["cassandra", "spark", "local"]
     }
 
     println "Enable profiles: " + Arrays.toString(args)
