@@ -2,6 +2,7 @@ status = debug
 name = ConductorConfig
 
 property.serviceName = kryptnostic-conductor
+
 property.rootDir = /opt/loom/
 property.runningDir = ${rootDir}
 property.rollingDir = ${rootDir}/logging/

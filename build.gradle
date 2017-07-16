@@ -18,11 +18,11 @@
  */
 
 plugins {
-  id "application"
-  id "java"
-  id "eclipse"
-  id "idea"
-  id "jacoco"
+    id "application"
+    id "java"
+    id "eclipse"
+    id "idea"
+    id "jacoco"
 }
 
 /*
@@ -33,7 +33,7 @@ description = "Kryptnostic Conductor Server"
 group = "com.kryptnostic"
 
 distTar {
-  archiveName "conductor.tgz"
+    archiveName "conductor.tgz"
 }
 
 ext.projectName = "conductor"
@@ -47,39 +47,39 @@ mainClassName = "com.kryptnostic.conductor.Conductor"
 
 def CONDUCTOR_XMS = "$System.env.CONDUCTOR_XMS"
 def CONDUCTOR_XMX = "$System.env.CONDUCTOR_XMX"
+def C_ARGS        = "$System.env.CONDUCTOR_ARGS"
 
-if( CONDUCTOR_XMS == 'null' || CONDUCTOR_XMS == null || CONDUCTOR_XMS == "" ) {
+if (CONDUCTOR_XMS == 'null' || CONDUCTOR_XMS == null || CONDUCTOR_XMS == "") {
     CONDUCTOR_XMS = '-Xms1g'
 }
 
-if( CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "" ) {
+if (CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "") {
     CONDUCTOR_XMX = '-Xms4g'
 }
 
 println "Using java args for running ${projectName}: Xms=" + CONDUCTOR_XMS + ",Xmx=" + CONDUCTOR_XMX + " -server"
 
 applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server"]
-sourceCompatibility=JavaVersion.VERSION_1_8
-targetCompatibility=JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-/*cd ..
-gw
 run {
-  if (System.getProperty("exec.args")) {
-    args System.getProperty("exec.args").split()
-  }
+    if (C_ARGS != null) {
+        args C_ARGS.split();
+    } else if (System.getProperty("exec.args") != null) {
+        args System.getProperty("exec.args").split()
+    } else {
+        args = ["cassandra", "spark", "local"]
+    }
 }
-*/
-
-run.args = ["cassandra", "spark","local"]
 
 configurations {
     provided
 }
 
 configurations.all {
-	exclude module: 'slf4j-log4j12'
-  exclude group :'asm', module: 'asm'
+    exclude module: 'slf4j-log4j12'
+    exclude group: 'asm', module: 'asm'
 }
 
 sourceSets {
@@ -90,14 +90,14 @@ sourceSets {
 
 dependencies {
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${jackson_version}"
-    
+
     compile "org.apache.spark:spark-core_2.11:${spark_version}"
     compile "org.apache.spark:spark-sql_2.11:${spark_version}"
     compile "org.apache.spark:spark-mllib_2.11:${spark_version}"
     compile "org.apache.spark:spark-graphx_2.11:${spark_version}"
     compile "org.apache.spark:spark-streaming_2.11:${spark_version}"
     compile "org.ow2.asm:asm:5.0.4"
-    if( project.hasProperty('developmentMode') && project.developmentMode ) {
+    if (project.hasProperty('developmentMode') && project.developmentMode) {
         logger.quiet(project.name + " using project dependencies.")
         compile project(":rhizome")
         compile project(":conductor-client")
@@ -113,12 +113,12 @@ dependencies {
     /*
      * TESTING
      */
-     testCompile "junit:junit:${junit_version}"
-     testCompile "org.mockito:mockito-all:${mockito_version}"
+    testCompile "junit:junit:${junit_version}"
+    testCompile "org.mockito:mockito-all:${mockito_version}"
 }
 
 test {
-    systemProperty 'java.library.path','lib/centos:lib/macosx:/usr/lib64'
+    systemProperty 'java.library.path', 'lib/centos:lib/macosx:/usr/lib64'
     jvmArgs '-Djava.library.path=./lib/centos:./lib/macosx:/usr/lib64'
 }
 
@@ -126,8 +126,8 @@ eclipse {
     ext.downloadSources = true
     ext.downloadJavadoc = true
 
-    ext.sourceCompatibility=JavaVersion.VERSION_1_8
-    ext.targetCompatibility=JavaVersion.VERSION_1_8
+    ext.sourceCompatibility = JavaVersion.VERSION_1_8
+    ext.targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 eclipse.classpath.plusConfigurations += [configurations.provided] 
