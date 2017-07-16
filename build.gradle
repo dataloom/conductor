@@ -55,12 +55,12 @@ if (CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "") {
     CONDUCTOR_XMX = '-Xms4g'
 }
 
-println "Using java args for running ${projectName}: Xms=" + CONDUCTOR_XMS + ",Xmx=" + CONDUCTOR_XMX + " -server"
-
 mainClassName = "com.kryptnostic.conductor.Conductor"
 applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server"]
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+println "Using java args for running ${projectName}: " + Arrays.toString( applicationDefaultJvmArgs )
 
 run {
     if (C_ARGS != null) {
