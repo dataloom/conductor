@@ -60,7 +60,7 @@ if (C_ARGS == 'null' || C_ARGS == null || C_ARGS == "") {
 }
 
 mainClassName = "com.kryptnostic.conductor.Conductor"
-applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server"]
+applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server", "-Djava.util.concurrent.ForkJoinPool.common.parallelism=32"]
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
