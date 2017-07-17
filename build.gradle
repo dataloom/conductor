@@ -55,6 +55,10 @@ if (CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "") {
     CONDUCTOR_XMX = '-Xms4g'
 }
 
+if (C_ARGS == 'null' || C_ARGS == null || C_ARGS == "") {
+    C_ARGS = 'cassandra spark local'
+}
+
 mainClassName = "com.kryptnostic.conductor.Conductor"
 applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server"]
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -67,12 +71,10 @@ run {
         args C_ARGS.split()
     } else if (System.getProperty("exec.args") != null) {
         args System.getProperty("exec.args").split()
-    } else {
-        args ["cassandra", "spark", "local"]
     }
 }
 
-println "Enable profiles: " + Arrays.toString(run.args)
+println "Enabled profiles: " + Arrays.toString(run.args)
 
 configurations {
     provided
