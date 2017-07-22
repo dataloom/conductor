@@ -53,15 +53,15 @@ public class DataLoadingService {
     }
 
     public void backgroundLoad() {
-        executor.execute( () ->
-                StreamUtil.stream( session
-                        .execute( DataMapstore.currentSyncs( session ) ) )
-                        .parallel()
-                        .map( dataMapstore::getEntityKeys )
-                        .map( ResultSetFuture::getUninterruptibly )
-                        .flatMap( StreamUtil::stream )
-                        .map( RowAdapters::entityKeyFromData )
-                        .forEach( data::get ) );
+//        executor.execute( () ->
+//                StreamUtil.stream( session
+//                        .execute( DataMapstore.currentSyncs(  ) ) )
+//                        .parallel()
+//                        .map( dataMapstore::getEntityKeys )
+//                        .map( ResultSetFuture::getUninterruptibly )
+//                        .flatMap( StreamUtil::stream )
+//                        .map( RowAdapters::entityKeyFromData )
+//                        .forEach( data::get ) );
 
         //.unordered();
         //.distinct()::iterator;
