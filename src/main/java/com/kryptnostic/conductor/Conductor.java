@@ -19,20 +19,20 @@
 
 package com.kryptnostic.conductor;
 
-import com.kryptnostic.conductor.pods.ConductorServicesPod;
-import java.util.concurrent.ExecutionException;
-
 import com.dataloom.hazelcast.pods.MapstoresPod;
 import com.dataloom.hazelcast.pods.SharedStreamSerializersPod;
 import com.dataloom.mail.pods.MailServicePod;
 import com.dataloom.mail.services.MailService;
 import com.kryptnostic.conductor.codecs.pods.TypeCodecsPod;
+import com.kryptnostic.conductor.pods.ConductorLoadingPod;
+import com.kryptnostic.conductor.pods.ConductorServicesPod;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
 import com.kryptnostic.datastore.cassandra.CassandraTablesPod;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
 import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class will not run unless ./gradlew :kindling:clean :kindling:build :kindling:shadow --daemon has been run in
@@ -42,7 +42,7 @@ import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConf
  * @author Matthew Tamayo-Rios &lt;matthew@kryptnostic.com&gt;
  */
 public class Conductor extends RhizomeApplicationServer {
-    public static final Class<?>[] rhizomePods   = new Class<?>[] {
+    public static final Class<?>[] rhizomePods = new Class<?>[] {
             CassandraPod.class,
             RegistryBasedHazelcastInstanceConfigurationPod.class };
 
@@ -55,20 +55,21 @@ public class Conductor extends RhizomeApplicationServer {
             MailServicePod.class,
             CassandraPod.class,
             CassandraTablesPod.class,
-            MapstoresPod.class
+            MapstoresPod.class,
+            ConductorLoadingPod.class
     };
 
     public Conductor() {
         super( Pods.concatenate( RhizomeApplicationServer.DEFAULT_PODS, rhizomePods, conductorPods ) );
     }
 
-    public static void main( String[] args ) throws InterruptedException, ExecutionException {
-        new Conductor().sprout( args );
-    }
-
     @Override
     public void sprout( String... activeProfiles ) {
         super.sprout( activeProfiles );
         getContext().getBean( MailService.class ).processEmailRequestsQueue();
+    }
+
+    public static void main( String[] args ) throws InterruptedException, ExecutionException {
+        new Conductor().sprout( args );
     }
 }
