@@ -4,6 +4,7 @@ bin/
 build/
 artifacts/
 src/main/webapp/auth/
+logging/
 
 # IDE generated files
 .classpath
