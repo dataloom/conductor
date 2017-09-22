@@ -19,31 +19,33 @@
 
 package com.kryptnostic.conductor;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.springframework.context.annotation.Configuration;
-
-import com.dataloom.hazelcast.serializers.ConductorCallStreamSerializer;
+import com.dataloom.hazelcast.serializers.BlockingAggregatorStreamSerializer;
 import com.dataloom.hazelcast.serializers.ConductorElasticsearchCallStreamSerializer;
 import com.dataloom.hazelcast.serializers.MatchingAggregatorStreamSerializer;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
-import com.kryptnostic.conductor.rpc.ConductorSparkApi;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 @Configuration
 public class PlasmaCoupling {
     @Inject
-    private ConductorElasticsearchApi                  elasticsearchApi;
+    private ConductorElasticsearchApi elasticsearchApi;
 
     @Inject
     private ConductorElasticsearchCallStreamSerializer cecss;
 
     @Inject
-    private MatchingAggregatorStreamSerializer         mass;
+    private MatchingAggregatorStreamSerializer mass;
+
+    @Inject
+    private BlockingAggregatorStreamSerializer bass;
 
     @PostConstruct
     public void connect() {
         cecss.setConductorElasticsearchApi( elasticsearchApi );
         mass.setConductorElasticsearchApi( elasticsearchApi );
+        bass.setConductorElasticsearchApi( elasticsearchApi );
     }
 }
