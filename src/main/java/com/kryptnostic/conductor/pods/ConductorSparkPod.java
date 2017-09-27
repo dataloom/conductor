@@ -32,6 +32,7 @@ import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
 import com.dataloom.hazelcast.HazelcastQueue;
 import com.dataloom.hazelcast.serializers.QueryResultStreamSerializer;
+import com.dataloom.linking.HazelcastBlockingService;
 import com.dataloom.mail.config.MailServiceRequirements;
 import com.dataloom.mappers.ObjectMappers;
 import com.datastax.driver.core.Session;
@@ -150,6 +151,11 @@ public class ConductorSparkPod {
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws UnknownHostException, IOException {
         return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
+    }
+
+    @Bean
+    public HazelcastBlockingService blockingService() {
+        return new HazelcastBlockingService( hazelcastInstance );
     }
 
     @PostConstruct
