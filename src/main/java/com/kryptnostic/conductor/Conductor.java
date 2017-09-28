@@ -32,6 +32,7 @@ import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
 import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
+import com.openlattice.jdbc.JdbcPod;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -56,7 +57,8 @@ public class Conductor extends RhizomeApplicationServer {
             CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class,
-            ConductorLoadingPod.class
+            ConductorLoadingPod.class,
+            JdbcPod.class
     };
 
     public Conductor() {

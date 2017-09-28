@@ -25,3 +25,13 @@ spark:
     port: 7077
     master:
         - "local[8]"
+
+hikari:
+    jdbcUrl: "jdbc:postgresql://localhost/openlattice"
+    dataSourceClassName: "org.postgresql.ds.PGSimpleDataSource"
+    username: "mtamayo"
+    dataSource.user: "mtamayo"
+    dataSource.databaseName: "openlattice"
+    maximumPoolSize: 98
+    #20 minutes
+    connectionTimeout: 12000000

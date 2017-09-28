@@ -20,11 +20,15 @@
 
 package com.kryptnostic.conductor.pods;
 
+import com.dataloom.data.hazelcast.DataKey;
 import com.dataloom.data.mapstores.DataMapstore;
+import com.dataloom.data.mapstores.PostgresDataMapstore;
 import com.datastax.driver.core.Session;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.MapStore;
 import com.kryptnostic.conductor.DataLoadingService;
+import java.nio.ByteBuffer;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -40,7 +44,7 @@ public class ConductorLoadingPod {
     private HazelcastInstance hazelcastInstance;
 
     @Inject
-    private DataMapstore dataMapstore;
+    private PostgresDataMapstore dataMapstore;
 
     @Inject
     private ListeningExecutorService executor;

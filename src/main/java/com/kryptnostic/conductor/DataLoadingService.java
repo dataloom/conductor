@@ -22,6 +22,7 @@ package com.kryptnostic.conductor;
 
 import com.dataloom.data.EntityKey;
 import com.dataloom.data.mapstores.DataMapstore;
+import com.dataloom.data.mapstores.PostgresDataMapstore;
 import com.dataloom.data.requests.Entity;
 import com.dataloom.hazelcast.HazelcastMap;
 import com.dataloom.streams.StreamUtil;
@@ -37,7 +38,7 @@ import com.kryptnostic.datastore.cassandra.RowAdapters;
  */
 public class DataLoadingService {
     private final ListeningExecutorService executor;
-    private final DataMapstore             dataMapstore;
+    private final PostgresDataMapstore     dataMapstore;
     private final IMap<EntityKey, Entity>  data;
     private final Session                  session;
 
@@ -45,7 +46,7 @@ public class DataLoadingService {
             Session session,
             HazelcastInstance hz,
             ListeningExecutorService executor,
-            DataMapstore dataMapstore ) {
+            PostgresDataMapstore dataMapstore ) {
         this.executor = executor;
         this.dataMapstore = dataMapstore;
         this.session = session;
