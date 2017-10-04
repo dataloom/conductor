@@ -28,10 +28,10 @@ spark:
 
 hikari:
     jdbcUrl: "jdbc:postgresql://localhost/openlattice"
-    dataSourceClassName: "org.postgresql.ds.PGSimpleDataSource"
+    #dataSourceClassName: "org.postgresql.ds.PGSimpleDataSource"
     username: "mtamayo"
-    dataSource.user: "mtamayo"
-    dataSource.databaseName: "openlattice"
+    #dataSource.user: "mtamayo"
+    #dataSource.databaseName: "openlattice"
     maximumPoolSize: 98
     #20 minutes
     connectionTimeout: 12000000

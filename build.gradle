@@ -46,6 +46,8 @@ apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptn
 def CONDUCTOR_XMS = "$System.env.CONDUCTOR_XMS"
 def CONDUCTOR_XMX = "$System.env.CONDUCTOR_XMX"
 def C_ARGS = "$System.env.CONDUCTOR_ARGS"
+def PARALLEL = "$System.env.PARALLELISM"
+def GC = "$System.env.GC"
 
 if (CONDUCTOR_XMS == 'null' || CONDUCTOR_XMS == null || CONDUCTOR_XMS == "") {
     CONDUCTOR_XMS = '-Xms1g'
@@ -59,8 +61,17 @@ if (C_ARGS == 'null' || C_ARGS == null || C_ARGS == "") {
     C_ARGS = 'cassandra spark local'
 }
 
+if (DS_ARGS == 'null' || DS_ARGS == null || DS_ARGS == "") {
+    DS_ARGS = 'local cassandra'
+}
+
+if (GC == 'null' || GC == null || GC == "") {
+    GC = "-XX:+UseG1GC"
+}
+
+
 mainClassName = "com.kryptnostic.conductor.Conductor"
-applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server", "-Djava.util.concurrent.ForkJoinPool.common.parallelism=32"]
+applicationDefaultJvmArgs = [CONDUCTOR_XMS, CONDUCTOR_XMX, "-server", GC, PARALLEL]
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
