@@ -19,6 +19,7 @@
 
 package com.kryptnostic.conductor;
 
+import com.openlattice.postgres.PostgresPod;
 import com.dataloom.hazelcast.pods.MapstoresPod;
 import com.dataloom.hazelcast.pods.SharedStreamSerializersPod;
 import com.dataloom.mail.pods.MailServicePod;
@@ -33,6 +34,7 @@ import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
 import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
 import com.openlattice.jdbc.JdbcPod;
+import com.openlattice.postgres.PostgresTablesPod;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -58,7 +60,9 @@ public class Conductor extends RhizomeApplicationServer {
             CassandraTablesPod.class,
             MapstoresPod.class,
             ConductorLoadingPod.class,
-            JdbcPod.class
+            JdbcPod.class,
+            PostgresTablesPod.class,
+            PostgresPod.class
     };
 
     public Conductor() {
