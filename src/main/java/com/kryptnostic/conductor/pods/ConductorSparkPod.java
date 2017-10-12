@@ -52,10 +52,8 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
 public class ConductorSparkPod {
@@ -71,9 +69,6 @@ public class ConductorSparkPod {
 
     @Inject
     private HazelcastInstance hazelcastInstance;
-
-    @Inject
-    private SparkSession sparkSession;
 
     @Inject
     private ConductorConfiguration conductorConfiguration;
