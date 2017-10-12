@@ -48,7 +48,6 @@ import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.core.Cutting;
-import com.kryptnostic.rhizome.pods.SparkPod;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import javax.annotation.PostConstruct;
@@ -59,7 +58,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import( SparkPod.class )
 public class ConductorSparkPod {
 
     @Inject
