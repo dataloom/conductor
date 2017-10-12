@@ -103,13 +103,6 @@ sourceSets {
 }
 
 dependencies {
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${jackson_version}"
-
-    compile "org.apache.spark:spark-core_2.11:${spark_version}"
-    compile "org.apache.spark:spark-sql_2.11:${spark_version}"
-    compile "org.apache.spark:spark-mllib_2.11:${spark_version}"
-    compile "org.apache.spark:spark-graphx_2.11:${spark_version}"
-    compile "org.apache.spark:spark-streaming_2.11:${spark_version}"
     compile "org.ow2.asm:asm:5.0.4"
     if (project.hasProperty('developmentMode') && project.developmentMode) {
         logger.quiet(project.name + " using project dependencies.")
@@ -129,11 +122,6 @@ dependencies {
      */
     testCompile "junit:junit:${junit_version}"
     testCompile "org.mockito:mockito-all:${mockito_version}"
-}
-
-test {
-    systemProperty 'java.library.path', 'lib/centos:lib/macosx:/usr/lib64'
-    jvmArgs '-Djava.library.path=./lib/centos:./lib/macosx:/usr/lib64'
 }
 
 eclipse {
