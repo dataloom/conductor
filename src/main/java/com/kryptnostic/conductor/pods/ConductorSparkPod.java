@@ -19,14 +19,9 @@
 
 package com.kryptnostic.conductor.pods;
 
-import com.dataloom.authorization.AbstractSecurableObjectResolveTypeService;
-import com.dataloom.authorization.AuthorizationManager;
-import com.dataloom.authorization.AuthorizationQueryService;
-import com.dataloom.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
-import com.dataloom.authorization.HazelcastAclKeyReservationService;
-import com.dataloom.authorization.HazelcastAuthorizationService;
+import com.dataloom.authorization.*;
 import com.dataloom.edm.internal.DatastoreConstants;
-import com.dataloom.edm.properties.CassandraTypeManager;
+import com.dataloom.edm.properties.PostgresTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
 import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
@@ -42,18 +37,20 @@ import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
-import com.kryptnostic.datastore.services.CassandraEntitySetManager;
 import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
+import com.kryptnostic.datastore.services.PostgresEntitySetManager;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.core.Cutting;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 @Configuration
 public class ConductorSparkPod {
@@ -78,6 +75,9 @@ public class ConductorSparkPod {
 
     @Inject
     private Cutting cutting;
+
+    @Inject
+    private HikariDataSource hikariDataSource;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -105,8 +105,8 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public CassandraEntitySetManager entitySetManager() {
-        return new CassandraEntitySetManager( DatastoreConstants.KEYSPACE, session, authorizationManager() );
+    public PostgresEntitySetManager entitySetManager() {
+        return new PostgresEntitySetManager( hikariDataSource );
     }
 
     @Bean
@@ -115,8 +115,8 @@ public class ConductorSparkPod {
     }
 
     @Bean
-    public CassandraTypeManager entityTypeManager() {
-        return new CassandraTypeManager( DatastoreConstants.KEYSPACE, session );
+    public PostgresTypeManager entityTypeManager() {
+        return new PostgresTypeManager( hikariDataSource );
     }
 
     @Bean
