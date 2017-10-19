@@ -112,7 +112,7 @@ public class ConductorSparkPod {
 
     @Bean
     public HazelcastSchemaManager schemaManager() {
-        return new HazelcastSchemaManager( DatastoreConstants.KEYSPACE, hazelcastInstance, schemaQueryService() );
+        return new HazelcastSchemaManager( hazelcastInstance, schemaQueryService() );
     }
 
     @Bean
