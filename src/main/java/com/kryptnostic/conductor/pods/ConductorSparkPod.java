@@ -133,8 +133,7 @@ public class ConductorSparkPod {
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
-                DatastoreConstants.KEYSPACE,
-                session,
+                hikariDataSource,
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
