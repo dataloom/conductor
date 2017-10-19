@@ -25,6 +25,7 @@ import com.dataloom.edm.properties.PostgresTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
 import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
+import com.dataloom.edm.schemas.postgres.PostgresSchemaQueryService;
 import com.dataloom.hazelcast.HazelcastQueue;
 import com.dataloom.hazelcast.serializers.QueryResultStreamSerializer;
 import com.dataloom.linking.HazelcastBlockingService;
@@ -101,7 +102,7 @@ public class ConductorSparkPod {
 
     @Bean
     public SchemaQueryService schemaQueryService() {
-        return new CassandraSchemaQueryService( DatastoreConstants.KEYSPACE, session );
+        return new PostgresSchemaQueryService( hikariDataSource );
     }
 
     @Bean
