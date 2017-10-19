@@ -20,19 +20,15 @@
 package com.kryptnostic.conductor.pods;
 
 import com.dataloom.authorization.*;
-import com.dataloom.edm.internal.DatastoreConstants;
 import com.dataloom.edm.properties.PostgresTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
-import com.dataloom.edm.schemas.cassandra.CassandraSchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
 import com.dataloom.edm.schemas.postgres.PostgresSchemaQueryService;
 import com.dataloom.hazelcast.HazelcastQueue;
-import com.dataloom.hazelcast.serializers.QueryResultStreamSerializer;
 import com.dataloom.linking.HazelcastBlockingService;
 import com.dataloom.linking.HazelcastMergingService;
 import com.dataloom.mail.config.MailServiceRequirements;
 import com.dataloom.mappers.ObjectMappers;
-import com.datastax.driver.core.Session;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
@@ -42,28 +38,17 @@ import com.kryptnostic.datastore.services.EdmManager;
 import com.kryptnostic.datastore.services.EdmService;
 import com.kryptnostic.datastore.services.PostgresEntitySetManager;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
-import com.kryptnostic.rhizome.configuration.cassandra.CassandraConfiguration;
 import com.kryptnostic.rhizome.core.Cutting;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
 @Configuration
 public class ConductorSparkPod {
-
-    @Inject
-    private CassandraConfiguration cassandraConfiguration;
-
-    @Inject
-    private Session session;
-
-    @Inject
-    private QueryResultStreamSerializer qrss;
 
     @Inject
     private HazelcastInstance hazelcastInstance;
@@ -155,10 +140,5 @@ public class ConductorSparkPod {
     @Bean
     public HazelcastMergingService mergingService() {
         return new HazelcastMergingService( hazelcastInstance );
-    }
-
-    @PostConstruct
-    public void setSession() {
-        qrss.setSession( session );
     }
 }
