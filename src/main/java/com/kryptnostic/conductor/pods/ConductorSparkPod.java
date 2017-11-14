@@ -21,6 +21,15 @@ package com.kryptnostic.conductor.pods;
 
 import com.dataloom.authorization.*;
 import com.dataloom.edm.properties.PostgresTypeManager;
+import com.dataloom.authorization.AbstractSecurableObjectResolveTypeService;
+import com.dataloom.authorization.AuthorizationManager;
+import com.dataloom.authorization.AuthorizationQueryService;
+import com.dataloom.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
+import com.dataloom.authorization.HazelcastAclKeyReservationService;
+import com.dataloom.authorization.HazelcastAuthorizationService;
+import com.dataloom.data.DatasourceManager;
+import com.dataloom.edm.internal.DatastoreConstants;
+import com.dataloom.edm.properties.CassandraTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
 import com.dataloom.edm.schemas.postgres.PostgresSchemaQueryService;
@@ -116,6 +125,11 @@ public class ConductorSparkPod {
     }
 
     @Bean
+    public DatasourceManager datasourceManager() {
+        return new DatasourceManager( hikariDataSource, hazelcastInstance );
+    }
+
+    @Bean
     public EdmManager dataModelService() {
         return new EdmService(
                 hikariDataSource,
@@ -124,7 +138,8 @@ public class ConductorSparkPod {
                 authorizationManager(),
                 entitySetManager(),
                 entityTypeManager(),
-                schemaManager() );
+                schemaManager(),
+                datasourceManager() );
     }
 
     @Bean
