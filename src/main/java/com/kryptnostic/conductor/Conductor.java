@@ -35,6 +35,7 @@ import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
 import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.postgres.PostgresTablesPod;
+import digital.loom.rhizome.authentication.Auth0Pod;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -56,6 +57,7 @@ public class Conductor extends RhizomeApplicationServer {
             SharedStreamSerializersPod.class,
             PlasmaCoupling.class,
             MailServicePod.class,
+            Auth0Pod.class,
             CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class,
