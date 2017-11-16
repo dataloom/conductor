@@ -26,6 +26,8 @@ import com.dataloom.hazelcast.serializers.MergeVertexAggregatorStreamSerializer;
 import com.dataloom.linking.HazelcastBlockingService;
 import com.dataloom.linking.HazelcastMergingService;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
+import com.openlattice.authorization.mapstores.UserMapstore;
+import digital.loom.rhizome.configuration.auth0.Auth0Configuration;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -33,6 +35,10 @@ import javax.inject.Inject;
 
 @Configuration
 public class PlasmaCoupling {
+
+    @Inject
+    private Auth0Configuration auth0Configuration;
+
     @Inject
     private ConductorElasticsearchApi elasticsearchApi;
 
@@ -54,8 +60,12 @@ public class PlasmaCoupling {
     @Inject
     private MergeVertexAggregatorStreamSerializer mvass;
 
+    @Inject
+    private  UserMapstore userMapstore;
+
     @PostConstruct
     public void connect() {
+        userMapstore.setToken( auth0Configuration.getToken() );
         cecss.setConductorElasticsearchApi( elasticsearchApi );
         feass.setConductorElasticsearchApi( elasticsearchApi );
         bass.setBlockingService( blockingService );
