@@ -35,6 +35,10 @@ import javax.inject.Inject;
 
 @Configuration
 public class PlasmaCoupling {
+
+    @Inject
+    private Auth0Configuration auth0Configuration;
+
     @Inject
     private ConductorElasticsearchApi elasticsearchApi;
 
@@ -57,13 +61,11 @@ public class PlasmaCoupling {
     private MergeVertexAggregatorStreamSerializer mvass;
 
     @Inject
-    private Auth0Configuration auth0Configuration;
-
-    @Inject
     private UserMapstore userMapstore;
 
     @PostConstruct
     public void connect() {
+        userMapstore.setToken( auth0Configuration.getToken() );
         cecss.setConductorElasticsearchApi( elasticsearchApi );
         feass.setConductorElasticsearchApi( elasticsearchApi );
         bass.setBlockingService( blockingService );

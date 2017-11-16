@@ -58,6 +58,7 @@ public class Conductor extends RhizomeApplicationServer {
             SharedStreamSerializersPod.class,
             PlasmaCoupling.class,
             MailServicePod.class,
+            Auth0Pod.class,
             CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class,
