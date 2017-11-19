@@ -36,6 +36,7 @@ import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConf
 import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.postgres.PostgresTablesPod;
 import digital.loom.rhizome.authentication.Auth0Pod;
+
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -64,7 +65,8 @@ public class Conductor extends RhizomeApplicationServer {
             ConductorLoadingPod.class,
             JdbcPod.class,
             PostgresTablesPod.class,
-            PostgresPod.class
+            PostgresPod.class,
+            Auth0Pod.class
     };
 
     public Conductor() {
