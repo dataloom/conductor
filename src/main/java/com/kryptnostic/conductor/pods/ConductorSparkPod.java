@@ -19,8 +19,6 @@
 
 package com.kryptnostic.conductor.pods;
 
-import com.dataloom.authorization.*;
-import com.dataloom.edm.properties.PostgresTypeManager;
 import com.dataloom.authorization.AbstractSecurableObjectResolveTypeService;
 import com.dataloom.authorization.AuthorizationManager;
 import com.dataloom.authorization.AuthorizationQueryService;
@@ -28,8 +26,7 @@ import com.dataloom.authorization.HazelcastAbstractSecurableObjectResolveTypeSer
 import com.dataloom.authorization.HazelcastAclKeyReservationService;
 import com.dataloom.authorization.HazelcastAuthorizationService;
 import com.dataloom.data.DatasourceManager;
-import com.dataloom.edm.internal.DatastoreConstants;
-import com.dataloom.edm.properties.CassandraTypeManager;
+import com.dataloom.edm.properties.PostgresTypeManager;
 import com.dataloom.edm.schemas.SchemaQueryService;
 import com.dataloom.edm.schemas.manager.HazelcastSchemaManager;
 import com.dataloom.edm.schemas.postgres.PostgresSchemaQueryService;
@@ -40,6 +37,7 @@ import com.dataloom.mail.config.MailServiceRequirements;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
@@ -49,12 +47,11 @@ import com.kryptnostic.datastore.services.PostgresEntitySetManager;
 import com.kryptnostic.kindling.search.ConductorElasticsearchImpl;
 import com.kryptnostic.rhizome.core.Cutting;
 import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import javax.inject.Inject;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import javax.inject.Inject;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ConductorSparkPod {
@@ -73,6 +70,9 @@ public class ConductorSparkPod {
 
     @Inject
     private HikariDataSource hikariDataSource;
+
+    @Inject
+    private ListeningExecutorService executorService;
 
     @Bean
     public ObjectMapper defaultObjectMapper() {
@@ -154,6 +154,6 @@ public class ConductorSparkPod {
 
     @Bean
     public HazelcastMergingService mergingService() {
-        return new HazelcastMergingService( hazelcastInstance );
+        return new HazelcastMergingService( hazelcastInstance, executorService );
     }
 }
