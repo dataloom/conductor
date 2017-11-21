@@ -25,7 +25,6 @@ import com.dataloom.hazelcast.pods.SharedStreamSerializersPod;
 import com.dataloom.mail.pods.MailServicePod;
 import com.dataloom.mail.services.MailService;
 import com.kryptnostic.conductor.codecs.pods.TypeCodecsPod;
-import com.kryptnostic.conductor.pods.ConductorLoadingPod;
 import com.kryptnostic.conductor.pods.ConductorServicesPod;
 import com.kryptnostic.conductor.pods.ConductorSparkPod;
 import com.kryptnostic.datastore.cassandra.CassandraTablesPod;
@@ -62,7 +61,6 @@ public class Conductor extends RhizomeApplicationServer {
             CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class,
-            ConductorLoadingPod.class,
             JdbcPod.class,
             PostgresTablesPod.class,
             PostgresPod.class,
