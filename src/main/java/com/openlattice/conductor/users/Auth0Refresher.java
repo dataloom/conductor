@@ -61,7 +61,7 @@ public class Auth0Refresher {
     @Scheduled( fixedRate = 15000 )
     void refreshAuth0Users() {
         //Only one instance can populate and refresh the map.
-        if ( refreshLock.tryLock() && nextTime.get() > System.currentTimeMillis() ) {
+        if ( refreshLock.tryLock() && ( nextTime.get() > System.currentTimeMillis() || nextTime.get() == 0 ) ) {
             logger.info( "Refreshing user list from Auth0." );
             try {
                 int page = 0;
