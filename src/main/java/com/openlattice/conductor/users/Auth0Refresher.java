@@ -20,24 +20,63 @@
 
 package com.openlattice.conductor.users;
 
+import com.codahale.metrics.annotation.Timed;
+import com.dataloom.client.RetrofitFactory;
 import com.dataloom.directory.pojo.Auth0UserBasic;
 import com.dataloom.hazelcast.HazelcastMap;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IAtomicLong;
+import com.hazelcast.core.ILock;
 import com.hazelcast.core.IMap;
+import com.kryptnostic.datastore.services.Auth0ManagementApi;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import retrofit2.Retrofit;
 
 /**
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class Auth0Refresher {
-    private final IMap<String, Auth0UserBasic> users;
+    private static final Logger logger            = LoggerFactory.getLogger( Auth0Refresher.class );
+    private static final int    DEFAULT_PAGE_SIZE = 100;
 
-    public Auth0Refresher( HazelcastInstance hazelcastInstance ) {
+    private final IMap<String, Auth0UserBasic> users;
+    private final Retrofit                     retrofit;
+    private final Auth0ManagementApi           auth0ManagementApi;
+    private final ILock                        refreshLock;
+    private final IAtomicLong                  nextTime;
+
+    public Auth0Refresher( HazelcastInstance hazelcastInstance, String token ) {
         this.users = hazelcastInstance.getMap( HazelcastMap.USERS.name() );
+        this.refreshLock = hazelcastInstance.getLock( Auth0Refresher.class.getCanonicalName() );
+        this.nextTime = hazelcastInstance.getAtomicLong( Auth0Refresher.class.getCanonicalName() );
+        this.retrofit = RetrofitFactory.newClient( "https://openlattice.auth0.com/api/v2/", () -> token );
+        this.auth0ManagementApi = retrofit.create( Auth0ManagementApi.class );
     }
 
+    @Timed
     @Scheduled( fixedRate = 15000 )
     void refreshAuth0Users() {
-        users.loadAll( true );
+        //Only one instance can populate and refresh the map.
+        if ( refreshLock.tryLock() && nextTime.get() > System.currentTimeMillis() ) {
+            logger.info( "Refreshing user list from Auth0." );
+            try {
+                int page = 0;
+                Set<Auth0UserBasic> pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
+                while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
+                    logger.debug( "Loading page {} of auth0 users", page );
+                    pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
+                    for ( Auth0UserBasic user : pageOfUsers ) {
+                        users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
+                    }
+                }
+            } finally {
+                nextTime.set( System.currentTimeMillis() + 15000 );
+                refreshLock.unlock();
+            }
+        }
     }
 }
