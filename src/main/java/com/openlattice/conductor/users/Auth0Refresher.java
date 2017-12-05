@@ -29,6 +29,7 @@ import com.hazelcast.core.IAtomicLong;
 import com.hazelcast.core.ILock;
 import com.hazelcast.core.IMap;
 import com.kryptnostic.datastore.services.Auth0ManagementApi;
+import com.openlattice.authorization.mapstores.UserMapstore;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class Auth0Refresher {
     public Auth0Refresher( HazelcastInstance hazelcastInstance, String token ) {
         this.users = hazelcastInstance.getMap( HazelcastMap.USERS.name() );
         this.refreshLock = hazelcastInstance.getLock( Auth0Refresher.class.getCanonicalName() );
-        this.nextTime = hazelcastInstance.getAtomicLong( Auth0Refresher.class.getCanonicalName() );
+        this.nextTime = hazelcastInstance.getAtomicLong( UserMapstore.class.getCanonicalName() );
         this.retrofit = RetrofitFactory.newClient( "https://openlattice.auth0.com/api/v2/", () -> token );
         this.auth0ManagementApi = retrofit.create( Auth0ManagementApi.class );
     }
