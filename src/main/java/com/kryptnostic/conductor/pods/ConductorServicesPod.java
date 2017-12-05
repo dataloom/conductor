@@ -28,6 +28,7 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
+import com.openlattice.conductor.users.Auth0Refresher;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -65,8 +66,8 @@ public class ConductorServicesPod {
     @Bean( name = "conductorConfiguration" )
     @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
     public ConductorConfiguration getLocalConductorConfiguration() throws IOException {
-        ConductorConfiguration config =  configurationService.getConfiguration( ConductorConfiguration.class );
-        logger.info("Using local conductor configuration: {}", config );
+        ConductorConfiguration config = configurationService.getConfiguration( ConductorConfiguration.class );
+        logger.info( "Using local conductor configuration: {}", config );
         return config;
     }
 
@@ -74,13 +75,18 @@ public class ConductorServicesPod {
     @Profile( Profiles.AWS_CONFIGURATION_PROFILE )
     public ConductorConfiguration getAwsConductorConfiguration() throws IOException {
 
-        ConductorConfiguration config =   ResourceConfigurationLoader.loadConfigurationFromS3( s3,
+        ConductorConfiguration config = ResourceConfigurationLoader.loadConfigurationFromS3( s3,
                 awsLaunchConfig.getBucket(),
                 awsLaunchConfig.getFolder(),
                 ConductorConfiguration.class );
 
-        logger.info("Using aws conductor configuration: {}", config );
+        logger.info( "Using aws conductor configuration: {}", config );
         return config;
+    }
+
+    @Bean
+    public Auth0Refresher auth0Refresher() {
+        return new Auth0Refresher( hazelcastInstance );
     }
 
 }
