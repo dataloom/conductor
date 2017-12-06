@@ -24,12 +24,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.dataloom.client.RetrofitFactory;
 import com.dataloom.directory.pojo.Auth0UserBasic;
 import com.dataloom.hazelcast.HazelcastMap;
+import com.google.common.collect.ImmutableMap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IAtomicLong;
 import com.hazelcast.core.ILock;
 import com.hazelcast.core.IMap;
 import com.kryptnostic.datastore.services.Auth0ManagementApi;
 import com.openlattice.authorization.mapstores.UserMapstore;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -69,10 +71,10 @@ public class Auth0Refresher {
                 Set<Auth0UserBasic> pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
                     logger.debug( "Loading page {} of auth0 users", page );
-                    pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                     for ( Auth0UserBasic user : pageOfUsers ) {
                         users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
                     }
+                    pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 }
             } finally {
                 nextTime.set( System.currentTimeMillis() + 15000 );
