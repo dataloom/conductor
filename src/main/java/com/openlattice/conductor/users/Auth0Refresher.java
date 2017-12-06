@@ -61,7 +61,7 @@ public class Auth0Refresher {
     }
 
     @Timed
-    @Scheduled( fixedRate = 15000 )
+    @Scheduled( fixedRate = 30000 )
     void refreshAuth0Users() {
         //Only one instance can populate and refresh the map.
         if ( refreshLock.tryLock() && ( nextTime.get() > System.currentTimeMillis() || nextTime.get() == 0 ) ) {
@@ -70,7 +70,7 @@ public class Auth0Refresher {
                 int page = 0;
                 Set<Auth0UserBasic> pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
-                    logger.debug( "Loading page {} of auth0 users", page );
+                    logger.info( "Loading page {} of auth0 users", page );
                     for ( Auth0UserBasic user : pageOfUsers ) {
                         users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
                     }
