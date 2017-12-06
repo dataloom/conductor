@@ -72,7 +72,7 @@ public class Auth0Refresher {
                 while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
                     logger.info( "Loading page {} of auth0 users", page );
                     for ( Auth0UserBasic user : pageOfUsers ) {
-                        users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
+                        users.putTransient( user.getUserId(), user, -1, TimeUnit.MINUTES );
                     }
                     pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 }
