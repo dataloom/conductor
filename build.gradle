@@ -25,12 +25,8 @@ plugins {
     id "jacoco"
 }
 
-/*
-*	Kryptnostic conductor service
-* 	version is defined in kryptnostic-gradles/kryptnostic.gradle
-*/
-description = "Kryptnostic Conductor Server"
-group = "com.kryptnostic"
+description = "Conductor Server"
+group = "com.openlattice"
 
 distTar {
     archiveName "conductor.tgz"
@@ -41,7 +37,7 @@ ext.scmUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 ext.connectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 ext.developerConnectionUrl = 'scm:git:https://github.com/dataloom/conductor.git'
 
-apply from: "https://raw.githubusercontent.com/kryptnostic/gradles/master/kryptnostic.gradle"
+apply from: "https://raw.githubusercontent.com/openlattice/gradles/master/openlattice.gradle"
 
 def CONDUCTOR_XMS = "$System.env.CONDUCTOR_XMS"
 def CONDUCTOR_XMX = "$System.env.CONDUCTOR_XMX"
@@ -112,10 +108,10 @@ dependencies {
         compile project(":courier")
     } else {
         logger.quiet(project.name + " using jar dependencies.")
-        compile "com.kryptnostic:rhizome:${rhizome_version}"
-        compile "com.kryptnostic:conductor-client:${conductor_client_version}"
-        compile "com.kryptnostic:kindling:${kindling_version}"
-        compile "com.kryptnostic:courier:${courier_version}"
+        compile "com.openlattice:rhizome:${rhizome_version}"
+        compile "com.openlattice:conductor-client:${conductor_client_version}"
+        compile "com.openlattice:kindling:${kindling_version}"
+        compile "com.openlattice:courier:${courier_version}"
     }
     /*
      * TESTING
