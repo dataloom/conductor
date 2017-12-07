@@ -62,6 +62,7 @@ public class Auth0Refresher {
     @Timed
     void refreshAuth0Users() {
         //Only one instance can populate and refresh the map.
+        logger.info("Trying to acquire lock to refresh auth0 users.");
         if ( refreshLock.tryLock() && ( nextTime.get() < System.currentTimeMillis() ) ) {
             logger.info( "Refreshing user list from Auth0." );
             try {
