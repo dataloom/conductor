@@ -24,7 +24,9 @@ import com.dataloom.authorization.AuthorizationManager;
 import com.dataloom.authorization.AuthorizationQueryService;
 import com.dataloom.authorization.HazelcastAclKeyReservationService;
 import com.dataloom.authorization.HazelcastAuthorizationService;
+import com.dataloom.directory.UserDirectoryService;
 import com.dataloom.mappers.ObjectMappers;
+import com.dataloom.organizations.HazelcastOrganizationService;
 import com.dataloom.organizations.roles.HazelcastPrincipalService;
 import com.dataloom.organizations.roles.SecurePrincipalsManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -125,6 +127,21 @@ public class ConductorServicesPod {
     @Bean
     public AuthorizationManager authorizationManager() {
         return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+    }
+
+    @Bean
+    public UserDirectoryService userDirectoryService() {
+        return new UserDirectoryService( auth0Configuration.getToken(), hazelcastInstance );
+    }
+
+    @Bean
+    public HazelcastOrganizationService organizationsManager() {
+        return new HazelcastOrganizationService(
+                hazelcastInstance,
+                aclKeyReservationService(),
+                authorizationManager(),
+                userDirectoryService(),
+                principalService() );
     }
 
     @Bean
