@@ -26,8 +26,8 @@ import com.dataloom.directory.pojo.Auth0UserBasic;
 import com.dataloom.hazelcast.HazelcastMap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IAtomicLong;
-import com.hazelcast.core.ILock;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.Member;
 import com.kryptnostic.datastore.services.Auth0ManagementApi;
 import com.openlattice.authorization.mapstores.UserMapstore;
 import java.util.Set;
@@ -45,25 +45,36 @@ public class Auth0Refresher {
     private static final Logger logger                  = LoggerFactory.getLogger( Auth0Refresher.class );
     private static final int    DEFAULT_PAGE_SIZE       = 100;
 
+    private final HazelcastInstance            hazelcastInstance;
     private final IMap<String, Auth0UserBasic> users;
     private final Retrofit                     retrofit;
     private final Auth0ManagementApi           auth0ManagementApi;
-    private final ILock                        refreshLock;
+    private final IAtomicLong                  memberId;
     private final IAtomicLong                  nextTime;
 
     public Auth0Refresher( HazelcastInstance hazelcastInstance, String token ) {
         this.users = hazelcastInstance.getMap( HazelcastMap.USERS.name() );
-        this.refreshLock = hazelcastInstance.getLock( Auth0Refresher.class.getCanonicalName() );
+        this.memberId = hazelcastInstance.getAtomicLong( Auth0Refresher.class.getCanonicalName() );
         this.nextTime = hazelcastInstance.getAtomicLong( UserMapstore.class.getCanonicalName() );
         this.retrofit = RetrofitFactory.newClient( "https://openlattice.auth0.com/api/v2/", () -> token );
         this.auth0ManagementApi = retrofit.create( Auth0ManagementApi.class );
+        this.hazelcastInstance = hazelcastInstance;
     }
 
     @Timed
     void refreshAuth0Users() {
-        //Only one instance can populate and refresh the map.
+        //Only one instance can populate and refresh the map. Unforunately, ILock is refusing to unlock causing issues
+        //So we implement a different gating mechanism. This may occasionally be wrong when cluster size changes.
         logger.info( "Trying to acquire lock to refresh auth0 users." );
-        if ( refreshLock.tryLock() && ( nextTime.get() < System.currentTimeMillis() ) ) {
+        String me = hazelcastInstance.getCluster().getLocalMember().getUuid();
+        String[] members = hazelcastInstance
+                .getCluster()
+                .getMembers()
+                .stream()
+                .map( Member::getUuid )
+                .toArray( String[]::new );
+        int index = ( (int) memberId.getAndIncrement() ) % members.length;
+        if ( me.equals( members[ index ] ) && ( nextTime.get() < System.currentTimeMillis() ) ) {
             logger.info( "Refreshing user list from Auth0." );
             try {
                 int page = 0;
@@ -71,15 +82,16 @@ public class Auth0Refresher {
                 while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
                     logger.info( "Loading page {} of {} auth0 users", page, pageOfUsers.size() );
                     for ( Auth0UserBasic user : pageOfUsers ) {
-                        users.putTransient( user.getUserId(), user, -1, TimeUnit.MINUTES );
+                        users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
                     }
                     pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 }
             } finally {
                 logger.info( "Scheduling next refresh." );
                 nextTime.set( System.currentTimeMillis() + REFRESH_INTERVAL_MILLIS );
-                refreshLock.unlock();
             }
+        } else {
+            logger.info( "Not elected to refresh users." );
         }
     }
 
