@@ -41,9 +41,9 @@ import retrofit2.Retrofit;
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class Auth0Refresher {
-    public static final int REFRESH_INTERVAL_MILLIS = 30000;
-    private static final Logger logger            = LoggerFactory.getLogger( Auth0Refresher.class );
-    private static final int    DEFAULT_PAGE_SIZE = 100;
+    public static final  int    REFRESH_INTERVAL_MILLIS = 30000;
+    private static final Logger logger                  = LoggerFactory.getLogger( Auth0Refresher.class );
+    private static final int    DEFAULT_PAGE_SIZE       = 100;
 
     private final IMap<String, Auth0UserBasic> users;
     private final Retrofit                     retrofit;
@@ -60,10 +60,9 @@ public class Auth0Refresher {
     }
 
     @Timed
-    @Scheduled( fixedRate = REFRESH_INTERVAL_MILLIS )
     void refreshAuth0Users() {
         //Only one instance can populate and refresh the map.
-        if ( refreshLock.tryLock() && ( nextTime.get() < System.currentTimeMillis() || nextTime.get() == 0 ) ) {
+        if ( refreshLock.tryLock() && ( nextTime.get() < System.currentTimeMillis() ) ) {
             logger.info( "Refreshing user list from Auth0." );
             try {
                 int page = 0;
@@ -71,7 +70,7 @@ public class Auth0Refresher {
                 while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
                     logger.info( "Loading page {} of auth0 users", page );
                     for ( Auth0UserBasic user : pageOfUsers ) {
-                        users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
+                        users.putTransient( user.getUserId(), user, -1, TimeUnit.MINUTES );
                     }
                     pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 }
@@ -79,6 +78,19 @@ public class Auth0Refresher {
                 nextTime.set( System.currentTimeMillis() + REFRESH_INTERVAL_MILLIS );
                 refreshLock.unlock();
             }
+        }
+    }
+
+    public static class Auth0RefreshDriver {
+        private final Auth0Refresher refresher;
+
+        public Auth0RefreshDriver( Auth0Refresher refresher ) {
+            this.refresher = refresher;
+        }
+
+        @Scheduled( fixedRate = REFRESH_INTERVAL_MILLIS )
+        void refreshAuth0Users() {
+            refresher.refreshAuth0Users();
         }
     }
 }

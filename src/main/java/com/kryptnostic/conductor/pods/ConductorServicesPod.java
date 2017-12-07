@@ -29,6 +29,7 @@ import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.conductor.users.Auth0Refresher;
+import com.openlattice.conductor.users.Auth0Refresher.Auth0RefreshDriver;
 import com.zaxxer.hikari.HikariDataSource;
 import digital.loom.rhizome.configuration.auth0.Auth0Configuration;
 import java.io.IOException;
@@ -91,6 +92,11 @@ public class ConductorServicesPod {
     @Bean
     public Auth0Refresher auth0Refresher() {
         return new Auth0Refresher( hazelcastInstance, auth0Configuration.getToken() );
+    }
+
+    @Bean
+    public Auth0RefreshDriver auth0RefreshDriver() {
+        return new Auth0RefreshDriver( auth0Refresher() );
     }
 
 }
