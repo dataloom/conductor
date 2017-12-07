@@ -54,7 +54,7 @@ if (CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "") {
 }
 
 if (C_ARGS == 'null' || C_ARGS == null || C_ARGS == "") {
-    C_ARGS = 'cassandra spark local'
+    C_ARGS = 'local postgres'
 }
 
 if( PARALLEL == 'null' || PARALLEL == null || PARALLEL == "" ) {
@@ -128,4 +128,4 @@ eclipse {
     ext.targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-eclipse.classpath.plusConfigurations += [configurations.provided] 
+eclipse.classpath.plusConfigurations += [configurations.provided]
