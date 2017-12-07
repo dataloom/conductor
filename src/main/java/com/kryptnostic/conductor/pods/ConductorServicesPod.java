@@ -19,6 +19,9 @@
 
 package com.kryptnostic.conductor.pods;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.kryptnostic.datastore.util.Util.returnAndLog;
+
 import com.amazonaws.services.s3.AmazonS3;
 import com.dataloom.authorization.AuthorizationManager;
 import com.dataloom.authorization.AuthorizationQueryService;
@@ -38,6 +41,8 @@ import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.authorization.DbCredentialService;
+import com.openlattice.bootstrap.AuthorizationBootstrap;
+import com.openlattice.bootstrap.OrganizationBootstrap;
 import com.openlattice.conductor.users.Auth0Synchronizer;
 import com.openlattice.conductor.users.Auth0Synchronizer.Auth0SyncDriver;
 import com.zaxxer.hikari.HikariDataSource;
@@ -142,6 +147,19 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 userDirectoryService(),
                 principalService() );
+    }
+
+    @Bean
+    public AuthorizationBootstrap authzBoot() {
+        return returnAndLog( new AuthorizationBootstrap( hazelcastInstance, principalService() ),
+                "Checkpoint AuthZ Boostrap" );
+    }
+
+    @Bean
+    public OrganizationBootstrap orgBoot() {
+        checkState( authzBoot().isInitialized(), "Roles must be initialized." );
+        return returnAndLog( new OrganizationBootstrap( organizationsManager() ),
+                "Checkpoint organization bootstrap." );
     }
 
     @Bean
