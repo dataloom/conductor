@@ -23,15 +23,24 @@ package com.openlattice.conductor.users;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.codahale.metrics.annotation.Timed;
+import com.dataloom.authorization.Principal;
+import com.dataloom.authorization.PrincipalType;
+import com.dataloom.authorization.SystemRole;
 import com.dataloom.client.RetrofitFactory;
 import com.dataloom.directory.pojo.Auth0UserBasic;
 import com.dataloom.hazelcast.HazelcastMap;
+import com.dataloom.organizations.roles.SecurePrincipalsManager;
+import com.google.common.base.Optional;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IAtomicLong;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
 import com.kryptnostic.datastore.services.Auth0ManagementApi;
+import com.openlattice.authorization.AclKey;
+import com.openlattice.authorization.DbCredentialService;
+import com.openlattice.authorization.SecurablePrincipal;
 import com.openlattice.authorization.mapstores.UserMapstore;
+import com.openlattice.bootstrap.AuthorizationBootstrap;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +52,9 @@ import retrofit2.Retrofit;
 /**
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
-public class Auth0Refresher {
+public class Auth0Synchronizer {
     public static final  int    REFRESH_INTERVAL_MILLIS = 30000;
-    private static final Logger logger                  = LoggerFactory.getLogger( Auth0Refresher.class );
+    private static final Logger logger                  = LoggerFactory.getLogger( Auth0Synchronizer.class );
     private static final int    DEFAULT_PAGE_SIZE       = 100;
 
     private final HazelcastInstance            hazelcastInstance;
@@ -55,15 +64,27 @@ public class Auth0Refresher {
     private final IQueue<String>               memberIds;
     private final IAtomicLong                  nextTime;
     private final String                       localMemberId;
+    private final DbCredentialService          dbCredentialService;
+    private final SecurePrincipalsManager      spm;
+    private final AclKey                       userRoleAclKey;
+    private final AclKey                       adminRoleAclKey;
 
-    public Auth0Refresher( HazelcastInstance hazelcastInstance, String token ) {
+    public Auth0Synchronizer(
+            HazelcastInstance hazelcastInstance,
+            SecurePrincipalsManager spm,
+            DbCredentialService dbCredentialService,
+            String token ) {
         this.users = hazelcastInstance.getMap( HazelcastMap.USERS.name() );
-        this.memberIds = hazelcastInstance.getQueue( Auth0Refresher.class.getCanonicalName() );
+        this.memberIds = hazelcastInstance.getQueue( Auth0Synchronizer.class.getCanonicalName() );
         this.nextTime = hazelcastInstance.getAtomicLong( UserMapstore.class.getCanonicalName() );
         this.retrofit = RetrofitFactory.newClient( "https://openlattice.auth0.com/api/v2/", () -> token );
         this.auth0ManagementApi = retrofit.create( Auth0ManagementApi.class );
         this.hazelcastInstance = hazelcastInstance;
         this.localMemberId = checkNotNull( hazelcastInstance.getLocalEndpoint().getUuid() );
+        this.dbCredentialService = dbCredentialService;
+        this.spm = spm;
+        this.userRoleAclKey = spm.lookup( AuthorizationBootstrap.GLOBAL_USER_ROLE.getPrincipal() );
+        this.adminRoleAclKey = spm.lookup( AuthorizationBootstrap.GLOBAL_ADMIN_ROLE.getPrincipal() );
         memberIds.add( localMemberId );
     }
 
@@ -83,9 +104,14 @@ public class Auth0Refresher {
                 Set<Auth0UserBasic> pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 while ( pageOfUsers != null && !pageOfUsers.isEmpty() ) {
                     logger.info( "Loading page {} of {} auth0 users", page, pageOfUsers.size() );
-                    for ( Auth0UserBasic user : pageOfUsers ) {
-                        users.set( user.getUserId(), user, -1, TimeUnit.MINUTES );
-                    }
+                    pageOfUsers
+                            .parallelStream()
+                            .forEach( user -> {
+                                String userId = user.getUserId();
+                                users.set( userId, user, -1, TimeUnit.MINUTES );
+                                dbCredentialService.createUserIfNotExists( userId );
+                                createPrincipal( user, userId );
+                            } );
                     pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 }
             } finally {
@@ -97,10 +123,30 @@ public class Auth0Refresher {
         }
     }
 
-    public static class Auth0RefreshDriver {
-        private final Auth0Refresher refresher;
+    public void createPrincipal( Auth0UserBasic user, String userId ) {
+        final Principal principal = new Principal( PrincipalType.USER, userId );
+        final String title = ( user.getNickname() != null && user.getNickname().length() > 0 ) ?
+                user.getNickname() :
+                user.getEmail();
 
-        public Auth0RefreshDriver( Auth0Refresher refresher ) {
+        spm.createSecurablePrincipalIfNotExists( principal,
+                new SecurablePrincipal( Optional.absent(), principal, title, Optional.absent() ) );
+
+        AclKey userAclKey = spm.lookup( principal );
+
+        if ( user.getRoles().contains( SystemRole.AUTHENTICATED_USER.getName() ) ) {
+            spm.addPrincipalToPrincipal( userRoleAclKey, userAclKey );
+        }
+
+        if ( user.getRoles().contains( SystemRole.ADMIN.getName() ) ) {
+            spm.addPrincipalToPrincipal( adminRoleAclKey, userAclKey );
+        }
+    }
+
+    public static class Auth0SyncDriver {
+        private final Auth0Synchronizer refresher;
+
+        public Auth0SyncDriver( Auth0Synchronizer refresher ) {
             this.refresher = refresher;
         }
 

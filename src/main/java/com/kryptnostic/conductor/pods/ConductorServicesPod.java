@@ -20,16 +20,24 @@
 package com.kryptnostic.conductor.pods;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.dataloom.authorization.AuthorizationManager;
+import com.dataloom.authorization.AuthorizationQueryService;
+import com.dataloom.authorization.HazelcastAclKeyReservationService;
+import com.dataloom.authorization.HazelcastAuthorizationService;
 import com.dataloom.mappers.ObjectMappers;
+import com.dataloom.organizations.roles.HazelcastPrincipalService;
+import com.dataloom.organizations.roles.SecurePrincipalsManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.conductor.rpc.ConductorConfiguration;
 import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
-import com.openlattice.conductor.users.Auth0Refresher;
-import com.openlattice.conductor.users.Auth0Refresher.Auth0RefreshDriver;
+import com.openlattice.authorization.DbCredentialService;
+import com.openlattice.conductor.users.Auth0Synchronizer;
+import com.openlattice.conductor.users.Auth0Synchronizer.Auth0SyncDriver;
 import com.zaxxer.hikari.HikariDataSource;
 import digital.loom.rhizome.configuration.auth0.Auth0Configuration;
 import java.io.IOException;
@@ -56,6 +64,9 @@ public class ConductorServicesPod {
 
     @Inject
     private HikariDataSource hikariDataSource;
+
+    @Inject
+    private EventBus eventBus;
 
     @Autowired( required = false )
     private AmazonS3 s3;
@@ -90,13 +101,40 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public Auth0Refresher auth0Refresher() {
-        return new Auth0Refresher( hazelcastInstance, auth0Configuration.getToken() );
+    public DbCredentialService dbcs() {
+        return new DbCredentialService( hazelcastInstance, hikariDataSource );
     }
 
     @Bean
-    public Auth0RefreshDriver auth0RefreshDriver() {
-        return new Auth0RefreshDriver( auth0Refresher() );
+    public AuthorizationQueryService authorizationQueryService() {
+        return new AuthorizationQueryService( hikariDataSource, hazelcastInstance );
+    }
+
+    @Bean
+    public HazelcastAclKeyReservationService aclKeyReservationService() {
+        return new HazelcastAclKeyReservationService( hazelcastInstance );
+    }
+
+    @Bean
+    public SecurePrincipalsManager principalService() {
+        return new HazelcastPrincipalService( hazelcastInstance,
+                aclKeyReservationService(),
+                authorizationManager() );
+    }
+
+    @Bean
+    public AuthorizationManager authorizationManager() {
+        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+    }
+
+    @Bean
+    public Auth0Synchronizer auth0Refresher() {
+        return new Auth0Synchronizer( hazelcastInstance, principalService(), dbcs(), auth0Configuration.getToken() );
+    }
+
+    @Bean
+    public Auth0SyncDriver auth0RefreshDriver() {
+        return new Auth0SyncDriver( auth0Refresher() );
     }
 
 }
