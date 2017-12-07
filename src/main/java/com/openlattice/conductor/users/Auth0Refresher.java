@@ -20,6 +20,8 @@
 
 package com.openlattice.conductor.users;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.codahale.metrics.annotation.Timed;
 import com.dataloom.client.RetrofitFactory;
 import com.dataloom.directory.pojo.Auth0UserBasic;
@@ -27,11 +29,12 @@ import com.dataloom.hazelcast.HazelcastMap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IAtomicLong;
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.Member;
+import com.hazelcast.core.IQueue;
 import com.kryptnostic.datastore.services.Auth0ManagementApi;
 import com.openlattice.authorization.mapstores.UserMapstore;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -49,16 +52,19 @@ public class Auth0Refresher {
     private final IMap<String, Auth0UserBasic> users;
     private final Retrofit                     retrofit;
     private final Auth0ManagementApi           auth0ManagementApi;
-    private final IAtomicLong                  memberId;
+    private final IQueue<String>               memberIds;
     private final IAtomicLong                  nextTime;
+    private final String                       localMemberId;
 
     public Auth0Refresher( HazelcastInstance hazelcastInstance, String token ) {
         this.users = hazelcastInstance.getMap( HazelcastMap.USERS.name() );
-        this.memberId = hazelcastInstance.getAtomicLong( Auth0Refresher.class.getCanonicalName() );
+        this.memberIds = hazelcastInstance.getQueue( Auth0Refresher.class.getCanonicalName() );
         this.nextTime = hazelcastInstance.getAtomicLong( UserMapstore.class.getCanonicalName() );
         this.retrofit = RetrofitFactory.newClient( "https://openlattice.auth0.com/api/v2/", () -> token );
         this.auth0ManagementApi = retrofit.create( Auth0ManagementApi.class );
         this.hazelcastInstance = hazelcastInstance;
+        this.localMemberId = checkNotNull( hazelcastInstance.getLocalEndpoint().getUuid() );
+        memberIds.add( localMemberId );
     }
 
     @Timed
@@ -66,15 +72,11 @@ public class Auth0Refresher {
         //Only one instance can populate and refresh the map. Unforunately, ILock is refusing to unlock causing issues
         //So we implement a different gating mechanism. This may occasionally be wrong when cluster size changes.
         logger.info( "Trying to acquire lock to refresh auth0 users." );
-        String me = hazelcastInstance.getCluster().getLocalMember().getUuid();
-        String[] members = hazelcastInstance
-                .getCluster()
-                .getMembers()
-                .stream()
-                .map( Member::getUuid )
-                .toArray( String[]::new );
-        int index = ( (int) memberId.getAndIncrement() ) % members.length;
-        if ( me.equals( members[ index ] ) && ( nextTime.get() < System.currentTimeMillis() ) ) {
+        String nextMember = memberIds.peek();
+
+        if ( StringUtils.equals( nextMember, localMemberId ) && ( nextTime.get() < System.currentTimeMillis() ) ) {
+            memberIds.add( localMemberId );
+            memberIds.poll();
             logger.info( "Refreshing user list from Auth0." );
             try {
                 int page = 0;
