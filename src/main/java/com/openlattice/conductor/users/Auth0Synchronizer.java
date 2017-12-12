@@ -109,8 +109,9 @@ public class Auth0Synchronizer {
                             .forEach( user -> {
                                 String userId = user.getUserId();
                                 users.set( userId, user, -1, TimeUnit.MINUTES );
-                                dbCredentialService.createUserIfNotExists( userId );
-                                createPrincipal( user, userId );
+                                if ( dbCredentialService.createUserIfNotExists( userId ) != null ) {
+                                    createPrincipal( user, userId );
+                                }
                             } );
                     pageOfUsers = auth0ManagementApi.getAllUsers( page++, DEFAULT_PAGE_SIZE );
                 }
