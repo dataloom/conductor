@@ -46,7 +46,7 @@ import com.openlattice.bootstrap.OrganizationBootstrap;
 import com.openlattice.conductor.users.Auth0Synchronizer;
 import com.openlattice.conductor.users.Auth0Synchronizer.Auth0SyncDriver;
 import com.zaxxer.hikari.HikariDataSource;
-import digital.loom.rhizome.configuration.auth0.Auth0Configuration;
+import com.openlattice.authentication.Auth0Configuration;
 import java.io.IOException;
 import javax.inject.Inject;
 import org.slf4j.Logger;

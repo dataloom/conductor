@@ -34,7 +34,7 @@ import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
 import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.postgres.PostgresTablesPod;
-import digital.loom.rhizome.authentication.Auth0Pod;
+import com.openlattice.auth0.Auth0Pod;
 
 import java.util.concurrent.ExecutionException;
 
