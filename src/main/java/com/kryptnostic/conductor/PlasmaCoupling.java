@@ -19,10 +19,7 @@
 
 package com.kryptnostic.conductor;
 
-import com.dataloom.hazelcast.serializers.BlockingAggregatorStreamSerializer;
-import com.dataloom.hazelcast.serializers.ConductorElasticsearchCallStreamSerializer;
-import com.dataloom.hazelcast.serializers.FeatureExtractionAggregationStreamSerializer;
-import com.dataloom.hazelcast.serializers.MergeVertexAggregatorStreamSerializer;
+import com.dataloom.hazelcast.serializers.*;
 import com.dataloom.linking.HazelcastBlockingService;
 import com.dataloom.linking.HazelcastMergingService;
 import com.kryptnostic.conductor.rpc.ConductorElasticsearchApi;
@@ -54,11 +51,15 @@ public class PlasmaCoupling {
     @Inject
     private MergeVertexAggregatorStreamSerializer mvass;
 
+    @Inject
+    private MergeEdgeAggregatorStreamSerializer meass;
+
     @PostConstruct
     public void connect() {
         cecss.setConductorElasticsearchApi( elasticsearchApi );
         feass.setConductorElasticsearchApi( elasticsearchApi );
         bass.setBlockingService( blockingService );
         mvass.setMergingService( mergingService );
+        meass.setMergingService( mergingService );
     }
 }
