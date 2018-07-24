@@ -47,6 +47,8 @@ import com.openlattice.directory.UserDirectoryService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.users.Auth0Synchronizer;
+import com.openlattice.users.Auth0Synchronizer.Auth0SyncDriver;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -163,6 +165,16 @@ public class ConductorServicesPod {
         checkState( authzBoot().isInitialized(), "Roles must be initialized." );
         return returnAndLog( new OrganizationBootstrap( organizationsManager() ),
                 "Checkpoint organization bootstrap." );
+    }
+
+    @Bean
+    public Auth0Synchronizer auth0Refresher() {
+        return new Auth0Synchronizer( hazelcastInstance, principalService(), dbcs(), auth0TokenProvider() );
+    }
+
+    @Bean
+    public Auth0SyncDriver auth0RefreshDriver() {
+        return new Auth0SyncDriver( auth0Refresher() );
     }
 
     @Bean
