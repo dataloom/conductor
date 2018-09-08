@@ -14,7 +14,7 @@ hazelcast:
         - "localhost"
     scheduled-executor:
         name: "syncs"
-        pool-size: 16
+        pool-size: 2
         capacity: 128
         durability: 1
 
