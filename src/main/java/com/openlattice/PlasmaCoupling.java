@@ -36,22 +36,8 @@ public class PlasmaCoupling {
     @Inject
     private ConductorElasticsearchCallStreamSerializer cecss;
 
-    @Inject
-    private FeatureExtractionAggregationStreamSerializer feass;
-
-    @Inject
-    private HazelcastBlockingService blockingService;
-
-    @Inject
-    private BlockingAggregatorStreamSerializer bass;
-
-    @Inject
-    private MergeVertexAggregatorStreamSerializer mvass;
-
     @PostConstruct
     public void connect() {
         cecss.setConductorElasticsearchApi( elasticsearchApi );
-        feass.setConductorElasticsearchApi( elasticsearchApi );
-        bass.setBlockingService( blockingService );
     }
 }

@@ -46,8 +46,10 @@ import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.kindling.search.ConductorElasticsearchImpl;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.IOException;
 import javax.inject.Inject;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -79,57 +81,53 @@ public class ConductorSparkPod {
 
     @Bean
     public AuthorizationQueryService authorizationQueryService() {
-        return new AuthorizationQueryService( hikariDataSource, hazelcastInstance );
+        return new AuthorizationQueryService(hikariDataSource, hazelcastInstance);
     }
 
     @Bean
     public AuthorizationManager authorizationManager() {
-        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+        return new HazelcastAuthorizationService(hazelcastInstance, authorizationQueryService(), eventBus);
     }
 
     @Bean
     public AbstractSecurableObjectResolveTypeService securableObjectTypes() {
-        return new HazelcastAbstractSecurableObjectResolveTypeService( hazelcastInstance );
+        return new HazelcastAbstractSecurableObjectResolveTypeService(hazelcastInstance);
     }
 
     @Bean
     public SchemaQueryService schemaQueryService() {
-        return new PostgresSchemaQueryService( hikariDataSource );
+        return new PostgresSchemaQueryService(hikariDataSource);
     }
 
     @Bean
     public PostgresEntitySetManager entitySetManager() {
-        return new PostgresEntitySetManager( hikariDataSource );
+        return new PostgresEntitySetManager(hikariDataSource);
     }
 
     @Bean
     public HazelcastSchemaManager schemaManager() {
-        return new HazelcastSchemaManager( hazelcastInstance, schemaQueryService() );
+        return new HazelcastSchemaManager(hazelcastInstance, schemaQueryService());
     }
 
     @Bean
     public PostgresTypeManager entityTypeManager() {
-        return new PostgresTypeManager( hikariDataSource );
+        return new PostgresTypeManager(hikariDataSource);
     }
 
     @Bean
     public HazelcastAclKeyReservationService aclKeyReservationService() {
-        return new HazelcastAclKeyReservationService( hazelcastInstance );
+        return new HazelcastAclKeyReservationService(hazelcastInstance);
     }
 
     @Bean
     public MailServiceRequirements mailServiceRequirements() {
-        return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
+        return () -> hazelcastInstance.getQueue(HazelcastQueue.EMAIL_SPOOL.name());
     }
 
-    @Bean
-    public DatasourceManager datasourceManager() {
-        return new DatasourceManager( hikariDataSource, hazelcastInstance );
-    }
 
     @Bean
     public PostgresEntityDataQueryService dataQueryService() {
-        return new PostgresEntityDataQueryService( hikariDataSource );
+        return new PostgresEntityDataQueryService(hikariDataSource);
     }
 
     @Bean
@@ -141,18 +139,12 @@ public class ConductorSparkPod {
                 authorizationManager(),
                 entitySetManager(),
                 entityTypeManager(),
-                schemaManager(),
-                datasourceManager() );
+                schemaManager());
     }
 
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws IOException {
-        return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
-    }
-
-    @Bean
-    public HazelcastBlockingService blockingService() {
-        return new HazelcastBlockingService( hazelcastInstance );
+        return new ConductorElasticsearchImpl(conductorConfiguration.getSearchConfiguration());
     }
 
 }

@@ -49,11 +49,14 @@ import com.openlattice.directory.UserDirectoryService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,11 +180,12 @@ public class ConductorServicesPod {
     @Bean
     public IScheduledFuture<?> auth0SyncTask() {
         var syncsExecutor = hazelcastInstance.getScheduledExecutorService( "syncs" );
+        Auth0SyncHelpers.setHazelcastInstance( hazelcastInstance );
+        Auth0SyncHelpers.setSpm( principalService() );
+        Auth0SyncHelpers.setOrganizationService( organizationsManager() );
+        Auth0SyncHelpers.setAuth0TokenProvider( auth0TokenProvider() );
+        Auth0SyncHelpers.setDbCredentialService( dbcs() );
         final var syncTask = new Auth0SyncTask();
-        Auth0SyncTask.setHazelcastInstance( hazelcastInstance );
-        Auth0SyncTask.setPrincipalManager( principalService() );
-        Auth0SyncTask.setOrganizationService( organizationsManager() );
-        Auth0SyncTask.setAuth0TokenProvider( auth0TokenProvider() );
         return syncsExecutor.scheduleAtFixedRate( syncTask, 0, REFRESH_INTERVAL_MILLIS, TimeUnit.MILLISECONDS );
     }
 
