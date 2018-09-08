@@ -12,6 +12,13 @@ hazelcast:
     password: "trellis"
     seed-nodes: 
         - "localhost"
+    scheduled-executor:
+        name: "syncs"
+        pool-size: 16
+        capacity: 128
+        durability: 1
+
+
 
 hikari:
     jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
