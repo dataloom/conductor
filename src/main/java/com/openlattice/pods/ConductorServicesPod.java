@@ -22,12 +22,14 @@ package com.openlattice.pods;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.openlattice.datastore.util.Util.returnAndLog;
+import static com.openlattice.users.Auth0SyncTaskKt.REFRESH_INTERVAL_MILLIS;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.scheduledexecutor.IScheduledFuture;
 import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
@@ -47,11 +49,12 @@ import com.openlattice.directory.UserDirectoryService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
-import com.openlattice.users.Auth0Synchronizer;
-import com.openlattice.users.Auth0Synchronizer.Auth0SyncDriver;
+import com.openlattice.users.Auth0SyncHelpers;
+import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -170,22 +173,20 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public Auth0Synchronizer auth0Refresher() {
-        return new Auth0Synchronizer( hazelcastInstance,
-                principalService(),
-                organizationsManager(),
-                dbcs(),
-                auth0TokenProvider() );
-    }
-
-    @Bean
-    public Auth0SyncDriver auth0RefreshDriver() {
-        return new Auth0SyncDriver( auth0Refresher() );
-    }
-
-    @Bean
     public Auth0TokenProvider auth0TokenProvider() {
         return new Auth0TokenProvider( auth0Configuration );
+    }
+
+    @Bean
+    public IScheduledFuture<?> auth0SyncTask() {
+        var syncsExecutor = hazelcastInstance.getScheduledExecutorService( "syncs" );
+        Auth0SyncHelpers.setHazelcastInstance( hazelcastInstance );
+        Auth0SyncHelpers.setSpm( principalService() );
+        Auth0SyncHelpers.setOrganizationService( organizationsManager() );
+        Auth0SyncHelpers.setAuth0TokenProvider( auth0TokenProvider() );
+        Auth0SyncHelpers.setDbCredentialService( dbcs() );
+        final var syncTask = new Auth0SyncTask();
+        return syncsExecutor.scheduleAtFixedRate( syncTask, 0, REFRESH_INTERVAL_MILLIS, TimeUnit.MILLISECONDS );
     }
 
 }
