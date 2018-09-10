@@ -37,6 +37,6 @@ public class ConductorSparkPod {
 
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws IOException {
-        return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
+        return new ConductorElasticsearchImpl(conductorConfiguration.getSearchConfiguration());
     }
 }

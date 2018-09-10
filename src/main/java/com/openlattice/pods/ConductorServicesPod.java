@@ -20,23 +20,35 @@
 
 package com.openlattice.pods;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.openlattice.datastore.util.Util.returnAndLog;
+import static com.openlattice.users.Auth0SyncTaskKt.REFRESH_INTERVAL_MILLIS;
+
 import com.amazonaws.services.s3.AmazonS3;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.scheduledexecutor.IScheduledFuture;
 import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
-import com.openlattice.authorization.*;
+import com.openlattice.authorization.AuthorizationManager;
+import com.openlattice.authorization.AuthorizationQueryService;
+import com.openlattice.authorization.DbCredentialService;
+import com.openlattice.authorization.HazelcastAclKeyReservationService;
+import com.openlattice.authorization.HazelcastAuthorizationService;
+import com.openlattice.authorization.PostgresUserApi;
+import com.openlattice.authorization.AbstractSecurableObjectResolveTypeService;
+import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
+import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.bootstrap.AuthorizationBootstrap;
 import com.openlattice.bootstrap.OrganizationBootstrap;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
-import com.openlattice.data.DatasourceManager;
 import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
@@ -54,29 +66,27 @@ import com.openlattice.graph.Graph;
 import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
-import com.openlattice.linking.HazelcastBlockingService;
 import com.openlattice.data.storage.HazelcastEntityDatastore;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
-import com.openlattice.search.EsEdmService;
 import com.openlattice.search.SearchService;
-import com.openlattice.users.Auth0Synchronizer;
-import com.openlattice.users.Auth0Synchronizer.Auth0SyncDriver;
+import com.openlattice.search.EsEdmService;
+import com.openlattice.users.Auth0SyncHelpers;
+import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import javax.inject.Inject;
-import java.io.IOException;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.openlattice.datastore.util.Util.returnAndLog;
 
 @Configuration
 public class ConductorServicesPod {
@@ -190,22 +200,20 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public Auth0Synchronizer auth0Refresher() {
-        return new Auth0Synchronizer( hazelcastInstance,
-                principalService(),
-                organizationsManager(),
-                dbcs(),
-                auth0TokenProvider() );
-    }
-
-    @Bean
-    public Auth0SyncDriver auth0RefreshDriver() {
-        return new Auth0SyncDriver( auth0Refresher() );
-    }
-
-    @Bean
     public Auth0TokenProvider auth0TokenProvider() {
         return new Auth0TokenProvider( auth0Configuration );
+    }
+
+    @Bean
+    public IScheduledFuture<?> auth0SyncTask() {
+        var syncsExecutor = hazelcastInstance.getScheduledExecutorService( "syncs" );
+        Auth0SyncHelpers.setHazelcastInstance( hazelcastInstance );
+        Auth0SyncHelpers.setSpm( principalService() );
+        Auth0SyncHelpers.setOrganizationService( organizationsManager() );
+        Auth0SyncHelpers.setAuth0TokenProvider( auth0TokenProvider() );
+        Auth0SyncHelpers.setDbCredentialService( dbcs() );
+        final var syncTask = new Auth0SyncTask();
+        return syncsExecutor.scheduleAtFixedRate( syncTask, 0, REFRESH_INTERVAL_MILLIS, TimeUnit.MILLISECONDS );
     }
 
     @Bean
@@ -249,11 +257,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public DatasourceManager datasourceManager() {
-        return new DatasourceManager( hikariDataSource, hazelcastInstance );
-    }
-
-    @Bean
     public PostgresEntityDataQueryService dataQueryService() {
         return new PostgresEntityDataQueryService( hikariDataSource );
     }
@@ -267,17 +270,11 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 edmManager(),
                 entityTypeManager(),
-                schemaManager(),
-                datasourceManager() );
+                schemaManager() );
     }
 
     @Bean
     public GraphService graphService() { return new Graph(hikariDataSource, dataModelService()); }
-
-    @Bean
-    public HazelcastBlockingService hazelcastBlockingService() {
-        return new HazelcastBlockingService( hazelcastInstance );
-    }
 
     @Bean
     public EntityDatastore entityDatastore() {
