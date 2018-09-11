@@ -72,7 +72,6 @@ import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.search.SearchService;
-import com.openlattice.search.EsEdmService;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
@@ -219,11 +218,6 @@ public class ConductorServicesPod {
     @Bean
     public SearchService searchService() {
         return new SearchService(eventBus);
-    }
-
-    @Bean
-    public EsEdmService esEdmService() {
-        return new EsEdmService();
     }
 
     @Bean

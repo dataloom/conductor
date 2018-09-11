@@ -23,6 +23,7 @@ package com.openlattice.pods;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.ConductorElasticsearchApi;
 import com.openlattice.kindling.search.ConductorElasticsearchImpl;
+import com.openlattice.search.EsEdmService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,5 +39,10 @@ public class ConductorSparkPod {
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws IOException {
         return new ConductorElasticsearchImpl(conductorConfiguration.getSearchConfiguration());
+    }
+
+    @Bean
+    public EsEdmService esEdmService() throws IOException {
+        return new EsEdmService(elasticsearchApi());
     }
 }
