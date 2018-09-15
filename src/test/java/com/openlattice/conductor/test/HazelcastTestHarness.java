@@ -38,7 +38,7 @@ import org.junit.Test;
 @Ignore
 public class HazelcastTestHarness {
 
-    protected static HazelcastInstance hazelcast = null;
+    static HazelcastInstance hazelcast = null;
 
     @Test
     public void simpleTest() {
