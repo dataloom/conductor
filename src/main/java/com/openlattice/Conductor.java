@@ -42,11 +42,11 @@ import com.openlattice.postgres.PostgresTablesPod;
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class Conductor extends RhizomeApplicationServer {
-    public static final Class<?>[] rhizomePods = new Class<?>[] {
+     static final Class<?>[] rhizomePods = new Class<?>[] {
             CassandraPod.class,
             RegistryBasedHazelcastInstanceConfigurationPod.class };
 
-    public static final Class<?>[] conductorPods = new Class<?>[] {
+     static final Class<?>[] conductorPods = new Class<?>[] {
             ConductorSparkPod.class,
             ConductorServicesPod.class,
             TypeCodecsPod.class,
