@@ -100,6 +100,17 @@ run {
 
 println "Enabled profiles: " + Arrays.toString(run.args)
 
+spotbugs {
+    toolVersion = '3.1.5'
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
 configurations {
     provided
 }
