@@ -204,20 +204,31 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public IScheduledFuture<?> auth0SyncTask() {
+    public Auth0SyncTask auth0SyncTask() {
         var syncsExecutor = hazelcastInstance.getScheduledExecutorService( "syncs" );
         Auth0SyncHelpers.setHazelcastInstance( hazelcastInstance );
         Auth0SyncHelpers.setSpm( principalService() );
         Auth0SyncHelpers.setOrganizationService( organizationsManager() );
         Auth0SyncHelpers.setAuth0TokenProvider( auth0TokenProvider() );
         Auth0SyncHelpers.setDbCredentialService( dbcs() );
+        Auth0SyncHelpers.setInitialized( true );
+        final var taskCount = hazelcastInstance.getAtomicLong( "AUTH0_SYNC_TASK_COUNT" );
         final var syncTask = new Auth0SyncTask();
-        return syncsExecutor.scheduleAtFixedRate( syncTask, 0, REFRESH_INTERVAL_MILLIS, TimeUnit.MILLISECONDS );
+        if ( taskCount.incrementAndGet() == 1 ) {
+            logger.info("Scheduling auth0 sync task.");
+            Auth0SyncHelpers.setSyncFuture(
+                    syncsExecutor
+                            .scheduleAtFixedRate( syncTask,
+                                    0,
+                                    REFRESH_INTERVAL_MILLIS,
+                                    TimeUnit.MILLISECONDS ) );
+        }
+        return syncTask;
     }
 
     @Bean
     public SearchService searchService() {
-        return new SearchService(eventBus);
+        return new SearchService( eventBus );
     }
 
     @Bean
@@ -268,12 +279,14 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public GraphService graphService() { return new Graph(hikariDataSource, dataModelService()); }
+    public GraphService graphService() {
+        return new Graph( hikariDataSource, dataModelService() );
+    }
 
     @Bean
     public EntityDatastore entityDatastore() {
         return new HazelcastEntityDatastore( hazelcastInstance, executor, defaultObjectMapper(), idService(),
-                postgresDataManager(), dataQueryService());
+                postgresDataManager(), dataQueryService() );
     }
 
     @Bean
