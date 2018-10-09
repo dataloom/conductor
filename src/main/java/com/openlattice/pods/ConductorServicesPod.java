@@ -71,6 +71,7 @@ import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.SearchService;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
@@ -90,6 +91,9 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class ConductorServicesPod {
     private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
+
+    @Inject
+    private PostgresTableManager tableManager;
 
     @Inject
     private HazelcastInstance hazelcastInstance;
@@ -215,7 +219,7 @@ public class ConductorServicesPod {
         final var taskCount = hazelcastInstance.getAtomicLong( "AUTH0_SYNC_TASK_COUNT" );
         final var syncTask = new Auth0SyncTask();
         if ( taskCount.incrementAndGet() == 1 ) {
-            logger.info("Scheduling auth0 sync task.");
+            logger.info( "Scheduling auth0 sync task." );
             Auth0SyncHelpers.setSyncFuture(
                     syncsExecutor
                             .scheduleAtFixedRate( syncTask,
@@ -243,7 +247,7 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEdmManager edmManager() {
-        return new PostgresEdmManager( hikariDataSource );
+        return new PostgresEdmManager( hikariDataSource, tableManager );
     }
 
     @Bean

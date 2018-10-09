@@ -21,7 +21,7 @@ hazelcast:
 
 
 hikari:
-    jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
+    jdbcUrl: jdbc:postgresql://localhost:5433/openlattice
     #"jdbc:postgresql://wonderwoman.openlattice.com:30001,captainamerica.openlattice.com:30002/openlattice?ssl=true"
     #dataSourceClassName: "org.postgresql.ds.PGSimpleDataSource"
     username: "oltest"
