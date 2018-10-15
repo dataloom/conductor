@@ -2,7 +2,7 @@
 # Rhizome Bootstrap Configuration
 ##
 
-# Set to false to disable persistence 
+# Set to false to disable persistence
 enable-persistence:  false
 session-clustering-enabled: false
 
@@ -10,7 +10,7 @@ hazelcast:
     server: true
     group: "local"
     password: "trellis"
-    seed-nodes: 
+    seed-nodes:
         - "localhost"
     scheduled-executor:
         name: "syncs"
@@ -21,7 +21,7 @@ hazelcast:
 
 
 hikari:
-    jdbcUrl: jdbc:postgresql://localhost:5433/openlattice
+    jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
     #"jdbc:postgresql://wonderwoman.openlattice.com:30001,captainamerica.openlattice.com:30002/openlattice?ssl=true"
     #dataSourceClassName: "org.postgresql.ds.PGSimpleDataSource"
     username: "oltest"
