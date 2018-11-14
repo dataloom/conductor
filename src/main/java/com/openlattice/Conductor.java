@@ -20,6 +20,7 @@
 
 package com.openlattice;
 
+import com.dataloom.mappers.ObjectMappers;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
 import com.kryptnostic.rhizome.pods.CassandraPod;
@@ -27,12 +28,14 @@ import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConf
 import com.openlattice.auth0.Auth0Pod;
 import com.openlattice.aws.AwsS3Pod;
 import com.openlattice.conductor.codecs.pods.TypeCodecsPod;
+import com.openlattice.data.serializers.FullQualifiedNameJacksonSerializer;
 import com.openlattice.datastore.cassandra.CassandraTablesPod;
 import com.openlattice.hazelcast.pods.MapstoresPod;
 import com.openlattice.hazelcast.pods.SharedStreamSerializersPod;
 import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.mail.pods.MailServicePod;
 import com.openlattice.mail.services.MailService;
+import com.openlattice.pods.ConductorEdmSyncPod;
 import com.openlattice.pods.ConductorServicesPod;
 import com.openlattice.pods.ConductorSparkPod;
 import com.openlattice.postgres.PostgresPod;
@@ -49,6 +52,7 @@ public class Conductor extends RhizomeApplicationServer {
      static final Class<?>[] conductorPods = new Class<?>[] {
             ConductorSparkPod.class,
             ConductorServicesPod.class,
+            ConductorEdmSyncPod.class,
             TypeCodecsPod.class,
             SharedStreamSerializersPod.class,
             PlasmaCoupling.class,
@@ -63,6 +67,10 @@ public class Conductor extends RhizomeApplicationServer {
             Auth0Pod.class,
             AwsS3Pod.class
     };
+
+    static {
+        ObjectMappers.foreach( FullQualifiedNameJacksonSerializer::registerWithMapper );
+    }
 
     public Conductor() {
         super( Pods.concatenate( RhizomeApplicationServer.DEFAULT_PODS, rhizomePods, conductorPods ) );
