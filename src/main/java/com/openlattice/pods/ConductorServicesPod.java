@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.scheduledexecutor.IScheduledFuture;
 import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
@@ -52,8 +51,10 @@ import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
+import com.openlattice.data.storage.ByteBlobDataManager;
 import com.openlattice.data.storage.PostgresDataManager;
 import com.openlattice.data.storage.PostgresEntityDataQueryService;
+import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
 import com.openlattice.directory.UserDirectoryService;
@@ -86,9 +87,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Import( { ByteBlobServicePod.class} )
 public class ConductorServicesPod {
     private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
@@ -106,6 +109,9 @@ public class ConductorServicesPod {
 
     @Inject
     private HikariDataSource hikariDataSource;
+
+    @Inject
+    private ByteBlobDataManager byteBlobDataManager;
 
     @Inject
     private PostgresUserApi pgUserApi;
@@ -267,7 +273,7 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEntityDataQueryService dataQueryService() {
-        return new PostgresEntityDataQueryService( hikariDataSource );
+        return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager );
     }
 
     @Bean

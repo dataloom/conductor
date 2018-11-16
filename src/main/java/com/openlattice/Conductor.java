@@ -28,6 +28,7 @@ import com.openlattice.auth0.Auth0Pod;
 import com.openlattice.aws.AwsS3Pod;
 import com.openlattice.conductor.codecs.pods.TypeCodecsPod;
 import com.openlattice.datastore.cassandra.CassandraTablesPod;
+import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.hazelcast.pods.MapstoresPod;
 import com.openlattice.hazelcast.pods.SharedStreamSerializersPod;
 import com.openlattice.jdbc.JdbcPod;
@@ -42,13 +43,14 @@ import com.openlattice.postgres.PostgresTablesPod;
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class Conductor extends RhizomeApplicationServer {
-     static final Class<?>[] rhizomePods = new Class<?>[] {
+    static final Class<?>[] rhizomePods = new Class<?>[] {
             CassandraPod.class,
             RegistryBasedHazelcastInstanceConfigurationPod.class };
 
-     static final Class<?>[] conductorPods = new Class<?>[] {
+    static final Class<?>[] conductorPods = new Class<?>[] {
             ConductorSparkPod.class,
             ConductorServicesPod.class,
+            ByteBlobServicePod.class,
             TypeCodecsPod.class,
             SharedStreamSerializersPod.class,
             PlasmaCoupling.class,
