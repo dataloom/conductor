@@ -23,7 +23,6 @@ package com.openlattice;
 import com.dataloom.mappers.ObjectMappers;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
-import com.kryptnostic.rhizome.pods.CassandraPod;
 import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
 import com.openlattice.auth0.Auth0Pod;
 import com.openlattice.aws.AwsS3Pod;
@@ -46,9 +45,7 @@ import com.openlattice.postgres.PostgresTablesPod;
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class Conductor extends RhizomeApplicationServer {
-    static final Class<?>[] rhizomePods = new Class<?>[] {
-            CassandraPod.class,
-            RegistryBasedHazelcastInstanceConfigurationPod.class };
+    static final Class<?>[] rhizomePods = new Class<?>[] { RegistryBasedHazelcastInstanceConfigurationPod.class };
 
     static final Class<?>[] conductorPods = new Class<?>[] {
             ConductorSparkPod.class,
@@ -60,7 +57,6 @@ public class Conductor extends RhizomeApplicationServer {
             PlasmaCoupling.class,
             MailServicePod.class,
             Auth0Pod.class,
-            CassandraPod.class,
             CassandraTablesPod.class,
             MapstoresPod.class,
             JdbcPod.class,
