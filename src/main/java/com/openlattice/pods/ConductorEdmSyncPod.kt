@@ -4,6 +4,7 @@ import com.openlattice.client.RetrofitFactory
 import com.openlattice.datastore.services.EdmManager
 import com.openlattice.edm.EdmApi
 import com.openlattice.edm.EntityDataModel
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.apache.olingo.commons.api.edm.FullQualifiedName
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
@@ -19,9 +20,8 @@ private const val EDM_SYNC_CONFIGURATION = "edmsync"
 @Configuration
 class ConductorEdmSyncPod
 @Inject constructor(val edmManager: EdmManager, val environment: Environment) {
-    private val OL_AUDIT_FQN = FullQualifiedName("OPENLATTICE_AUDIT", "AUDIT")
-
     companion object {
+        private val OL_AUDIT_FQN = FullQualifiedName("OPENLATTICE_AUDIT", "AUDIT")
         private val logger = LoggerFactory.getLogger(ConductorEdmSyncPod::class.java)
     }
 
@@ -59,12 +59,13 @@ class ConductorEdmSyncPod
         val edmDiff = edmManager.getEntityDataModelDiff(edm)
 
         // update with differences
-        edmManager.setEntityDataModel(edmDiff.diff)
+        edmManager.entityDataModel = edmDiff.diff
     }
 
     /**
      * Filter out audit entity sets
      */
+    @SuppressFBWarnings(value=["BC_BAD_CAST_TO_ABSTRACT_COLLECTION"],justification = "Weird bug")
     fun removeAuditType(edm: EntityDataModel): EntityDataModel {
         val propertyTypes = edm.propertyTypes.filter { it.type.toString() != OL_AUDIT_FQN.toString() }
         val entityTypes = edm.entityTypes.filter { it.type.toString() != OL_AUDIT_FQN.toString() }
