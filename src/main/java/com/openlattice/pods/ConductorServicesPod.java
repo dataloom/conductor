@@ -22,6 +22,7 @@ package com.openlattice.pods;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.openlattice.datastore.util.Util.returnAndLog;
+import static com.openlattice.search.PersistentSearchMessengerKt.ALERT_MESSENGER_INTERVAL_MILLIS;
 import static com.openlattice.users.Auth0SyncTaskKt.REFRESH_INTERVAL_MILLIS;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -48,6 +49,7 @@ import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.bootstrap.AuthorizationBootstrap;
 import com.openlattice.bootstrap.OrganizationBootstrap;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
+import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
@@ -68,11 +70,15 @@ import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
 import com.openlattice.data.storage.HazelcastEntityDatastore;
+import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
+import com.openlattice.mail.services.MailService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.postgres.PostgresTableManager;
+import com.openlattice.search.PersistentSearchMessenger;
+import com.openlattice.search.PersistentSearchMessengerHelpers;
 import com.openlattice.search.SearchService;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
@@ -91,7 +97,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Import( { ByteBlobServicePod.class} )
+@Import( { ByteBlobServicePod.class } )
 public class ConductorServicesPod {
     private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
@@ -151,6 +157,11 @@ public class ConductorServicesPod {
 
         logger.info( "Using aws conductor configuration: {}", config );
         return config;
+    }
+
+    @Bean( name = "mapboxConfiguration")
+    public MapboxConfiguration mapboxConfiguration() throws IOException {
+        return configurationService.getConfiguration( MapboxConfiguration.class );
     }
 
     @Bean
@@ -234,6 +245,33 @@ public class ConductorServicesPod {
                                     TimeUnit.MILLISECONDS ) );
         }
         return syncTask;
+    }
+
+    @Bean
+    public MailServiceClient mailServiceClient() {
+        return new MailServiceClient( mailServiceRequirements().getEmailQueue() );
+    }
+
+    @Bean
+    public PersistentSearchMessenger persistentSearchMessenger() throws IOException {
+        var alertMessengerExecutor = hazelcastInstance.getScheduledExecutorService( "alertMessenger" );
+        PersistentSearchMessengerHelpers.setHds( hikariDataSource );
+        PersistentSearchMessengerHelpers.setHazelcastInstance( hazelcastInstance );
+        PersistentSearchMessengerHelpers.setPrincipalsManager( principalService() );
+        PersistentSearchMessengerHelpers.setAuthorizationManager( authorizationManager() );
+        PersistentSearchMessengerHelpers.setSearchService( searchService() );
+        PersistentSearchMessengerHelpers.setMailServiceClient( mailServiceClient() );
+        PersistentSearchMessengerHelpers.setMapboxToken( mapboxConfiguration().getMapboxToken() );
+        PersistentSearchMessengerHelpers.setInitialized( true );
+
+        final var taskCount = hazelcastInstance.getAtomicLong( "ALERT_MESSENGER_TASK_COUNT" );
+        final var messengerTask = new PersistentSearchMessenger();
+        if ( taskCount.incrementAndGet() == 1 ) {
+            logger.info( "Scheduling alert messenger task." );
+            PersistentSearchMessengerHelpers.setSyncFuture( alertMessengerExecutor
+                    .scheduleAtFixedRate( messengerTask, 0, ALERT_MESSENGER_INTERVAL_MILLIS, TimeUnit.MILLISECONDS ) );
+        }
+        return messengerTask;
     }
 
     @Bean
