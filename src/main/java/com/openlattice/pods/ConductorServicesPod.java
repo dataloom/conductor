@@ -35,6 +35,8 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
+import com.openlattice.auditing.AuditRecordEntitySetsManager;
+import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
 import com.openlattice.authorization.AuthorizationManager;
@@ -112,6 +114,9 @@ public class ConductorServicesPod {
 
     @Inject
     private Auth0Configuration auth0Configuration;
+
+    @Inject
+    private AuditingConfiguration auditingConfiguration;
 
     @Inject
     private HikariDataSource hikariDataSource;
@@ -323,7 +328,13 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 edmManager(),
                 entityTypeManager(),
-                schemaManager() );
+                schemaManager(),
+                aresManager());
+    }
+
+    @Bean
+    public AuditRecordEntitySetsManager aresManager() {
+        return new AuditRecordEntitySetsManager( auditingConfiguration, authorizationManager(), hazelcastInstance );
     }
 
     @Bean
