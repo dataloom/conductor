@@ -164,7 +164,7 @@ public class ConductorServicesPod {
         return config;
     }
 
-    @Bean( name = "mapboxConfiguration")
+    @Bean( name = "mapboxConfiguration" )
     public MapboxConfiguration mapboxConfiguration() throws IOException {
         return configurationService.getConfiguration( MapboxConfiguration.class );
     }
@@ -328,13 +328,12 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 edmManager(),
                 entityTypeManager(),
-                schemaManager(),
-                aresManager());
+                schemaManager() );
     }
 
     @Bean
     public AuditRecordEntitySetsManager aresManager() {
-        return new AuditRecordEntitySetsManager( auditingConfiguration, authorizationManager(), hazelcastInstance );
+        return new AuditRecordEntitySetsManager( auditingConfiguration, authorizationManager(), hazelcastInstance, dataModelService() );
     }
 
     @Bean
