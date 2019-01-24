@@ -296,7 +296,7 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEdmManager edmManager() {
-        return new PostgresEdmManager( hikariDataSource, tableManager );
+        return new PostgresEdmManager( hikariDataSource, tableManager, hazelcastInstance );
     }
 
     @Bean
@@ -343,8 +343,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new HazelcastEntityDatastore( hazelcastInstance, executor, defaultObjectMapper(), idService(),
-                postgresDataManager(), dataQueryService() );
+        return new HazelcastEntityDatastore(  idService(), postgresDataManager(), dataQueryService() );
     }
 
     @Bean

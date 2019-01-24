@@ -23,6 +23,8 @@ package com.openlattice.conductor;
 
 import com.geekbeast.rhizome.NetworkUtils;
 import com.openlattice.Conductor;
+import javax.mail.AuthenticationFailedException;
+import jodd.mail.MailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +32,24 @@ import org.slf4j.LoggerFactory;
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class ConductorBootstrap {
+
+
     protected static final Conductor conductor;
 
     static {
+        final Logger logger = LoggerFactory.getLogger( ConductorBootstrap.class );
         conductor = new Conductor();
-        if ( NetworkUtils.isRunningOnHost( "bamboo.openlattice.com" ) ) {
-            LoggerFactory.getLogger( ConductorBootstrap.class ).info("Running on bamboo!");
-            conductor.sprout( "awstest", "postgres" );
-        } else {
-            LoggerFactory.getLogger( ConductorBootstrap.class ).info("Not running on bamboo!");
-            conductor.sprout( "local", "postgres" );
+        try {
+
+            if ( NetworkUtils.isRunningOnHost( "bamboo.openlattice.com" ) ) {
+                logger.info( "Running on bamboo!" );
+                conductor.sprout( "awstest", "postgres", "awstest" );
+            } else {
+                logger.info( "Not running on bamboo!" );
+                conductor.sprout( "local", "postgres", "medialocal" );
+            }
+        } catch ( MailException ex ) {
+            logger.info( "Mail configuration didn't " );
         }
     }
 
