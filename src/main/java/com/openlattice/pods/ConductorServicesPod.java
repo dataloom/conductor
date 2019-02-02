@@ -73,6 +73,7 @@ import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
 import com.openlattice.linking.LinkingQueryService;
+import com.openlattice.linking.PostgresLinkingFeedbackQueryService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
@@ -364,5 +365,10 @@ public class ConductorServicesPod {
     @Bean
     public LinkingQueryService lqs() {
         return new PostgresLinkingQueryService( hikariDataSource );
+    }
+
+    @Bean
+    public PostgresLinkingFeedbackQueryService postgresLinkingFeedbackQueryService() {
+        return new PostgresLinkingFeedbackQueryService( hikariDataSource );
     }
 }

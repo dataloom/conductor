@@ -77,7 +77,7 @@ public class Conductor extends RhizomeApplicationServer {
     @Override
     public void sprout( String... activeProfiles ) {
         super.sprout( activeProfiles );
-        //getContext().getBean( MailService.class ).processEmailRequestsQueue();
+        getContext().getBean( MailService.class ).processEmailRequestsQueue();
     }
 
     public static void main( String[] args ) {
