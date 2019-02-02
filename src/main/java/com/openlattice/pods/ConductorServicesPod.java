@@ -72,6 +72,11 @@ import com.openlattice.graph.Graph;
 import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
+
+import com.openlattice.data.storage.HazelcastEntityDatastore;
+import com.openlattice.linking.LinkingQueryService;
+import com.openlattice.linking.graph.PostgresLinkingQueryService;
+
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
@@ -359,4 +364,8 @@ public class ConductorServicesPod {
         return new EdmAuthorizationHelper( dataModelService(), authorizationManager() );
     }
 
+    @Bean
+    public LinkingQueryService lqs() {
+        return new PostgresLinkingQueryService( hikariDataSource );
+    }
 }
