@@ -35,17 +35,19 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
+import com.openlattice.auditing.AuditingConfiguration;
+import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
+import com.openlattice.authorization.AbstractSecurableObjectResolveTypeService;
 import com.openlattice.authorization.AuthorizationManager;
 import com.openlattice.authorization.AuthorizationQueryService;
 import com.openlattice.authorization.DbCredentialService;
+import com.openlattice.authorization.EdmAuthorizationHelper;
+import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
 import com.openlattice.authorization.HazelcastAclKeyReservationService;
 import com.openlattice.authorization.HazelcastAuthorizationService;
 import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.authorization.AbstractSecurableObjectResolveTypeService;
-import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
-import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.bootstrap.AuthorizationBootstrap;
 import com.openlattice.bootstrap.OrganizationBootstrap;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
@@ -54,6 +56,7 @@ import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.ByteBlobDataManager;
+import com.openlattice.data.storage.HazelcastEntityDatastore;
 import com.openlattice.data.storage.PostgresDataManager;
 import com.openlattice.data.storage.PostgresEntityDataQueryService;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
@@ -69,10 +72,8 @@ import com.openlattice.graph.Graph;
 import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
-import com.openlattice.data.storage.HazelcastEntityDatastore;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
-import com.openlattice.mail.services.MailService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
@@ -83,11 +84,9 @@ import com.openlattice.search.SearchService;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +96,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Import( { ByteBlobServicePod.class } )
+@Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class } )
 public class ConductorServicesPod {
     private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
@@ -112,6 +111,9 @@ public class ConductorServicesPod {
 
     @Inject
     private Auth0Configuration auth0Configuration;
+
+    @Inject
+    private AuditingConfiguration auditingConfiguration;
 
     @Inject
     private HikariDataSource hikariDataSource;
@@ -159,7 +161,7 @@ public class ConductorServicesPod {
         return config;
     }
 
-    @Bean( name = "mapboxConfiguration")
+    @Bean( name = "mapboxConfiguration" )
     public MapboxConfiguration mapboxConfiguration() throws IOException {
         return configurationService.getConfiguration( MapboxConfiguration.class );
     }
@@ -323,7 +325,8 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 edmManager(),
                 entityTypeManager(),
-                schemaManager() );
+                schemaManager(),
+                auditingConfiguration);
     }
 
     @Bean
