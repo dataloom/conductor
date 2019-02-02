@@ -21,11 +21,15 @@
 
 package com.openlattice.conductor.auth0;
 
+import com.google.common.collect.ImmutableSet;
+import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
+import com.kryptnostic.rhizome.pods.AwsConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
 import com.openlattice.conductor.ConductorBootstrap;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,13 +37,17 @@ import org.junit.Test;
  */
 public class Auth0TokenProviderTest extends ConductorBootstrap {
     @Test
+    @Ignore
     public void testAuth0TokenProvider() {
-        Auth0Configuration configuration = conductor.getContext().getBean( Auth0Configuration.class );
-        Assert.assertNotNull( configuration );
-        Assert.assertTrue( StringUtils.isNotBlank( configuration.getClientSecret() ) );
-        Assert.assertTrue( StringUtils.isNotBlank( configuration.getManagementApiUrl() ) );
-        Assert.assertTrue( StringUtils.isNotBlank( configuration.getClientId() ) );
-        Auth0TokenProvider provider = new Auth0TokenProvider( configuration );
-        Assert.assertTrue( StringUtils.isNotBlank( provider.getToken() ) );
+        if ( ImmutableSet.of( conductor.getContext().getEnvironment().getActiveProfiles() )
+                .contains( Profiles.AWS_TESTING_PROFILE ) ) {
+            Auth0Configuration configuration = conductor.getContext().getBean( Auth0Configuration.class );
+            Assert.assertNotNull( configuration );
+            Assert.assertTrue( StringUtils.isNotBlank( configuration.getClientSecret() ) );
+            Assert.assertTrue( StringUtils.isNotBlank( configuration.getManagementApiUrl() ) );
+            Assert.assertTrue( StringUtils.isNotBlank( configuration.getClientId() ) );
+            Auth0TokenProvider provider = new Auth0TokenProvider( configuration );
+            Assert.assertTrue( StringUtils.isNotBlank( provider.getToken() ) );
+        }
     }
 }
