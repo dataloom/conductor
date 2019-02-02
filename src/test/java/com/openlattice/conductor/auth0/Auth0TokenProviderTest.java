@@ -37,7 +37,6 @@ import org.junit.Test;
  */
 public class Auth0TokenProviderTest extends ConductorBootstrap {
     @Test
-    @Ignore
     public void testAuth0TokenProvider() {
         if ( ImmutableSet.of( conductor.getContext().getEnvironment().getActiveProfiles() )
                 .contains( Profiles.AWS_TESTING_PROFILE ) ) {
