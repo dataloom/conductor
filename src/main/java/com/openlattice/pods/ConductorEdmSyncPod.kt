@@ -44,11 +44,7 @@ class ConductorEdmSyncPod
         // get prod edm model and remove audit types
         val prodEdm = removeAuditType(prodEdmApi.entityDataModel)
 
-        // update version number
-        val localVersion = edmManager.currentEntityDataModelVersion
-
         val edm = EntityDataModel(
-                localVersion,
                 prodEdm.namespaces,
                 prodEdm.schemas,
                 prodEdm.entityTypes,
@@ -74,7 +70,6 @@ class ConductorEdmSyncPod
         }
 
         return EntityDataModel(
-                edm.version,
                 edm.namespaces,
                 edm.schemas,
                 entityTypes,
