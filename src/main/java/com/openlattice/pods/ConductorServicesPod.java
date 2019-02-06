@@ -35,6 +35,9 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
+import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.AssemblerConfiguration;
+import com.openlattice.assembler.pods.TransporterConfigurationPod;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
@@ -72,10 +75,8 @@ import com.openlattice.graph.Graph;
 import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
-
 import com.openlattice.linking.LinkingQueryService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
-
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
@@ -85,9 +86,6 @@ import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
 import com.openlattice.search.SearchService;
-import com.openlattice.assembler.TransporterConfiguration;
-import com.openlattice.assembler.TransporterService;
-import com.openlattice.assembler.pods.TransporterConfigurationPod;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
@@ -138,7 +136,7 @@ public class ConductorServicesPod {
     private ListeningExecutorService executor;
 
     @Inject
-    private TransporterConfiguration transporterConfiguration;
+    private AssemblerConfiguration assemblerConfiguration;
 
     @Autowired( required = false )
     private AmazonS3 s3;
@@ -196,7 +194,7 @@ public class ConductorServicesPod {
         return new HazelcastPrincipalService( hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                transporterService() );
+                assembler() );
     }
 
     @Bean
@@ -210,8 +208,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public TransporterService transporterService() {
-        return new TransporterService( transporterConfiguration,
+    public Assembler assembler() {
+        return new Assembler( assemblerConfiguration,
                 authorizationManager(),
                 dbcs(),
                 hikariDataSource,
@@ -226,7 +224,7 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 userDirectoryService(),
                 principalService(),
-                transporterService() );
+                assembler() );
     }
 
     @Bean
