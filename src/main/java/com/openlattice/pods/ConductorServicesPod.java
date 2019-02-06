@@ -73,7 +73,6 @@ import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
 
-import com.openlattice.data.storage.HazelcastEntityDatastore;
 import com.openlattice.linking.LinkingQueryService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
 
@@ -86,6 +85,9 @@ import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
 import com.openlattice.search.SearchService;
+import com.openlattice.assembler.TransporterConfiguration;
+import com.openlattice.assembler.TransporterService;
+import com.openlattice.assembler.pods.TransporterConfigurationPod;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
@@ -101,7 +103,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class } )
+@Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, TransporterConfigurationPod.class } )
 public class ConductorServicesPod {
     private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
@@ -134,6 +136,9 @@ public class ConductorServicesPod {
 
     @Inject
     private ListeningExecutorService executor;
+
+    @Inject
+    private TransporterConfiguration transporterConfiguration;
 
     @Autowired( required = false )
     private AmazonS3 s3;
@@ -190,7 +195,8 @@ public class ConductorServicesPod {
     public SecurePrincipalsManager principalService() {
         return new HazelcastPrincipalService( hazelcastInstance,
                 aclKeyReservationService(),
-                authorizationManager() );
+                authorizationManager(),
+                transporterService() );
     }
 
     @Bean
@@ -204,13 +210,23 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public TransporterService transporterService() {
+        return new TransporterService( transporterConfiguration,
+                authorizationManager(),
+                dbcs(),
+                hikariDataSource,
+                hazelcastInstance );
+    }
+
+    @Bean
     public HazelcastOrganizationService organizationsManager() {
         return new HazelcastOrganizationService(
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
                 userDirectoryService(),
-                principalService() );
+                principalService(),
+                transporterService() );
     }
 
     @Bean
@@ -331,7 +347,7 @@ public class ConductorServicesPod {
                 edmManager(),
                 entityTypeManager(),
                 schemaManager(),
-                auditingConfiguration);
+                auditingConfiguration );
     }
 
     @Bean
@@ -341,7 +357,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new HazelcastEntityDatastore(  idService(), postgresDataManager(), dataQueryService() );
+        return new HazelcastEntityDatastore( idService(), postgresDataManager(), dataQueryService() );
     }
 
     @Bean
