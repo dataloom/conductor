@@ -227,11 +227,11 @@ public class ConductorServicesPod {
                 principalService(),
                 assembler() );
         if( assemblerConfiguration.getInitialize().orElse( false )) {
+            assembler().initializeRolesAndUsers( principalService() );
             final var es =dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
             final var org = hos.getOrganization( hos.getOrganization( es.getOrganization() ).getId() );
             final var apt = dataModelService().getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
             assembler().createOrganizationDatabase( org,principalService() );
-
             final var results = assembler().materializeEntitySets( org.getId(),org.getPrincipal(), ImmutableMap.of(es.getId(), apt) );
             logger.info("Results of materializing: {}", results );
         }
