@@ -28,6 +28,7 @@ import static com.openlattice.users.Auth0SyncTaskKt.REFRESH_INTERVAL_MILLIS;
 import com.amazonaws.services.s3.AmazonS3;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
@@ -218,13 +219,23 @@ public class ConductorServicesPod {
 
     @Bean
     public HazelcastOrganizationService organizationsManager() {
-        return new HazelcastOrganizationService(
+        final var hos = new HazelcastOrganizationService(
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
                 userDirectoryService(),
                 principalService(),
                 assembler() );
+        if( assemblerConfiguration.getInitialize().orElse( false )) {
+            final var es =dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
+            final var org = hos.getOrganization( hos.getOrganization( es.getOrganization() ).getId() );
+            final var apt = dataModelService().getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
+            assembler().createOrganizationDatabase( org,principalService() );
+
+            final var results = assembler().materializeEntitySets( org.getId(),org.getPrincipal(), ImmutableMap.of(es.getId(), apt) );
+            logger.info("Results of materializing: {}", results );
+        }
+        return hos;
     }
 
     @Bean
