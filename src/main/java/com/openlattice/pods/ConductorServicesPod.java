@@ -37,7 +37,7 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.assembler.Assembler;
 import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.pods.TransporterConfigurationPod;
+import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
@@ -101,7 +101,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, TransporterConfigurationPod.class } )
+@Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
 public class ConductorServicesPod {
     private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
