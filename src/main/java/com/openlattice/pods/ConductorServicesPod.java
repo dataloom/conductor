@@ -38,6 +38,7 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.assembler.Assembler;
 import com.openlattice.assembler.AssemblerConfiguration;
+import com.openlattice.assembler.AssemblerConnectionManager;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
@@ -74,6 +75,7 @@ import com.openlattice.edm.schemas.manager.HazelcastSchemaManager;
 import com.openlattice.edm.schemas.postgres.PostgresSchemaQueryService;
 import com.openlattice.graph.Graph;
 import com.openlattice.graph.core.GraphService;
+import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
 import com.openlattice.linking.LinkingQueryService;
@@ -218,24 +220,39 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public AssemblerConnectionManager bootstrapRolesAndUsers() {
+        final var hos = organizationsManager();
+
+        AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
+        AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
+        AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
+        AssemblerConnectionManager.initializeOrganizatons( hos );
+        AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
+        AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
+
+        if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
+            assembler().initializeRolesAndUsers( principalService() );
+            final var es = dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
+            final var org = hos.getOrganization( hos.getOrganization( es.getOrganization() ).getId() );
+            final var apt = dataModelService()
+                    .getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
+            AssemblerConnectionManager.createOrganizationDatabase( org.getId() );
+            final var results = AssemblerConnectionManager
+                    .materializeEntitySets( org.getId(), ImmutableMap.of( es.getId(), apt ) );
+            logger.info( "Results of materializing: {}", results );
+        }
+        return new AssemblerConnectionManager();
+    }
+
+    @Bean
     public HazelcastOrganizationService organizationsManager() {
-        final var hos = new HazelcastOrganizationService(
+        return new HazelcastOrganizationService(
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
                 userDirectoryService(),
                 principalService(),
                 assembler() );
-        if( assemblerConfiguration.getInitialize().orElse( false )) {
-            assembler().initializeRolesAndUsers( principalService() );
-            final var es =dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
-            final var org = hos.getOrganization( hos.getOrganization( es.getOrganization() ).getId() );
-            final var apt = dataModelService().getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
-            assembler().createOrganizationDatabase( org,principalService() );
-            final var results = assembler().materializeEntitySets( org.getId(),org.getPrincipal(), ImmutableMap.of(es.getId(), apt) );
-            logger.info("Results of materializing: {}", results );
-        }
-        return hos;
     }
 
     @Bean
