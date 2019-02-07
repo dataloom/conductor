@@ -226,7 +226,7 @@ public class ConductorServicesPod {
         AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
         AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
         AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
-        AssemblerConnectionManager.initializeOrganizatons( hos );
+        AssemblerConnectionManager.initializeOrganizations( hos );
         AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
         AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
 
