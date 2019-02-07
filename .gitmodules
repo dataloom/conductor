@@ -1,3 +1,0 @@
-[submodule "indexer"]
-	path = indexer
-	url = git@github.com:openlattice/indexer.git
