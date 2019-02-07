@@ -223,12 +223,12 @@ public class ConductorServicesPod {
     public AssemblerConnectionManager bootstrapRolesAndUsers() {
         final var hos = organizationsManager();
 
-        AssemblerConnectionManager.assemblerConfiguration = assemblerConfiguration ;
-        AssemblerConnectionManager.hds = hikariDataSource;
-        AssemblerConnectionManager.securePrincipalsManager = principalService() ;
-        AssemblerConnectionManager.organizations= hos;
-        AssemblerConnectionManager.dbCredentialService =dbcs();
-        AssemblerConnectionManager.entitySets = hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() );
+        AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
+        AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
+        AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
+        AssemblerConnectionManager.initializeOrganizations( hos );
+        AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
+        AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
         AssemblerConnectionManager.initializeUsersAndRoles();
 
         if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
