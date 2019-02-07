@@ -231,7 +231,6 @@ public class ConductorServicesPod {
         AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
 
         if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
-            assembler().initializeRolesAndUsers( principalService() );
             final var es = dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
             final var org = hos.getOrganization( hos.getOrganization( es.getOrganization() ).getId() );
             final var apt = dataModelService()
