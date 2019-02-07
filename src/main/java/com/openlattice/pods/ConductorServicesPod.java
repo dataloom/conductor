@@ -223,7 +223,7 @@ public class ConductorServicesPod {
     public AssemblerConnectionManager bootstrapRolesAndUsers() {
         final var hos = organizationsManager();
 
-        AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
+        AssemblerConnectionManager.assemblerConfiguration = assemblerConfiguration ;
         AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
         AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
         AssemblerConnectionManager.initializeOrganizations( hos );
