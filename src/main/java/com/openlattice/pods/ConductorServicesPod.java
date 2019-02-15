@@ -93,9 +93,11 @@ import com.openlattice.search.SearchService;
 import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
 import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -384,7 +386,10 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new HazelcastEntityDatastore( idService(), postgresDataManager(), dataQueryService() );
+        return new HazelcastEntityDatastore( idService(),
+                postgresDataManager(),
+                dataQueryService(),
+                dataModelService() );
     }
 
     @Bean
