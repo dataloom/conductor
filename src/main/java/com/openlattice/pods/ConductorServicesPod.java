@@ -26,6 +26,7 @@ import static com.openlattice.search.PersistentSearchMessengerKt.ALERT_MESSENGER
 import static com.openlattice.users.Auth0SyncTaskKt.REFRESH_INTERVAL_MILLIS;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -149,6 +150,9 @@ public class ConductorServicesPod {
     @Autowired( required = false )
     private AmazonLaunchConfiguration awsLaunchConfig;
 
+    @Inject
+    private MetricRegistry metricRegistry;
+
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return ObjectMappers.getJsonMapper();
@@ -225,6 +229,7 @@ public class ConductorServicesPod {
     public AssemblerConnectionManager bootstrapRolesAndUsers() {
         final var hos = organizationsManager();
 
+        AssemblerConnectionManager.initializeMetrics( metricRegistry );
         AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
         AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
         AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
