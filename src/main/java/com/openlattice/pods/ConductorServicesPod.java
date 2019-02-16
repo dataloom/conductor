@@ -222,7 +222,9 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 dbcs(),
                 hikariDataSource,
-                hazelcastInstance );
+                metricRegistry,
+                hazelcastInstance,
+                eventBus );
     }
 
     @Bean
