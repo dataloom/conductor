@@ -222,7 +222,9 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 dbcs(),
                 hikariDataSource,
-                hazelcastInstance );
+                metricRegistry,
+                hazelcastInstance,
+                eventBus );
     }
 
     @Bean
@@ -237,6 +239,8 @@ public class ConductorServicesPod {
         AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
         AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
         AssemblerConnectionManager.initializeUsersAndRoles();
+
+        assembler().initializeMissingOrganizations();
 
         if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
             final var es = dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
