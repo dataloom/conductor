@@ -238,7 +238,7 @@ public class ConductorServicesPod {
         AssemblerConnectionManager.initializeOrganizations( hos );
         AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
         AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
-        AssemblerConnectionManager.initializeUsersAndRoles();
+//        AssemblerConnectionManager.initializeUsersAndRoles();
 
 //        assembler().initialize();
 
