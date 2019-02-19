@@ -62,7 +62,7 @@ import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.ByteBlobDataManager;
 import com.openlattice.data.storage.HazelcastEntityDatastore;
-import com.openlattice.data.storage.PostgresDataManager;
+import com.openlattice.data.storage.IndexingMetadataManager;
 import com.openlattice.data.storage.PostgresEntityDataQueryService;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
@@ -411,8 +411,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PostgresDataManager postgresDataManager() {
-        return new PostgresDataManager( hikariDataSource );
+    public IndexingMetadataManager postgresDataManager() {
+        return new IndexingMetadataManager( hikariDataSource );
     }
 
     @Bean
