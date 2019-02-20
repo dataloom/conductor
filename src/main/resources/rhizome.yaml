@@ -13,7 +13,7 @@ hazelcast:
     seed-nodes:
         - "localhost"
     scheduled-executor:
-        name: "syncs"
+        name: "hazelcast_scheduled_tasks"
         pool-size: 2
         capacity: 128
         durability: 1
@@ -22,18 +22,10 @@ hazelcast:
 
 hikari:
     jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
-    #"jdbc:postgresql://wonderwoman.openlattice.com:30001,captainamerica.openlattice.com:30002/openlattice?ssl=true"
-    #dataSourceClassName: "org.postgresql.ds.PGSimpleDataSource"
     username: "oltest"
-    #username: "openlattice"
     password: "test"
-    #dataSource.ssl: true
-    #dataSource.sslMode: "verify-full"
-    #dataSource.user: "mtamayo"
-    #dataSource.databaseName: "openlattice"
     maximumPoolSize: 98
-    #20 minutes
-    connectionTimeout: 12000000
+    connectionTimeout: 1200000
 
 #graphite:
 #    host: "jarvis"

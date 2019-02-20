@@ -30,13 +30,14 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 @Configuration
-public class ConductorSparkPod {
+public class ConductorPostInitializationPod {
 
     @Inject
     private ConductorConfiguration conductorConfiguration;
 
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws IOException {
-        return new ConductorElasticsearchImpl(conductorConfiguration.getSearchConfiguration());
+        return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
     }
+
 }

@@ -35,10 +35,11 @@ import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.mail.pods.MailServicePod;
 import com.openlattice.mail.services.MailService;
 import com.openlattice.pods.ConductorEdmSyncPod;
+import com.openlattice.pods.ConductorPostInitializationPod;
 import com.openlattice.pods.ConductorServicesPod;
-import com.openlattice.pods.ConductorSparkPod;
 import com.openlattice.postgres.PostgresPod;
 import com.openlattice.postgres.PostgresTablesPod;
+import com.openlattice.tasks.pods.TaskSchedulerPod;
 
 /**
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
@@ -47,7 +48,7 @@ public class Conductor extends RhizomeApplicationServer {
     static final Class<?>[] rhizomePods = new Class<?>[] { RegistryBasedHazelcastInstanceConfigurationPod.class };
 
     static final Class<?>[] conductorPods = new Class<?>[] {
-            ConductorSparkPod.class,
+            ConductorPostInitializationPod.class,
             ConductorServicesPod.class,
             ByteBlobServicePod.class,
             ConductorEdmSyncPod.class,
@@ -61,7 +62,8 @@ public class Conductor extends RhizomeApplicationServer {
             PostgresTablesPod.class,
             PostgresPod.class,
             Auth0Pod.class,
-            AwsS3Pod.class
+            AwsS3Pod.class,
+            TaskSchedulerPod.class
     };
 
     static {
