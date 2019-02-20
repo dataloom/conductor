@@ -46,7 +46,7 @@ description = "Conductor Server"
 group = "com.openlattice"
 
 distTar {
-    archiveName "conductor.tgz"
+    archiveFileName "conductor.tgz"
 }
 
 ext.projectName = "conductor"

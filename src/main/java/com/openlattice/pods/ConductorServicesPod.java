@@ -35,6 +35,7 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.assembler.Assembler;
 import com.openlattice.assembler.AssemblerConfiguration;
+import com.openlattice.assembler.AssemblerConnectionManager;
 import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
@@ -200,7 +201,7 @@ public class ConductorServicesPod {
         return new HazelcastPrincipalService( hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                assembler() );
+                eventBus );
     }
 
     @Bean
@@ -233,6 +234,7 @@ public class ConductorServicesPod {
     public AuthorizationBootstrapDependencies authorizationBootstrapDependencies() {
         return new AuthorizationBootstrapDependencies( principalService() );
     }
+
     @Bean
     public AssemblerDependencies assemblerDependencies() {
         return new AssemblerDependencies(
@@ -242,6 +244,7 @@ public class ConductorServicesPod {
                 organizationsManager(),
                 dbcs(),
                 hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ),
+                assemblerConnectionManager(),
                 metricRegistry );
     }
 
@@ -254,33 +257,17 @@ public class ConductorServicesPod {
         return new UsersAndRolesInitializationTask();
     }
 
-    //    @Bean
-    //    public AssemblerConnectionManager bootstrapRolesAndUsers() {
-    //        final var hos = organizationsManager();
-    //
-    //        AssemblerConnectionManager.initializeMetrics( metricRegistry );
-    //        AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
-    //        AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
-    //        AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
-    //        AssemblerConnectionManager.initializeOrganizations( hos );
-    //        AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
-    //        AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
-    //        //        AssemblerConnectionManager.initializeUsersAndRoles();
-    //
-    //        //        assembler().initialize();
-    //
-    //        if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
-    //            final var es = dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
-    //            final var org = hos.getOrganization( es.getOrganizationId() );
-    //            final var apt = dataModelService()
-    //                    .getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
-    //            AssemblerConnectionManager.createOrganizationDatabase( org.getId() );
-    //            final var results = AssemblerConnectionManager
-    //                    .materializeEntitySets( org.getId(), ImmutableMap.of( es.getId(), apt ) );
-    //            logger.info( "Results of materializing: {}", results );
-    //        }
-    //        return new AssemblerConnectionManager();
-    //    }
+    @Bean
+    public AssemblerConnectionManager assemblerConnectionManager() {
+        return new AssemblerConnectionManager( assemblerConfiguration,
+                hikariDataSource,
+                principalService(),
+                organizationsManager(),
+                dbcs(),
+                hazelcastInstance,
+                eventBus,
+                metricRegistry );
+    }
 
     @Bean
     public HazelcastOrganizationService organizationsManager() {
