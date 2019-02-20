@@ -20,16 +20,12 @@
 
 package com.openlattice.pods;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.openlattice.datastore.util.Util.returnAndLog;
 import static com.openlattice.search.PersistentSearchMessengerKt.ALERT_MESSENGER_INTERVAL_MILLIS;
-import static com.openlattice.users.Auth0SyncTaskKt.REFRESH_INTERVAL_MILLIS;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
@@ -39,8 +35,9 @@ import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.assembler.Assembler;
 import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.AssemblerConnectionManager;
+import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
+import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
@@ -54,7 +51,8 @@ import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveType
 import com.openlattice.authorization.HazelcastAclKeyReservationService;
 import com.openlattice.authorization.HazelcastAuthorizationService;
 import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.bootstrap.AuthorizationBootstrap;
+import com.openlattice.authorization.initializers.AuthorizationBootstrap;
+import com.openlattice.authorization.initializers.AuthorizationBootstrapDependencies;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
@@ -84,20 +82,19 @@ import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.OrganizationBootstrap;
+import com.openlattice.organizations.OrganizationBootstrapDependencies;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
 import com.openlattice.search.SearchService;
-import com.openlattice.users.Auth0SyncHelpers;
 import com.openlattice.users.Auth0SyncTask;
+import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,32 +225,62 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AssemblerConnectionManager bootstrapRolesAndUsers() {
-        final var hos = organizationsManager();
-
-        AssemblerConnectionManager.initializeMetrics( metricRegistry );
-        AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
-        AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
-        AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
-        AssemblerConnectionManager.initializeOrganizations( hos );
-        AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
-        AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
-//        AssemblerConnectionManager.initializeUsersAndRoles();
-
-//        assembler().initialize();
-
-        if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
-            final var es = dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
-            final var org = hos.getOrganization( es.getOrganizationId() );
-            final var apt = dataModelService()
-                    .getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
-            AssemblerConnectionManager.createOrganizationDatabase( org.getId() );
-            final var results = AssemblerConnectionManager
-                    .materializeEntitySets( org.getId(), ImmutableMap.of( es.getId(), apt ) );
-            logger.info( "Results of materializing: {}", results );
-        }
-        return new AssemblerConnectionManager();
+    public OrganizationBootstrapDependencies organizationBootstrapDependencies() {
+        return new OrganizationBootstrapDependencies( organizationsManager() );
     }
+
+    @Bean
+    public AuthorizationBootstrapDependencies authorizationBootstrapDependencies() {
+        return new AuthorizationBootstrapDependencies( principalService() );
+    }
+    @Bean
+    public AssemblerDependencies assemblerDependencies() {
+        return new AssemblerDependencies(
+                assemblerConfiguration,
+                hikariDataSource,
+                principalService(),
+                organizationsManager(),
+                dbcs(),
+                hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ),
+                metricRegistry );
+    }
+
+    @Bean
+    public AuthorizationBootstrap authorizationBootstrap() {
+        return new AuthorizationBootstrap();
+    }
+
+    @Bean UsersAndRolesInitializationTask assemblerInitializationTask() {
+        return new UsersAndRolesInitializationTask();
+    }
+
+    //    @Bean
+    //    public AssemblerConnectionManager bootstrapRolesAndUsers() {
+    //        final var hos = organizationsManager();
+    //
+    //        AssemblerConnectionManager.initializeMetrics( metricRegistry );
+    //        AssemblerConnectionManager.initializeAssemblerConfiguration( assemblerConfiguration );
+    //        AssemblerConnectionManager.initializeProductionDatasource( hikariDataSource );
+    //        AssemblerConnectionManager.initializeSecurePrincipalsManager( principalService() );
+    //        AssemblerConnectionManager.initializeOrganizations( hos );
+    //        AssemblerConnectionManager.initializeDbCredentialService( dbcs() );
+    //        AssemblerConnectionManager.initializeEntitySets( hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ) );
+    //        //        AssemblerConnectionManager.initializeUsersAndRoles();
+    //
+    //        //        assembler().initialize();
+    //
+    //        if ( assemblerConfiguration.getInitialize().orElse( false ) ) {
+    //            final var es = dataModelService().getEntitySet( assemblerConfiguration.getTestEntitySet().get() );
+    //            final var org = hos.getOrganization( es.getOrganizationId() );
+    //            final var apt = dataModelService()
+    //                    .getPropertyTypesAsMap( dataModelService().getEntityType( es.getEntityTypeId() ).getProperties() );
+    //            AssemblerConnectionManager.createOrganizationDatabase( org.getId() );
+    //            final var results = AssemblerConnectionManager
+    //                    .materializeEntitySets( org.getId(), ImmutableMap.of( es.getId(), apt ) );
+    //            logger.info( "Results of materializing: {}", results );
+    //        }
+    //        return new AssemblerConnectionManager();
+    //    }
 
     @Bean
     public HazelcastOrganizationService organizationsManager() {
@@ -267,16 +294,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AuthorizationBootstrap authzBoot() {
-        return returnAndLog( new AuthorizationBootstrap( hazelcastInstance, principalService() ),
-                "Checkpoint AuthZ Boostrap" );
-    }
-
-    @Bean
-    public OrganizationBootstrap orgBoot() {
-        checkState( authzBoot().isInitialized(), "Roles must be initialized." );
-        return returnAndLog( new OrganizationBootstrap( organizationsManager() ),
-                "Checkpoint organization bootstrap." );
+    public OrganizationBootstrap organizationBootstrap() {
+        return new OrganizationBootstrap();
     }
 
     @Bean
@@ -285,26 +304,17 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
+        return new Auth0SyncTaskDependencies( hazelcastInstance,
+                principalService(),
+                organizationsManager(),
+                dbcs(),
+                auth0TokenProvider() );
+    }
+
+    @Bean
     public Auth0SyncTask auth0SyncTask() {
-        var syncsExecutor = hazelcastInstance.getScheduledExecutorService( "syncs" );
-        Auth0SyncHelpers.setHazelcastInstance( hazelcastInstance );
-        Auth0SyncHelpers.setSpm( principalService() );
-        Auth0SyncHelpers.setOrganizationService( organizationsManager() );
-        Auth0SyncHelpers.setAuth0TokenProvider( auth0TokenProvider() );
-        Auth0SyncHelpers.setDbCredentialService( dbcs() );
-        Auth0SyncHelpers.setInitialized( true );
-        final var taskCount = hazelcastInstance.getAtomicLong( "AUTH0_SYNC_TASK_COUNT" );
-        final var syncTask = new Auth0SyncTask();
-        if ( taskCount.incrementAndGet() == 1 ) {
-            logger.info( "Scheduling auth0 sync task." );
-            Auth0SyncHelpers.setSyncFuture(
-                    syncsExecutor
-                            .scheduleAtFixedRate( syncTask,
-                                    0,
-                                    REFRESH_INTERVAL_MILLIS,
-                                    TimeUnit.MILLISECONDS ) );
-        }
-        return syncTask;
+        return new Auth0SyncTask();
     }
 
     @Bean

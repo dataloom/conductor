@@ -39,6 +39,7 @@ import com.openlattice.pods.ConductorServicesPod;
 import com.openlattice.pods.ConductorSparkPod;
 import com.openlattice.postgres.PostgresPod;
 import com.openlattice.postgres.PostgresTablesPod;
+import com.openlattice.tasks.pods.TaskSchedulerPod;
 
 /**
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
@@ -61,7 +62,8 @@ public class Conductor extends RhizomeApplicationServer {
             PostgresTablesPod.class,
             PostgresPod.class,
             Auth0Pod.class,
-            AwsS3Pod.class
+            AwsS3Pod.class,
+            TaskSchedulerPod.class
     };
 
     static {
