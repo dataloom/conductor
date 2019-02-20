@@ -9,6 +9,7 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import javax.annotation.PostConstruct
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class ConductorEdmSyncPod
 
     @PostConstruct
     fun syncEdm() {
-        if (environment.acceptsProfiles(EDM_SYNC_CONFIGURATION)) {
+        if (environment.acceptsProfiles(Profiles.of(EDM_SYNC_CONFIGURATION))) {
             logger.info("Start syncing EDM")
             updateEdm()
             logger.info("Finished syncing EDM")
