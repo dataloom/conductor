@@ -56,8 +56,8 @@ import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveType
 import com.openlattice.authorization.HazelcastAclKeyReservationService;
 import com.openlattice.authorization.HazelcastAuthorizationService;
 import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
+import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
@@ -86,8 +86,8 @@ import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
-import com.openlattice.organizations.OrganizationsInitializationTask;
 import com.openlattice.organizations.OrganizationBootstrapDependencies;
+import com.openlattice.organizations.OrganizationsInitializationTask;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.postgres.PostgresTableManager;
@@ -225,6 +225,7 @@ public class ConductorServicesPod {
         return new PostInitializerDependencies();
     }
 
+    @Bean
     public PostInitializerTask postInitializerTask() {
         return new PostInitializerTask();
     }
