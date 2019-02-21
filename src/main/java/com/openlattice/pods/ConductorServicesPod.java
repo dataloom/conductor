@@ -94,6 +94,8 @@ import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
 import com.openlattice.search.SearchService;
+import com.openlattice.tasks.PostInitializerDependencies;
+import com.openlattice.tasks.PostInitializerDependencies.PostInitializerTask;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
@@ -219,9 +221,17 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public PostInitializerDependencies postInitializerDependencies(){
+        return new PostInitializerDependencies();
+    }
+
+    public PostInitializerTask postInitializerTask() {
+        return new PostInitializerTask();
+    }
+
+    @Bean
     public Assembler assembler() {
         return new Assembler( authorizationManager(),
-                assemblerConnectionManager(),
                 dbcs(),
                 hikariDataSource,
                 metricRegistry,
