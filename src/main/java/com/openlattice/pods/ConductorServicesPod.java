@@ -221,6 +221,7 @@ public class ConductorServicesPod {
     @Bean
     public Assembler assembler() {
         return new Assembler( authorizationManager(),
+                assemblerConnectionManager(),
                 dbcs(),
                 hikariDataSource,
                 metricRegistry,
