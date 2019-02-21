@@ -34,10 +34,14 @@ import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
+import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
 import com.openlattice.assembler.AssemblerConfiguration;
 import com.openlattice.assembler.AssemblerConnectionManager;
 import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
+import com.openlattice.assembler.tasks.CleanOutOldUsersInitializationTask;
+import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
@@ -52,8 +56,8 @@ import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveType
 import com.openlattice.authorization.HazelcastAclKeyReservationService;
 import com.openlattice.authorization.HazelcastAuthorizationService;
 import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
+import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
@@ -83,14 +87,16 @@ import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
-import com.openlattice.organizations.OrganizationBootstrap;
 import com.openlattice.organizations.OrganizationBootstrapDependencies;
+import com.openlattice.organizations.OrganizationsInitializationTask;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
 import com.openlattice.search.SearchService;
+import com.openlattice.tasks.PostInitializerDependencies;
+import com.openlattice.tasks.PostInitializerDependencies.PostInitializerTask;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
@@ -216,9 +222,18 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public PostInitializerDependencies postInitializerDependencies(){
+        return new PostInitializerDependencies();
+    }
+
+    @Bean
+    public PostInitializerTask postInitializerTask() {
+        return new PostInitializerTask();
+    }
+
+    @Bean
     public Assembler assembler() {
-        return new Assembler( assemblerConfiguration,
-                authorizationManager(),
+        return new Assembler( authorizationManager(),
                 dbcs(),
                 hikariDataSource,
                 metricRegistry,
@@ -246,6 +261,7 @@ public class ConductorServicesPod {
                 dbcs(),
                 hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ),
                 assemblerConnectionManager(),
+                hazelcastInstance.getMap( HazelcastMap.SECURABLE_OBJECT_TYPES.name() ),
                 metricRegistry );
     }
 
@@ -256,6 +272,26 @@ public class ConductorServicesPod {
 
     @Bean UsersAndRolesInitializationTask assemblerInitializationTask() {
         return new UsersAndRolesInitializationTask();
+    }
+
+    @Bean
+    public ProductionViewSchemaInitializationTask productionViewSchemaInitializationTask() {
+        return new ProductionViewSchemaInitializationTask();
+    }
+
+    @Bean
+    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
+        return new CleanOutOldUsersInitializationTask();
+    }
+
+    @Bean
+    public OrganizationAssembliesInitializerTask organizationAssembliesInitializerTask() {
+        return new OrganizationAssembliesInitializerTask();
+    }
+
+    @Bean
+    public EntitySetViewsInitializerTask entityViewsInitializerTask(){
+        return new EntitySetViewsInitializerTask();
     }
 
     @Bean
@@ -282,8 +318,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationBootstrap organizationBootstrap() {
-        return new OrganizationBootstrap();
+    public OrganizationsInitializationTask organizationBootstrap() {
+        return new OrganizationsInitializationTask();
     }
 
     @Bean
