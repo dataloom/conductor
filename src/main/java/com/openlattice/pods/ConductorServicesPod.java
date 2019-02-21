@@ -248,6 +248,7 @@ public class ConductorServicesPod {
                 dbcs(),
                 hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ),
                 assemblerConnectionManager(),
+                hazelcastInstance.getMap( HazelcastMap.SECURABLE_OBJECT_TYPES.name() ),
                 metricRegistry );
     }
 
