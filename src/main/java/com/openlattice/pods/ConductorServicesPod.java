@@ -52,8 +52,8 @@ import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveType
 import com.openlattice.authorization.HazelcastAclKeyReservationService;
 import com.openlattice.authorization.HazelcastAuthorizationService;
 import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.authorization.initializers.AuthorizationBootstrap;
-import com.openlattice.authorization.initializers.AuthorizationBootstrapDependencies;
+import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
+import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
@@ -232,8 +232,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AuthorizationBootstrapDependencies authorizationBootstrapDependencies() {
-        return new AuthorizationBootstrapDependencies( principalService() );
+    public AuthorizationInitializationDependencies authorizationBootstrapDependencies() {
+        return new AuthorizationInitializationDependencies( principalService() );
     }
 
     @Bean
@@ -250,8 +250,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AuthorizationBootstrap authorizationBootstrap() {
-        return new AuthorizationBootstrap();
+    public AuthorizationInitializationTask authorizationBootstrap() {
+        return new AuthorizationInitializationTask();
     }
 
     @Bean UsersAndRolesInitializationTask assemblerInitializationTask() {
