@@ -82,7 +82,7 @@ import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
-import com.openlattice.organizations.OrganizationBootstrap;
+import com.openlattice.organizations.OrganizationsInitializationTask;
 import com.openlattice.organizations.OrganizationBootstrapDependencies;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
@@ -216,8 +216,7 @@ public class ConductorServicesPod {
 
     @Bean
     public Assembler assembler() {
-        return new Assembler( assemblerConfiguration,
-                authorizationManager(),
+        return new Assembler( authorizationManager(),
                 dbcs(),
                 hikariDataSource,
                 metricRegistry,
@@ -281,8 +280,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationBootstrap organizationBootstrap() {
-        return new OrganizationBootstrap();
+    public OrganizationsInitializationTask organizationBootstrap() {
+        return new OrganizationsInitializationTask();
     }
 
     @Bean
