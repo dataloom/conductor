@@ -34,10 +34,14 @@ import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
 import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
+import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
 import com.openlattice.assembler.AssemblerConfiguration;
 import com.openlattice.assembler.AssemblerConnectionManager;
 import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
+import com.openlattice.assembler.tasks.CleanOutOldUsersInitializationTask;
+import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
@@ -254,6 +258,26 @@ public class ConductorServicesPod {
 
     @Bean UsersAndRolesInitializationTask assemblerInitializationTask() {
         return new UsersAndRolesInitializationTask();
+    }
+
+    @Bean
+    public ProductionViewSchemaInitializationTask productionViewSchemaInitializationTask() {
+        return new ProductionViewSchemaInitializationTask();
+    }
+
+    @Bean
+    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
+        return new CleanOutOldUsersInitializationTask();
+    }
+
+    @Bean
+    public OrganizationAssembliesInitializerTask organizationAssembliesInitializerTask() {
+        return new OrganizationAssembliesInitializerTask();
+    }
+
+    @Bean
+    public EntitySetViewsInitializerTask entityViewsInitializerTask(){
+        return new EntitySetViewsInitializerTask();
     }
 
     @Bean

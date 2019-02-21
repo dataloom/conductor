@@ -9,3 +9,4 @@ foreignDbName: "openlattice"
 foreignPort: 5432
 foreignUsername: "oltest"
 foreignPassword: "test"
+ssl: false
