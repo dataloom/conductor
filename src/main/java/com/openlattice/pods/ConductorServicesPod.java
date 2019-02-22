@@ -47,15 +47,15 @@ import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
-import com.openlattice.authorization.AbstractSecurableObjectResolveTypeService;
 import com.openlattice.authorization.AuthorizationManager;
 import com.openlattice.authorization.AuthorizationQueryService;
 import com.openlattice.authorization.DbCredentialService;
 import com.openlattice.authorization.EdmAuthorizationHelper;
-import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
 import com.openlattice.authorization.HazelcastAclKeyReservationService;
 import com.openlattice.authorization.HazelcastAuthorizationService;
+import com.openlattice.authorization.HazelcastSecurableObjectResolveTypeService;
 import com.openlattice.authorization.PostgresUserApi;
+import com.openlattice.authorization.SecurableObjectResolveTypeService;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
@@ -87,10 +87,12 @@ import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
-import com.openlattice.organizations.OrganizationBootstrapDependencies;
-import com.openlattice.organizations.OrganizationsInitializationTask;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.organizations.tasks.OrganizationMembersCleanupDependencies;
+import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializationTask;
+import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
+import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
@@ -242,8 +244,20 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationBootstrapDependencies organizationBootstrapDependencies() {
-        return new OrganizationBootstrapDependencies( organizationsManager() );
+    public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
+        return new OrganizationsInitializationDependencies( organizationsManager() );
+    }
+
+    @Bean
+    public OrganizationMembersCleanupDependencies organizationMembersCleanupDependencies() {
+        return new OrganizationMembersCleanupDependencies( principalService(),
+                organizationsManager(),
+                securableObjectTypes() );
+    }
+
+    @Bean
+    public OrganizationMembersCleanupInitializationTask organizationMembersCleanupInitializationTask() {
+        return new OrganizationMembersCleanupInitializationTask();
     }
 
     @Bean
@@ -270,7 +284,8 @@ public class ConductorServicesPod {
         return new AuthorizationInitializationTask();
     }
 
-    @Bean UsersAndRolesInitializationTask assemblerInitializationTask() {
+    @Bean
+    public UsersAndRolesInitializationTask assemblerInitializationTask() {
         return new UsersAndRolesInitializationTask();
     }
 
@@ -290,7 +305,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public EntitySetViewsInitializerTask entityViewsInitializerTask(){
+    public EntitySetViewsInitializerTask entityViewsInitializerTask() {
         return new EntitySetViewsInitializerTask();
     }
 
@@ -374,8 +389,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AbstractSecurableObjectResolveTypeService securableObjectTypes() {
-        return new HazelcastAbstractSecurableObjectResolveTypeService( hazelcastInstance );
+    public SecurableObjectResolveTypeService securableObjectTypes() {
+        return new HazelcastSecurableObjectResolveTypeService( hazelcastInstance );
     }
 
     @Bean
