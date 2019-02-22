@@ -222,6 +222,7 @@ public class ConductorServicesPod {
         return new UserDirectoryService( auth0TokenProvider(), hazelcastInstance );
     }
 
+    @Bean
     public PostConstructInitializerTaskDependencies postInitializerDependencies(){
         return new PostConstructInitializerTaskDependencies();
     }
