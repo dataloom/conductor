@@ -41,6 +41,8 @@ import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.CleanOutOldUsersInitializationTask;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
+import com.openlattice.auditing.AuditInitializationTask;
+import com.openlattice.auditing.AuditTaskDependencies;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
@@ -284,6 +286,19 @@ public class ConductorServicesPod {
     @Bean
     public EntitySetViewsInitializerTask entityViewsInitializerTask() {
         return new EntitySetViewsInitializerTask();
+    }
+
+    @Bean
+    public AuditTaskDependencies auditTaskDependencies() {
+        return new AuditTaskDependencies(
+                principalService(),
+                dataModelService(),
+                authorizationManager() );
+    }
+
+    @Bean
+    public AuditInitializationTask auditInitializationTask() {
+        return new AuditInitializationTask( hazelcastInstance );
     }
 
     @Bean
