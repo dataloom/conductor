@@ -20,8 +20,6 @@
 
 package com.openlattice.pods;
 
-import static com.openlattice.search.PersistentSearchMessengerKt.ALERT_MESSENGER_INTERVAL_MILLIS;
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
@@ -43,19 +41,13 @@ import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.CleanOutOldUsersInitializationTask;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
+import com.openlattice.auditing.AuditInitializationTask;
+import com.openlattice.auditing.AuditTaskDependencies;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
-import com.openlattice.authorization.AbstractSecurableObjectResolveTypeService;
-import com.openlattice.authorization.AuthorizationManager;
-import com.openlattice.authorization.AuthorizationQueryService;
-import com.openlattice.authorization.DbCredentialService;
-import com.openlattice.authorization.EdmAuthorizationHelper;
-import com.openlattice.authorization.HazelcastAbstractSecurableObjectResolveTypeService;
-import com.openlattice.authorization.HazelcastAclKeyReservationService;
-import com.openlattice.authorization.HazelcastAuthorizationService;
-import com.openlattice.authorization.PostgresUserApi;
+import com.openlattice.authorization.*;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
@@ -99,9 +91,6 @@ import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstr
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +98,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import static com.openlattice.search.PersistentSearchMessengerKt.ALERT_MESSENGER_INTERVAL_MILLIS;
 
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
@@ -221,7 +216,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PostConstructInitializerTaskDependencies postInitializerDependencies(){
+    public PostConstructInitializerTaskDependencies postInitializerDependencies() {
         return new PostConstructInitializerTaskDependencies();
     }
 
@@ -248,6 +243,14 @@ public class ConductorServicesPod {
     @Bean
     public AuthorizationInitializationDependencies authorizationBootstrapDependencies() {
         return new AuthorizationInitializationDependencies( principalService() );
+    }
+
+    @Bean
+    public AuditTaskDependencies auditTaskDependencies() {
+        return new AuditTaskDependencies(
+                principalService(),
+                dataModelService(),
+                authorizationManager() );
     }
 
     @Bean
@@ -289,8 +292,13 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public EntitySetViewsInitializerTask entityViewsInitializerTask(){
+    public EntitySetViewsInitializerTask entityViewsInitializerTask() {
         return new EntitySetViewsInitializerTask();
+    }
+
+    @Bean
+    public AuditInitializationTask auditInitializationTask() {
+        return new AuditInitializationTask( hazelcastInstance );
     }
 
     @Bean
