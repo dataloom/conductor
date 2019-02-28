@@ -9,6 +9,7 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import javax.annotation.PostConstruct
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class ConductorEdmSyncPod
 
     @PostConstruct
     fun syncEdm() {
-        if (environment.acceptsProfiles(EDM_SYNC_CONFIGURATION)) {
+        if (environment.acceptsProfiles(Profiles.of(EDM_SYNC_CONFIGURATION))) {
             logger.info("Start syncing EDM")
             updateEdm()
             logger.info("Finished syncing EDM")
@@ -44,11 +45,7 @@ class ConductorEdmSyncPod
         // get prod edm model and remove audit types
         val prodEdm = removeAuditType(prodEdmApi.entityDataModel)
 
-        // update version number
-        val localVersion = edmManager.currentEntityDataModelVersion
-
         val edm = EntityDataModel(
-                localVersion,
                 prodEdm.namespaces,
                 prodEdm.schemas,
                 prodEdm.entityTypes,
@@ -74,7 +71,6 @@ class ConductorEdmSyncPod
         }
 
         return EntityDataModel(
-                edm.version,
                 edm.namespaces,
                 edm.schemas,
                 entityTypes,

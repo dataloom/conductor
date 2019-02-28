@@ -74,14 +74,17 @@ import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
 import com.openlattice.linking.LinkingQueryService;
+import com.openlattice.linking.PostgresLinkingFeedbackService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.organizations.HazelcastOrganizationService;
-import com.openlattice.organizations.OrganizationBootstrapDependencies;
-import com.openlattice.organizations.OrganizationsInitializationTask;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.organizations.tasks.OrganizationMembersCleanupDependencies;
+import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializationTask;
+import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
+import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessenger;
 import com.openlattice.search.PersistentSearchMessengerHelpers;
@@ -236,8 +239,20 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationBootstrapDependencies organizationBootstrapDependencies() {
-        return new OrganizationBootstrapDependencies( organizationsManager() );
+    public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
+        return new OrganizationsInitializationDependencies( organizationsManager() );
+    }
+
+    @Bean
+    public OrganizationMembersCleanupDependencies organizationMembersCleanupDependencies() {
+        return new OrganizationMembersCleanupDependencies( principalService(),
+                organizationsManager(),
+                securableObjectTypes() );
+    }
+
+    @Bean
+    public OrganizationMembersCleanupInitializationTask organizationMembersCleanupInitializationTask() {
+        return new OrganizationMembersCleanupInitializationTask();
     }
 
     @Bean
@@ -264,7 +279,8 @@ public class ConductorServicesPod {
         return new AuthorizationInitializationTask();
     }
 
-    @Bean UsersAndRolesInitializationTask assemblerInitializationTask() {
+    @Bean
+    public UsersAndRolesInitializationTask assemblerInitializationTask() {
         return new UsersAndRolesInitializationTask();
     }
 
@@ -376,8 +392,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AbstractSecurableObjectResolveTypeService securableObjectTypes() {
-        return new HazelcastAbstractSecurableObjectResolveTypeService( hazelcastInstance );
+    public SecurableObjectResolveTypeService securableObjectTypes() {
+        return new HazelcastSecurableObjectResolveTypeService( hazelcastInstance );
     }
 
     @Bean
@@ -464,5 +480,10 @@ public class ConductorServicesPod {
     @Bean
     public LinkingQueryService lqs() {
         return new PostgresLinkingQueryService( hikariDataSource );
+    }
+
+    @Bean
+    public PostgresLinkingFeedbackService postgresLinkingFeedbackQueryService() {
+        return new PostgresLinkingFeedbackService( hikariDataSource, hazelcastInstance );
     }
 }
