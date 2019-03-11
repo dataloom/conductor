@@ -92,7 +92,6 @@ import com.openlattice.search.SearchService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
 import com.openlattice.users.Auth0SyncInitializationTask;
-import com.openlattice.users.Auth0SyncInitializationTaskDependencies;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
@@ -359,11 +358,6 @@ public class ConductorServicesPod {
     @Bean
     public Auth0SyncTask auth0SyncTask() {
         return new Auth0SyncTask();
-    }
-
-    @Bean
-    public Auth0SyncInitializationTaskDependencies auth0SyncInitializationTaskDependencies() {
-        return new Auth0SyncInitializationTaskDependencies( auth0SyncTask() );
     }
 
     @Bean
