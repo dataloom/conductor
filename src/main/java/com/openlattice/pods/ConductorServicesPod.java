@@ -328,7 +328,6 @@ public class ConductorServicesPod {
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                userDirectoryService(),
                 principalService(),
                 assembler() );
     }
