@@ -86,7 +86,7 @@ import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializat
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
-import com.openlattice.search.PersistentSearchMessenger;
+import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
@@ -381,8 +381,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PersistentSearchMessenger persistentSearchMessenger() throws IOException {
-        return new PersistentSearchMessenger();
+    public PersistentSearchMessengerTask persistentSearchMessengerTask() throws IOException {
+        return new PersistentSearchMessengerTask();
     }
 
     @Bean
