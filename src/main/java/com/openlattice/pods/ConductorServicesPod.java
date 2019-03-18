@@ -441,7 +441,8 @@ public class ConductorServicesPod {
                 edmManager(),
                 entityTypeManager(),
                 schemaManager(),
-                auditingConfiguration );
+                auditingConfiguration,
+                assembler() );
     }
 
     @Bean
