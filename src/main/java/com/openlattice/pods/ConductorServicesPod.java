@@ -86,8 +86,8 @@ import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializat
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
-import com.openlattice.search.PersistentSearchMessenger;
-import com.openlattice.search.PersistentSearchMessengerHelpers;
+import com.openlattice.search.PersistentSearchMessengerTask;
+import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
@@ -105,9 +105,6 @@ import org.springframework.context.annotation.Profile;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import static com.openlattice.search.PersistentSearchMessengerKt.ALERT_MESSENGER_INTERVAL_MILLIS;
 
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
@@ -370,25 +367,21 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PersistentSearchMessenger persistentSearchMessenger() throws IOException {
-        var alertMessengerExecutor = hazelcastInstance.getScheduledExecutorService( "alertMessenger" );
-        PersistentSearchMessengerHelpers.setHds( hikariDataSource );
-        PersistentSearchMessengerHelpers.setHazelcastInstance( hazelcastInstance );
-        PersistentSearchMessengerHelpers.setPrincipalsManager( principalService() );
-        PersistentSearchMessengerHelpers.setAuthorizationManager( authorizationManager() );
-        PersistentSearchMessengerHelpers.setSearchService( searchService() );
-        PersistentSearchMessengerHelpers.setMailServiceClient( mailServiceClient() );
-        PersistentSearchMessengerHelpers.setMapboxToken( mapboxConfiguration().getMapboxToken() );
-        PersistentSearchMessengerHelpers.setInitialized( true );
+    public PersistentSearchMessengerTaskDependencies persistentSearchMessengerTaskDependencies() throws IOException {
+        return new PersistentSearchMessengerTaskDependencies(
+                hazelcastInstance,
+                hikariDataSource,
+                principalService(),
+                authorizationManager(),
+                searchService(),
+                mailServiceClient(),
+                mapboxConfiguration().getMapboxToken()
+        );
+    }
 
-        final var taskCount = hazelcastInstance.getAtomicLong( "ALERT_MESSENGER_TASK_COUNT" );
-        final var messengerTask = new PersistentSearchMessenger();
-        if ( taskCount.incrementAndGet() == 1 ) {
-            logger.info( "Scheduling alert messenger task." );
-            PersistentSearchMessengerHelpers.setSyncFuture( alertMessengerExecutor
-                    .scheduleAtFixedRate( messengerTask, 0, ALERT_MESSENGER_INTERVAL_MILLIS, TimeUnit.MILLISECONDS ) );
-        }
-        return messengerTask;
+    @Bean
+    public PersistentSearchMessengerTask persistentSearchMessengerTask() throws IOException {
+        return new PersistentSearchMessengerTask();
     }
 
     @Bean
