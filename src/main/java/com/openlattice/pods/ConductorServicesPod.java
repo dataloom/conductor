@@ -287,10 +287,10 @@ public class ConductorServicesPod {
         return new ProductionViewSchemaInitializationTask();
     }
 
-    @Bean
-    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
-        return new CleanOutOldUsersInitializationTask();
-    }
+//    @Bean
+//    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
+//        return new CleanOutOldUsersInitializationTask();
+//    }
 
     @Bean
     public OrganizationAssembliesInitializerTask organizationAssembliesInitializerTask() {
