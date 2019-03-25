@@ -287,10 +287,10 @@ public class ConductorServicesPod {
         return new ProductionViewSchemaInitializationTask();
     }
 
-    @Bean
-    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
-        return new CleanOutOldUsersInitializationTask();
-    }
+//    @Bean
+//    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
+//        return new CleanOutOldUsersInitializationTask();
+//    }
 
     @Bean
     public OrganizationAssembliesInitializerTask organizationAssembliesInitializerTask() {
@@ -459,7 +459,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityKeyIdService idService() {
-        return new PostgresEntityKeyIdService( hazelcastInstance, hikariDataSource, idGenerationService() );
+        return new PostgresEntityKeyIdService( hazelcastInstance, executor, hikariDataSource, idGenerationService() );
     }
 
     @Bean
