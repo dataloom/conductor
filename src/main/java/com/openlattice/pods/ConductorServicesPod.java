@@ -445,8 +445,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new HazelcastEntityDatastore( hazelcastInstance,
-                idService(),
+        return new HazelcastEntityDatastore( idService(),
                 postgresDataManager(),
                 dataQueryService(),
                 dataModelService(),
