@@ -38,7 +38,6 @@ import com.openlattice.assembler.AssemblerConfiguration;
 import com.openlattice.assembler.AssemblerConnectionManager;
 import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
-import com.openlattice.assembler.tasks.CleanOutOldUsersInitializationTask;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
@@ -228,12 +227,7 @@ public class ConductorServicesPod {
 
     @Bean
     public Assembler assembler() {
-        return new Assembler( authorizationManager(),
-                dbcs(),
-                hikariDataSource,
-                metricRegistry,
-                hazelcastInstance,
-                eventBus );
+        return new Assembler( dbcs(), hikariDataSource, metricRegistry, hazelcastInstance, eventBus );
     }
 
     @Bean
