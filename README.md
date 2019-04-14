@@ -27,5 +27,5 @@ curl -XDELETE 'http://localhost:9200/entity_type_index'
 curl -XDELETE 'http://localhost:9200/association_type_index'
 curl -XDELETE 'http://localhost:9200/app_index'
 curl -XDELETE 'http://localhost:9200/app_type_index'
-curl -XDELETE 'http://localhost:9200/securable_object_*'
+curl -XDELETE 'http://localhost:9200/data_*'
 ```
