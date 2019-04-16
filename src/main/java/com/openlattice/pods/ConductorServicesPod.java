@@ -311,6 +311,7 @@ public class ConductorServicesPod {
         return new AssemblerConnectionManager( assemblerConfiguration,
                 hikariDataSource,
                 principalService(),
+                authorizingComponent(),
                 organizationsManager(),
                 dbcs(),
                 hazelcastInstance,
