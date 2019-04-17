@@ -43,14 +43,19 @@ class ConductorEdmSyncPod
         val prodRetrofit = RetrofitFactory.newClient(RetrofitFactory.Environment.PRODUCTION)
         val prodEdmApi = prodRetrofit.create(EdmApi::class.java)
         // get prod edm model and remove audit types
-        val prodEdm = removeAuditType(prodEdmApi.entityDataModel)
+        val prodEdm = prodEdmApi.entityDataModel
+        if(prodEdm == null) {
+            logger.error("Received null EntityDataModel from prod. Either prod is down or EntityDataModel changed.")
+            return
+        }
 
+        val cleanedProdEdm = removeAuditType(prodEdm)
         val edm = EntityDataModel(
-                prodEdm.namespaces,
-                prodEdm.schemas,
-                prodEdm.entityTypes,
-                prodEdm.associationTypes,
-                prodEdm.propertyTypes)
+                cleanedProdEdm.namespaces,
+                cleanedProdEdm.schemas,
+                cleanedProdEdm.entityTypes,
+                cleanedProdEdm.associationTypes,
+                cleanedProdEdm.propertyTypes)
 
         // get differences between prod and local
         val edmDiff = edmManager.getEntityDataModelDiff(edm)
