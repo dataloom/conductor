@@ -18,14 +18,15 @@ hazelcast:
         capacity: 128
         durability: 1
 
-
-
-hikari:
-    jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
-    username: "oltest"
-    password: "test"
-    maximumPoolSize: 98
-    connectionTimeout: 1200000
+postgres:
+    citus: false
+    initialize-indices: true
+    hikari:
+        jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
+        username: "oltest"
+        password: "test"
+        maximumPoolSize: 98
+        connectionTimeout: 1200000
 
 #graphite:
 #    host: "jarvis"
