@@ -18,7 +18,6 @@ hazelcast:
         capacity: 128
         durability: 1
 
-
 postgres:
     initialize-indices: false
     hikari:
