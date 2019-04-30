@@ -315,7 +315,6 @@ public class ConductorServicesPod {
                 authorizingComponent(),
                 organizationsManager(),
                 dbcs(),
-                hazelcastInstance,
                 eventBus,
                 metricRegistry );
     }
