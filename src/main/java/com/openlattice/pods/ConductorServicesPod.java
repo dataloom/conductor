@@ -311,9 +311,10 @@ public class ConductorServicesPod {
         return new AssemblerConnectionManager( assemblerConfiguration,
                 hikariDataSource,
                 principalService(),
+                authorizationManager(),
+                authorizingComponent(),
                 organizationsManager(),
                 dbcs(),
-                hazelcastInstance,
                 eventBus,
                 metricRegistry );
     }
@@ -369,6 +370,7 @@ public class ConductorServicesPod {
                 hikariDataSource,
                 principalService(),
                 authorizationManager(),
+                authorizingComponent(),
                 searchService(),
                 mailServiceClient(),
                 mapboxConfiguration().getMapboxToken()
