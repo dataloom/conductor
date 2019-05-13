@@ -10,6 +10,7 @@ hazelcast:
     server: true
     group: "local"
     password: "trellis"
+    cp-member-count: 0
     seed-nodes:
         - "localhost"
     scheduled-executor:
@@ -27,7 +28,3 @@ postgres:
         password: "test"
         maximumPoolSize: 98
         connectionTimeout: 12000000 #20 minutes
-
-#graphite:
-#    host: "jarvis"
-#    global-prefix: "conductor"
