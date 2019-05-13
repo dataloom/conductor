@@ -58,6 +58,7 @@ import com.openlattice.data.storage.ByteBlobDataManager;
 import com.openlattice.data.storage.HazelcastEntityDatastore;
 import com.openlattice.data.storage.IndexingMetadataManager;
 import com.openlattice.data.storage.PostgresEntityDataQueryService;
+import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
@@ -283,10 +284,10 @@ public class ConductorServicesPod {
         return new ProductionViewSchemaInitializationTask();
     }
 
-//    @Bean
-//    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
-//        return new CleanOutOldUsersInitializationTask();
-//    }
+    //    @Bean
+    //    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
+    //        return new CleanOutOldUsersInitializationTask();
+    //    }
 
     @Bean
     public OrganizationAssembliesInitializerTask organizationAssembliesInitializerTask() {
@@ -475,6 +476,11 @@ public class ConductorServicesPod {
         return new AuditInitializationTask( hazelcastInstance );
     }
 
+    @Bean
+    public PostgresEntitySetSizesTaskDependency postgresEntitySetSizesTaskDependency() {
+        return new PostgresEntitySetSizesTaskDependency( hikariDataSource );
+    }
+    
     @Bean
     public LinkingQueryService lqs() {
         return new PostgresLinkingQueryService( hikariDataSource );
