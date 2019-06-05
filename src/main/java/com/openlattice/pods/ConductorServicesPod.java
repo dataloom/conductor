@@ -294,10 +294,10 @@ public class ConductorServicesPod {
         return new OrganizationAssembliesInitializerTask();
     }
 
-    @Bean
-    public EntitySetViewsInitializerTask entityViewsInitializerTask() {
-        return new EntitySetViewsInitializerTask();
-    }
+//    @Bean
+//    public EntitySetViewsInitializerTask entityViewsInitializerTask() {
+//        return new EntitySetViewsInitializerTask();
+//    }
 
     @Bean
     public AuditTaskDependencies auditTaskDependencies() {
