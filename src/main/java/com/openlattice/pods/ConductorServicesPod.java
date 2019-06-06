@@ -31,12 +31,9 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
-import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
-import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.AssemblerConnectionManager;
-import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
@@ -318,6 +315,11 @@ public class ConductorServicesPod {
                 dbcs(),
                 eventBus,
                 metricRegistry );
+    }
+
+    @Bean
+    public AssemblerQueryService assemblerQueryService() {
+        return new AssemblerQueryService();
     }
 
     @Bean
