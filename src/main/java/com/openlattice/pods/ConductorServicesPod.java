@@ -96,6 +96,7 @@ import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
+import com.openlattice.subscriptions.SubscriptionNotificationTask;
 import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
@@ -531,7 +532,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public SubscriptionNotificationTaskStreamSerializer subscriptionNotificationTask() {
-        return new SubscriptionNotificationTaskStreamSerializer();
+    public SubscriptionNotificationTask subscriptionNotificationTask() {
+        return new SubscriptionNotificationTask();
     }
 }
