@@ -104,6 +104,7 @@ import com.openlattice.users.Auth0SyncInitializationTask;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -534,5 +535,10 @@ public class ConductorServicesPod {
     @Bean
     public SubscriptionNotificationTask subscriptionNotificationTask() {
         return new SubscriptionNotificationTask();
+    }
+
+    @PostConstruct
+    void initPrincipals() {
+        Principals.init( principalService() );
     }
 }
