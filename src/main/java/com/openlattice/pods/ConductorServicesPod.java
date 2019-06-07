@@ -319,7 +319,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AssemblerQueryService assemblerQueryService() {
-        return new AssemblerQueryService();
+        return new AssemblerQueryService( dataModelService() );
     }
 
     @Bean
