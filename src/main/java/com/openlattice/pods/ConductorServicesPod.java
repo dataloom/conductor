@@ -54,11 +54,7 @@ import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
-import com.openlattice.data.storage.ByteBlobDataManager;
-import com.openlattice.data.storage.HazelcastEntityDatastore;
-import com.openlattice.data.storage.IndexingMetadataManager;
-import com.openlattice.data.storage.PostgresEntityDataQueryService;
-import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
+import com.openlattice.data.storage.*;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
@@ -74,7 +70,6 @@ import com.openlattice.graph.PostgresGraphQueryService;
 import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
-import com.openlattice.hazelcast.serializers.SubscriptionNotificationTaskStreamSerializer;
 import com.openlattice.ids.HazelcastIdGenerationService;
 import com.openlattice.ids.tasks.IdGenerationCatchUpTask;
 import com.openlattice.ids.tasks.IdGenerationCatchupDependency;
@@ -104,7 +99,6 @@ import com.openlattice.users.Auth0SyncInitializationTask;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +107,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 
@@ -529,7 +524,8 @@ public class ConductorServicesPod {
                 authorizingComponent(),
                 mailServiceClient(),
                 subscriptionService(),
-                gqs() );
+                gqs(),
+                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ));
     }
 
     @Bean
