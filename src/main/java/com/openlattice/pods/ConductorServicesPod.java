@@ -51,11 +51,7 @@ import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
-import com.openlattice.data.storage.ByteBlobDataManager;
-import com.openlattice.data.storage.HazelcastEntityDatastore;
-import com.openlattice.data.storage.IndexingMetadataManager;
-import com.openlattice.data.storage.PostgresEntityDataQueryService;
-import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
+import com.openlattice.data.storage.*;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
@@ -66,6 +62,8 @@ import com.openlattice.edm.schemas.SchemaQueryService;
 import com.openlattice.edm.schemas.manager.HazelcastSchemaManager;
 import com.openlattice.edm.schemas.postgres.PostgresSchemaQueryService;
 import com.openlattice.graph.Graph;
+import com.openlattice.graph.GraphQueryService;
+import com.openlattice.graph.PostgresGraphQueryService;
 import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
@@ -88,6 +86,10 @@ import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
+import com.openlattice.subscriptions.PostgresSubscriptionService;
+import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
+import com.openlattice.subscriptions.SubscriptionNotificationTask;
+import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
 import com.openlattice.users.Auth0SyncInitializationTask;
@@ -102,6 +104,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 
@@ -482,7 +485,7 @@ public class ConductorServicesPod {
     public PostgresEntitySetSizesTaskDependency postgresEntitySetSizesTaskDependency() {
         return new PostgresEntitySetSizesTaskDependency( hikariDataSource );
     }
-    
+
     @Bean
     public LinkingQueryService lqs() {
         return new PostgresLinkingQueryService( hikariDataSource );
@@ -503,5 +506,37 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchUpTask idgenCatchupTask() {
         return new IdGenerationCatchUpTask();
+    }
+
+    @Bean
+    public GraphQueryService gqs() {
+        return new PostgresGraphQueryService( hikariDataSource, dataModelService(), dataQueryService() );
+    }
+
+    @Bean
+    public SubscriptionService subscriptionService() {
+        return new PostgresSubscriptionService( hikariDataSource, defaultObjectMapper() );
+    }
+
+    @Bean
+    public SubscriptionNotificationDependencies subscriptionNotificationDependencies() {
+        return new SubscriptionNotificationDependencies( hikariDataSource,
+                principalService(),
+                authorizationManager(),
+                authorizingComponent(),
+                mailServiceClient(),
+                subscriptionService(),
+                gqs(),
+                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ));
+    }
+
+    @Bean
+    public SubscriptionNotificationTask subscriptionNotificationTask() {
+        return new SubscriptionNotificationTask();
+    }
+
+    @PostConstruct
+    void initPrincipals() {
+        Principals.init( principalService() );
     }
 }
