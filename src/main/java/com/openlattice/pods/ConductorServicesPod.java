@@ -78,6 +78,7 @@ import com.openlattice.linking.PostgresLinkingFeedbackService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
+import com.openlattice.notifications.sms.PhoneNumberService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
@@ -324,12 +325,18 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public PhoneNumberService phoneNumberService() {
+        return new PhoneNumberService( hazelcastInstance );
+    }
+
+    @Bean
     public HazelcastOrganizationService organizationsManager() {
         return new HazelcastOrganizationService(
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
                 principalService(),
+                phoneNumberService(),
                 assembler() );
     }
 
@@ -525,7 +532,7 @@ public class ConductorServicesPod {
                 mailServiceClient(),
                 subscriptionService(),
                 gqs(),
-                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ));
+                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ) );
     }
 
     @Bean
