@@ -55,6 +55,7 @@ import com.openlattice.data.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.*;
+import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
@@ -433,6 +434,9 @@ public class ConductorServicesPod {
         return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager );
     }
 
+    @Bean PartitionManager partitionManager() {
+        return new PartitionManager( hazelcastInstance, hikariDataSource );
+    }
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
@@ -444,6 +448,7 @@ public class ConductorServicesPod {
                 entityTypeManager(),
                 schemaManager(),
                 auditingConfiguration,
+                partitionManager(),
                 assembler() );
     }
 
