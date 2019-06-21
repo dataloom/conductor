@@ -31,13 +31,11 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
-import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
-import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.AssemblerConnectionManager;
-import com.openlattice.assembler.AssemblerDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
+import com.openlattice.assembler.tasks.MaterializedEntitySetsDataRefreshTask;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
@@ -273,6 +271,21 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public MaterializedEntitySetsDependencies materializedEntitySetsDependencies() {
+        return new MaterializedEntitySetsDependencies(
+                assembler(),
+                hazelcastInstance.getMap( HazelcastMap.MATERIALIZED_ENTITY_SETS.name() ),
+                organizationsManager(),
+                dataModelService(),
+                authorizingComponent() );
+    }
+
+    @Bean
+    public MaterializedEntitySetsDataRefreshTask materializedEntitySetsDataRefreshTask() {
+        return new MaterializedEntitySetsDataRefreshTask();
+    }
+
+    @Bean
     public AuthorizationInitializationTask authorizationBootstrap() {
         return new AuthorizationInitializationTask();
     }
@@ -321,6 +334,11 @@ public class ConductorServicesPod {
                 dbcs(),
                 eventBus,
                 metricRegistry );
+    }
+
+    @Bean
+    public AssemblerQueryService assemblerQueryService() {
+        return new AssemblerQueryService( dataModelService() );
     }
 
     @Bean
