@@ -338,6 +338,7 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 principalService(),
                 phoneNumberService(),
+                partitionManager(),
                 assembler() );
     }
 
