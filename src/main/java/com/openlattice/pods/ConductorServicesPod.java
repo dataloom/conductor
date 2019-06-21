@@ -35,6 +35,7 @@ import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
+import com.openlattice.assembler.tasks.MaterializedEntitySetsDataRefreshTask;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
@@ -267,6 +268,21 @@ public class ConductorServicesPod {
                 assemblerConnectionManager(),
                 hazelcastInstance.getMap( HazelcastMap.SECURABLE_OBJECT_TYPES.name() ),
                 metricRegistry );
+    }
+
+    @Bean
+    public MaterializedEntitySetsDependencies materializedEntitySetsDependencies() {
+        return new MaterializedEntitySetsDependencies(
+                assembler(),
+                hazelcastInstance.getMap( HazelcastMap.MATERIALIZED_ENTITY_SETS.name() ),
+                organizationsManager(),
+                dataModelService(),
+                authorizingComponent() );
+    }
+
+    @Bean
+    public MaterializedEntitySetsDataRefreshTask materializedEntitySetsDataRefreshTask() {
+        return new MaterializedEntitySetsDataRefreshTask();
     }
 
     @Bean
