@@ -457,7 +457,7 @@ public class ConductorServicesPod {
 
     @Bean
     public GraphService graphService() {
-        return new Graph( hikariDataSource, dataModelService() );
+        return new Graph( hikariDataSource, dataModelService(), partitionManager() );
     }
 
     @Bean
