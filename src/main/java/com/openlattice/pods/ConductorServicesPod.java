@@ -309,7 +309,8 @@ public class ConductorServicesPod {
         return new AuditTaskDependencies(
                 principalService(),
                 dataModelService(),
-                authorizationManager() );
+                authorizationManager(),
+                partitionManager() );
     }
 
     @Bean
@@ -438,6 +439,7 @@ public class ConductorServicesPod {
     @Bean PartitionManager partitionManager() {
         return new PartitionManager( hazelcastInstance, hikariDataSource );
     }
+
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
