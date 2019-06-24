@@ -433,7 +433,7 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEntityDataQueryService dataQueryService() {
-        return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager );
+        return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager, partitionManager() );
     }
 
     @Bean PartitionManager partitionManager() {
