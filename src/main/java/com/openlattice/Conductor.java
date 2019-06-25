@@ -27,7 +27,6 @@ import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConf
 import com.openlattice.auth0.Auth0Pod;
 import com.openlattice.aws.AwsS3Pod;
 import com.openlattice.data.serializers.FullQualifiedNameJacksonSerializer;
-import com.openlattice.datastore.cassandra.CassandraTablesPod;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.hazelcast.pods.MapstoresPod;
 import com.openlattice.hazelcast.pods.SharedStreamSerializersPod;
@@ -56,7 +55,6 @@ public class Conductor extends RhizomeApplicationServer {
             PlasmaCoupling.class,
             MailServicePod.class,
             Auth0Pod.class,
-            CassandraTablesPod.class,
             MapstoresPod.class,
             JdbcPod.class,
             PostgresTablesPod.class,
