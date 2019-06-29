@@ -88,6 +88,8 @@ import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializat
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
+import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
+import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
 import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
@@ -549,6 +551,16 @@ public class ConductorServicesPod {
     @Bean
     public IdConstantsReservationTask idConstantsReservationTask() {
         return new IdConstantsReservationTask();
+    }
+
+    @Bean
+    public PostgresMetaDataPropertiesInitializationDependency postgresMetaDataPropertiesInitializationDependency() {
+        return new PostgresMetaDataPropertiesInitializationDependency( dataModelService() );
+    }
+
+    @Bean
+    public PostgresMetaDataPropertiesInitializationTask postgresMetaDataPropertiesInitializationTask() {
+        return new PostgresMetaDataPropertiesInitializationTask();
     }
 
     @Bean
