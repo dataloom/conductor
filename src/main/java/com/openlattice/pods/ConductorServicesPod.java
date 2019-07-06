@@ -49,10 +49,11 @@ import com.openlattice.authorization.initializers.AuthorizationInitializationDep
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
-import com.openlattice.data.EntityDatastore;
+import com.openlattice.data.storage.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.*;
+import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
@@ -69,6 +70,8 @@ import com.openlattice.graph.core.GraphService;
 import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
+import com.openlattice.ids.tasks.IdConstantsReservationDependency;
+import com.openlattice.ids.tasks.IdConstantsReservationTask;
 import com.openlattice.ids.tasks.IdGenerationCatchUpTask;
 import com.openlattice.ids.tasks.IdGenerationCatchupDependency;
 import com.openlattice.linking.LinkingQueryService;
@@ -76,6 +79,7 @@ import com.openlattice.linking.PostgresLinkingFeedbackService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
+import com.openlattice.notifications.sms.PhoneNumberService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
@@ -84,6 +88,8 @@ import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializat
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
+import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
+import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
 import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
@@ -320,7 +326,8 @@ public class ConductorServicesPod {
         return new AuditTaskDependencies(
                 principalService(),
                 dataModelService(),
-                authorizationManager() );
+                authorizationManager(),
+                partitionManager() );
     }
 
     @Bean
@@ -337,6 +344,11 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public PhoneNumberService phoneNumberService() {
+        return new PhoneNumberService( hazelcastInstance );
+    }
+
+    @Bean
     public AssemblerQueryService assemblerQueryService() {
         return new AssemblerQueryService( dataModelService() );
     }
@@ -348,6 +360,8 @@ public class ConductorServicesPod {
                 aclKeyReservationService(),
                 authorizationManager(),
                 principalService(),
+                phoneNumberService(),
+                partitionManager(),
                 assembler() );
     }
 
@@ -441,7 +455,11 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEntityDataQueryService dataQueryService() {
-        return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager );
+        return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager, partitionManager() );
+    }
+
+    @Bean PartitionManager partitionManager() {
+        return new PartitionManager( hazelcastInstance, hikariDataSource );
     }
 
     @Bean
@@ -455,17 +473,18 @@ public class ConductorServicesPod {
                 entityTypeManager(),
                 schemaManager(),
                 auditingConfiguration,
+                partitionManager(),
                 assembler() );
     }
 
     @Bean
     public GraphService graphService() {
-        return new Graph( hikariDataSource, dataModelService() );
+        return new Graph( hikariDataSource, dataModelService(), partitionManager() );
     }
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new HazelcastEntityDatastore( idService(),
+        return new PostgresEntityDatastore( idService(),
                 postgresDataManager(),
                 dataQueryService(),
                 dataModelService(),
@@ -525,6 +544,26 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public IdConstantsReservationDependency idConstantsReservationDependency() {
+        return new IdConstantsReservationDependency( idService() );
+    }
+
+    @Bean
+    public IdConstantsReservationTask idConstantsReservationTask() {
+        return new IdConstantsReservationTask();
+    }
+
+    @Bean
+    public PostgresMetaDataPropertiesInitializationDependency postgresMetaDataPropertiesInitializationDependency() {
+        return new PostgresMetaDataPropertiesInitializationDependency( dataModelService() );
+    }
+
+    @Bean
+    public PostgresMetaDataPropertiesInitializationTask postgresMetaDataPropertiesInitializationTask() {
+        return new PostgresMetaDataPropertiesInitializationTask();
+    }
+
+    @Bean
     public GraphQueryService gqs() {
         return new PostgresGraphQueryService( hikariDataSource, dataModelService(), dataQueryService() );
     }
@@ -543,7 +582,7 @@ public class ConductorServicesPod {
                 mailServiceClient(),
                 subscriptionService(),
                 gqs(),
-                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ));
+                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ) );
     }
 
     @Bean
