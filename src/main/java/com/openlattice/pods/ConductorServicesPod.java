@@ -505,7 +505,8 @@ public class ConductorServicesPod {
         return new PostgresEntityKeyIdService( hazelcastClientProvider,
                 executor,
                 hikariDataSource,
-                idGenerationService() );
+                idGenerationService(),
+                partitionManager() );
     }
 
     @Bean
