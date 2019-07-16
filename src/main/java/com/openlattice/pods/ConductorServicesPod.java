@@ -553,7 +553,7 @@ public class ConductorServicesPod {
 
     @Bean
     public IdConstantsReservationDependency idConstantsReservationDependency() {
-        return new IdConstantsReservationDependency( idService() );
+        return new IdConstantsReservationDependency( idService(), dataModelService(), principalService() );
     }
 
     @Bean
