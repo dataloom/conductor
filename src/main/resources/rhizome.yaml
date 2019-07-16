@@ -27,12 +27,6 @@ hazelcast-clients:
         cp-member-count: 0
         seed-nodes:
             - "localhost"
-        scheduled-executor:
-            name: "hazelcast_scheduled_tasks"
-            pool-size: 2
-            capacity: 128
-            durability: 2
-
 
 postgres:
     citus: false
