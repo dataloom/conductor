@@ -475,8 +475,7 @@ public class ConductorServicesPod {
                 entityTypeManager(),
                 schemaManager(),
                 auditingConfiguration,
-                partitionManager(),
-                assembler() );
+                partitionManager() );
     }
 
     @Bean
@@ -489,8 +488,7 @@ public class ConductorServicesPod {
         return new PostgresEntityDatastore( idService(),
                 postgresDataManager(),
                 dataQueryService(),
-                dataModelService(),
-                assembler() );
+                dataModelService() );
     }
 
     @Bean
