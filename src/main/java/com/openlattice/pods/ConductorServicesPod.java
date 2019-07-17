@@ -247,7 +247,6 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 authorizingComponent(),
                 principalService(),
-                organizationsManager(),
                 metricRegistry,
                 hazelcastInstance,
                 eventBus
@@ -340,6 +339,7 @@ public class ConductorServicesPod {
         return new AssemblerConnectionManager( assemblerConfiguration,
                 hikariDataSource,
                 principalService(),
+                organizationsManager(),
                 dbcs(),
                 eventBus,
                 metricRegistry );
