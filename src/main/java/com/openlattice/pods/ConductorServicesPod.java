@@ -241,7 +241,16 @@ public class ConductorServicesPod {
 
     @Bean
     public Assembler assembler() {
-        return new Assembler( dbcs(), hikariDataSource, metricRegistry, hazelcastInstance, eventBus );
+        return new Assembler(
+                dbcs(),
+                hikariDataSource,
+                authorizationManager(),
+                authorizingComponent(),
+                principalService(),
+                metricRegistry,
+                hazelcastInstance,
+                eventBus
+        );
     }
 
     @Bean
@@ -268,16 +277,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AssemblerDependencies assemblerDependencies() {
-        return new AssemblerDependencies(
-                assemblerConfiguration,
-                hikariDataSource,
-                principalService(),
-                organizationsManager(),
-                dbcs(),
-                hazelcastInstance.getMap( HazelcastMap.ENTITY_SETS.name() ),
-                assemblerConnectionManager(),
-                hazelcastInstance.getMap( HazelcastMap.SECURABLE_OBJECT_TYPES.name() ),
-                metricRegistry );
+        return new AssemblerDependencies( hikariDataSource, dbcs(), assemblerConnectionManager() );
     }
 
     @Bean
@@ -339,8 +339,6 @@ public class ConductorServicesPod {
         return new AssemblerConnectionManager( assemblerConfiguration,
                 hikariDataSource,
                 principalService(),
-                authorizationManager(),
-                authorizingComponent(),
                 organizationsManager(),
                 dbcs(),
                 eventBus,
@@ -477,8 +475,7 @@ public class ConductorServicesPod {
                 entityTypeManager(),
                 schemaManager(),
                 auditingConfiguration,
-                partitionManager(),
-                assembler() );
+                partitionManager() );
     }
 
     @Bean
@@ -491,8 +488,7 @@ public class ConductorServicesPod {
         return new PostgresEntityDatastore( idService(),
                 postgresDataManager(),
                 dataQueryService(),
-                dataModelService(),
-                assembler() );
+                dataModelService() );
     }
 
     @Bean
