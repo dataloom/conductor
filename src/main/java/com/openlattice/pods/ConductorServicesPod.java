@@ -486,7 +486,7 @@ public class ConductorServicesPod {
     @Bean
     public EntityDatastore entityDatastore() {
         return new PostgresEntityDatastore( idService(),
-                postgresDataManager(),
+                indexingMetadataManager(),
                 dataQueryService(),
                 dataModelService() );
     }
@@ -506,8 +506,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public IndexingMetadataManager postgresDataManager() {
-        return new IndexingMetadataManager( hikariDataSource );
+    public IndexingMetadataManager indexingMetadataManager() {
+        return new IndexingMetadataManager( hikariDataSource, partitionManager() );
     }
 
     @Bean
