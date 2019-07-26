@@ -437,7 +437,7 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEdmManager edmManager() {
-        return new PostgresEdmManager( hikariDataSource, tableManager, hazelcastInstance );
+        return new PostgresEdmManager( hikariDataSource, hazelcastInstance );
     }
 
     @Bean
