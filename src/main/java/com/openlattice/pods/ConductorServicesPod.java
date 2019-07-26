@@ -436,7 +436,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PostgresEdmManager edmManager() {
+    public PostgresEdmManager pgEdmManager() {
         return new PostgresEdmManager( hikariDataSource, tableManager, hazelcastInstance );
     }
 
@@ -471,7 +471,7 @@ public class ConductorServicesPod {
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                edmManager(),
+                pgEdmManager(),
                 entityTypeManager(),
                 schemaManager(),
                 auditingConfiguration,
@@ -488,7 +488,8 @@ public class ConductorServicesPod {
         return new PostgresEntityDatastore( idService(),
                 indexingMetadataManager(),
                 dataQueryService(),
-                dataModelService() );
+                dataModelService(),
+                pgEdmManager() );
     }
 
     @Bean
