@@ -485,11 +485,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new PostgresEntityDatastore( idService(),
-                indexingMetadataManager(),
-                dataQueryService(),
-                dataModelService(),
-                pgEdmManager() );
+        return new PostgresEntityDatastore( dataQueryService(), dataModelService(), pgEdmManager() );
     }
 
     @Bean
