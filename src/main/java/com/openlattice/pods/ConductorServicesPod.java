@@ -524,7 +524,7 @@ public class ConductorServicesPod {
 
     @Bean
     public LinkingQueryService lqs() {
-        return new PostgresLinkingQueryService( hikariDataSource, partitionManager );
+        return new PostgresLinkingQueryService( hikariDataSource, partitionManager() );
     }
 
     @Bean
