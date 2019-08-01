@@ -247,6 +247,7 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 authorizingComponent(),
                 principalService(),
+                partitionManager(),
                 metricRegistry,
                 hazelcastInstance,
                 eventBus
