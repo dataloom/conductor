@@ -36,6 +36,7 @@ import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
+import com.openlattice.assembler.tasks.MaterializePermissionSyncTask;
 import com.openlattice.assembler.tasks.MaterializedEntitySetsDataRefreshTask;
 import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
@@ -299,6 +300,11 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public MaterializePermissionSyncTask materializePermissionSyncTask() {
+        return new MaterializePermissionSyncTask();
+    }
+
+    @Bean
     public AuthorizationInitializationTask authorizationBootstrap() {
         return new AuthorizationInitializationTask();
     }
@@ -463,7 +469,8 @@ public class ConductorServicesPod {
         return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager, partitionManager() );
     }
 
-    @Bean PartitionManager partitionManager() {
+    @Bean
+    PartitionManager partitionManager() {
         return new PartitionManager( hazelcastInstance, hikariDataSource );
     }
 
