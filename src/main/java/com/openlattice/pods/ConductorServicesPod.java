@@ -288,7 +288,9 @@ public class ConductorServicesPod {
                 hazelcastInstance.getMap( HazelcastMap.MATERIALIZED_ENTITY_SETS.name() ),
                 organizationsManager(),
                 dataModelService(),
-                authorizingComponent() );
+                authorizingComponent(),
+                hikariDataSource
+        );
     }
 
     @Bean
