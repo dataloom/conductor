@@ -51,7 +51,6 @@ import com.openlattice.authorization.initializers.AuthorizationInitializationDep
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
-import com.openlattice.data.storage.EntityDatastore;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.*;
@@ -550,16 +549,6 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchUpTask idgenCatchupTask() {
         return new IdGenerationCatchUpTask();
-    }
-
-    @Bean
-    public IdConstantsReservationDependency idConstantsReservationDependency() {
-        return new IdConstantsReservationDependency( idService(), dataModelService(), principalService() );
-    }
-
-    @Bean
-    public IdConstantsReservationTask idConstantsReservationTask() {
-        return new IdConstantsReservationTask();
     }
 
     @Bean
