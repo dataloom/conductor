@@ -68,6 +68,7 @@ import com.openlattice.graph.Graph;
 import com.openlattice.graph.GraphQueryService;
 import com.openlattice.graph.PostgresGraphQueryService;
 import com.openlattice.graph.core.GraphService;
+import com.openlattice.hazelcast.HazelcastClient;
 import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
@@ -542,7 +543,8 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchupDependency idgenCatchupDependency() {
         return new IdGenerationCatchupDependency(
-                hazelcastInstance.getMap( HazelcastMap.ID_GENERATION.name() ),
+                hazelcastClientProvider.getClient( HazelcastClient.IDS.name() )
+                        .getMap( HazelcastMap.ID_GENERATION.name() ),
                 hikariDataSource );
     }
 
