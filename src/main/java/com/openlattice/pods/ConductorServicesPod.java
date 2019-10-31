@@ -487,8 +487,7 @@ public class ConductorServicesPod {
         return new PostgresEntityDataQueryService(
                 hikariDataSource,
                 byteBlobDataManager,
-                partitionManager(),
-                indexingMetadataManager()
+                partitionManager()
         );
     }
 
