@@ -77,6 +77,8 @@ import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
+import com.openlattice.datastore.services.EntitySetManager;
+import com.openlattice.datastore.services.EntitySetService;
 import com.openlattice.directory.UserDirectoryService;
 import com.openlattice.edm.PostgresEdmManager;
 import com.openlattice.edm.properties.PostgresTypeManager;
@@ -354,7 +356,7 @@ public class ConductorServicesPod {
     public AuditTaskDependencies auditTaskDependencies() {
         return new AuditTaskDependencies(
                 principalService(),
-                dataModelService(),
+                entitySetManager(),
                 authorizationManager(),
                 partitionManager() );
     }
@@ -482,7 +484,11 @@ public class ConductorServicesPod {
 
     @Bean
     public PostgresEntityDataQueryService dataQueryService() {
-        return new PostgresEntityDataQueryService( hikariDataSource, byteBlobDataManager, partitionManager() );
+        return new PostgresEntityDataQueryService(
+                hikariDataSource,
+                byteBlobDataManager,
+                partitionManager()
+        );
     }
 
     @Bean
@@ -499,19 +505,32 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 pgEdmManager(),
                 entityTypeManager(),
-                schemaManager(),
-                auditingConfiguration,
-                partitionManager() );
+                schemaManager()
+        );
+    }
+
+    @Bean
+    public EntitySetManager entitySetManager() {
+        return new EntitySetService(
+                hazelcastInstance,
+                eventBus,
+                pgEdmManager(),
+                aclKeyReservationService(),
+                authorizationManager(),
+                partitionManager(),
+                dataModelService(),
+                auditingConfiguration
+        );
     }
 
     @Bean
     public GraphService graphService() {
-        return new Graph( hikariDataSource, dataModelService(), partitionManager() );
+        return new Graph( hikariDataSource, entitySetManager(), partitionManager() );
     }
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new PostgresEntityDatastore( dataQueryService(), dataModelService(), pgEdmManager() );
+        return new PostgresEntityDatastore( dataQueryService(), pgEdmManager(), entitySetManager() );
     }
 
     @Bean
@@ -535,7 +554,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EdmAuthorizationHelper authorizingComponent() {
-        return new EdmAuthorizationHelper( dataModelService(), authorizationManager() );
+        return new EdmAuthorizationHelper( dataModelService(), authorizationManager(), entitySetManager() );
     }
 
     @Bean
@@ -583,7 +602,7 @@ public class ConductorServicesPod {
 
     @Bean
     public GraphQueryService gqs() {
-        return new PostgresGraphQueryService( hikariDataSource, dataModelService(), dataQueryService() );
+        return new PostgresGraphQueryService( hikariDataSource, entitySetManager(), dataQueryService() );
     }
 
     @Bean
