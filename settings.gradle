@@ -18,7 +18,6 @@
  *
  */
 
-rootProject.name='conductor'
 pluginManagement {
     repositories {
         maven {
@@ -26,3 +25,5 @@ pluginManagement {
         }
     }
 }
+
+rootProject.name='conductor'
