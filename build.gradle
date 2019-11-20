@@ -18,16 +18,6 @@
  *
  */
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        // Replace $version with the current version
-        classpath "com.smokejumperit.gradle.license:Gradle-License-Report:0.0.2"
-    }
-}
-
 
 plugins {
     id "application"
@@ -40,6 +30,7 @@ plugins {
     id 'com.github.spotbugs' version '2.0.1'
     id 'org.jetbrains.kotlin.jvm' version '1.3.50'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.3.50'
+    id 'com.github.jk1.dependency-license-report' version '1.11'
 }
 
 description = "Conductor Server"
@@ -56,7 +47,6 @@ ext.developerConnectionUrl = 'scm:git:https://github.com/openlattice/conductor.g
 
 apply from: "https://raw.githubusercontent.com/openlattice/gradles/master/openlattice.gradle"
 apply plugin: 'kotlin'
-apply plugin: 'license-report'
 
 def CONDUCTOR_XMS = "$System.env.CONDUCTOR_XMS"
 def CONDUCTOR_XMX = "$System.env.CONDUCTOR_XMX"
@@ -122,6 +112,11 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
         xml.enabled = false
         html.enabled = true
     }
+}
+
+import com.github.jk1.license.render.*
+licenseReport {
+    renderers = [new InventoryHtmlReportRenderer()]
 }
 
 configurations {
