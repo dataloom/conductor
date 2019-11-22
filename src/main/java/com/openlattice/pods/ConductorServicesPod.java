@@ -277,7 +277,7 @@ public class ConductorServicesPod {
 
     @Bean
     public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
-        return new OrganizationsInitializationDependencies( organizationsManager() );
+        return new OrganizationsInitializationDependencies( organizationsManager(), principalService() );
     }
 
     @Bean
@@ -413,8 +413,9 @@ public class ConductorServicesPod {
 
     @Bean
     public ManagementAPI managementAPI() {
-        return new ManagementAPI(auth0Configuration.getDomain(), auth0TokenProvider().getToken());
+        return new ManagementAPI( auth0Configuration.getDomain(), auth0TokenProvider().getToken() );
     }
+
     @Bean
     public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
         return new Auth0SyncTaskDependencies( hazelcastInstance,
