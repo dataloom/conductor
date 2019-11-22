@@ -59,7 +59,7 @@ if (CONDUCTOR_XMS == 'null' || CONDUCTOR_XMS == null || CONDUCTOR_XMS == "") {
 }
 
 if (CONDUCTOR_XMX == 'null' || CONDUCTOR_XMX == null || CONDUCTOR_XMX == "") {
-    CONDUCTOR_XMX = '-Xms4g'
+    CONDUCTOR_XMX = '-Xmx4g'
 }
 
 if (C_ARGS == 'null' || C_ARGS == null || C_ARGS == "") {
