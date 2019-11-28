@@ -21,6 +21,7 @@
 package com.openlattice.pods;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.auth0.client.mgmt.ManagementAPI;
 import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -121,6 +122,7 @@ import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
 import com.openlattice.users.Auth0SyncInitializationTask;
+import com.openlattice.users.Auth0SyncService;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.zaxxer.hikari.HikariDataSource;
@@ -275,7 +277,7 @@ public class ConductorServicesPod {
 
     @Bean
     public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
-        return new OrganizationsInitializationDependencies( organizationsManager() );
+        return new OrganizationsInitializationDependencies( organizationsManager(), principalService() );
     }
 
     @Bean
@@ -405,12 +407,25 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public Auth0SyncService auth0SyncService() {
+        return new Auth0SyncService( hazelcastInstance, hikariDataSource, principalService(), organizationsManager() );
+    }
+
+    @Bean
+    public ManagementAPI managementAPI() {
+        return new ManagementAPI( auth0Configuration.getDomain(), auth0TokenProvider().getToken() );
+    }
+
+    @Bean
     public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
         return new Auth0SyncTaskDependencies( hazelcastInstance,
                 principalService(),
+                auth0SyncService(),
+                managementAPI(),
                 organizationsManager(),
                 dbcs(),
-                auth0TokenProvider() );
+                auth0TokenProvider(),
+                auth0Configuration );
     }
 
     @Bean
