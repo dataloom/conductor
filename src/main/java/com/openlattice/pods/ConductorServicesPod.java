@@ -276,8 +276,19 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
-        return new OrganizationsInitializationDependencies( organizationsManager(), principalService() );
+    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
+    public OrganizationsInitializationDependencies organizationLocalBootstrapDependencies() throws IOException {
+        return new OrganizationsInitializationDependencies( organizationsManager(),
+                principalService(),
+                getLocalConductorConfiguration() );
+    }
+
+    @Bean
+    @Profile( { Profiles.AWS_CONFIGURATION_PROFILE, Profiles.AWS_TESTING_PROFILE } )
+    public OrganizationsInitializationDependencies organizationAwsBootstrapDependencies() throws IOException {
+        return new OrganizationsInitializationDependencies( organizationsManager(),
+                principalService(),
+                getAwsConductorConfiguration() );
     }
 
     @Bean
