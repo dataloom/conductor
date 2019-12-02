@@ -268,8 +268,19 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
-        return new OrganizationsInitializationDependencies( organizationsManager(), principalService(), getLocalConductorConfiguration() );
+    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
+    public OrganizationsInitializationDependencies organizationLocalBootstrapDependencies() throws IOException {
+        return new OrganizationsInitializationDependencies( organizationsManager(),
+                principalService(),
+                getLocalConductorConfiguration() );
+    }
+
+    @Bean
+    @Profile( { Profiles.AWS_CONFIGURATION_PROFILE, Profiles.AWS_TESTING_PROFILE } )
+    public OrganizationsInitializationDependencies organizationAwsBootstrapDependencies() throws IOException {
+        return new OrganizationsInitializationDependencies( organizationsManager(),
+                principalService(),
+                getAwsConductorConfiguration() );
     }
 
     @Bean
@@ -537,7 +548,7 @@ public class ConductorServicesPod {
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new PostgresEntityDatastore( dataQueryService(), pgEdmManager(), entitySetManager() , metricRegistry );
+        return new PostgresEntityDatastore( dataQueryService(), pgEdmManager(), entitySetManager(), metricRegistry );
     }
 
     @Bean
