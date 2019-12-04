@@ -32,7 +32,6 @@ import com.openlattice.hazelcast.pods.MapstoresPod;
 import com.openlattice.hazelcast.pods.SharedStreamSerializersPod;
 import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.mail.pods.MailServicePod;
-import com.openlattice.mail.services.MailService;
 import com.openlattice.pods.ConductorEdmSyncPod;
 import com.openlattice.pods.ConductorPostInitializationPod;
 import com.openlattice.pods.ConductorServicesPod;
@@ -76,7 +75,6 @@ public class Conductor extends RhizomeApplicationServer {
     @Override
     public void sprout( String... activeProfiles ) {
         super.sprout( activeProfiles );
-        getContext().getBean( MailService.class ).processEmailRequestsQueue();
     }
 
     public static void main( String[] args ) {
