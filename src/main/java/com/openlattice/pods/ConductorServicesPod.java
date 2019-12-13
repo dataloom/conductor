@@ -64,6 +64,8 @@ import com.openlattice.authorization.Principals;
 import com.openlattice.authorization.SecurableObjectResolveTypeService;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
+import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
+import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
@@ -187,6 +189,12 @@ public class ConductorServicesPod {
     @Inject
     private HazelcastClientProvider hazelcastClientProvider;
 
+    @Inject
+    private SecurablePrincipalsMapLoader spml;
+
+    @Inject
+    private ResolvedPrincipalTreesMapLoader rptml;
+    
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return ObjectMappers.getJsonMapper();
@@ -655,6 +663,10 @@ public class ConductorServicesPod {
 
     @PostConstruct
     void initPrincipals() {
-        Principals.init( principalService() );
+        final var spm = principalService();
+        spml.initSpm( spm );
+        rptml.initSpm( spm );
+        rptml.initPrincipalsMapstore( hazelcastInstance );
+        Principals.init( spm, hazelcastInstance );
     }
 }
