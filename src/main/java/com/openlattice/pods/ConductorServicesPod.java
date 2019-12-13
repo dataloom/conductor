@@ -663,9 +663,6 @@ public class ConductorServicesPod {
 
     @PostConstruct
     void initPrincipals() {
-        final var spm = principalService();
-        spml.initPrincipalsMapstore( hazelcastInstance );
-        rptml.initPrincipalsMapstore( hazelcastInstance );
-        Principals.init( spm, hazelcastInstance );
+        Principals.init( principalService(), hazelcastInstance );
     }
 }
