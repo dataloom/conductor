@@ -104,7 +104,8 @@ jacoco {
 }
 
 spotbugs {
-    toolVersion = '3.1.12'
+    reportLevel = 'high'
+    toolVersion = "${spotbugs_annotations_version}"
 }
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {
