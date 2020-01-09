@@ -438,14 +438,7 @@ public class ConductorServicesPod {
 
     @Bean
     public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
-        return new Auth0SyncTaskDependencies( hazelcastInstance,
-                principalService(),
-                auth0SyncService(),
-                managementAPI(),
-                organizationsManager(),
-                dbcs(),
-                auth0TokenProvider(),
-                auth0Configuration );
+        return new Auth0SyncTaskDependencies( auth0SyncService(), managementAPI() );
     }
 
     @Bean
