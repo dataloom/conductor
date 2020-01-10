@@ -23,6 +23,7 @@ package com.openlattice;
 import com.dataloom.mappers.ObjectMappers;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
 import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
+import com.openlattice.auth0.Auth0Pod;
 import com.openlattice.aws.AwsS3Pod;
 import com.openlattice.data.serializers.FullQualifiedNameJacksonSerializer;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
@@ -43,6 +44,7 @@ import com.openlattice.tasks.pods.TaskSchedulerPod;
  */
 public class Conductor extends RhizomeApplicationServer {
     static final Class<?>[] conductorPods = new Class<?>[] {
+            Auth0Pod.class,
             AwsS3Pod.class,
             ByteBlobServicePod.class,
             ConductorPostInitializationPod.class,
@@ -64,7 +66,7 @@ public class Conductor extends RhizomeApplicationServer {
     }
 
     public Conductor() {
-        super( Pods.concatenate( RhizomeApplicationServer.DEFAULT_PODS, conductorPods ) );
+        super( Pods.concatenate( conductorPods ) );
     }
 
     @Override
