@@ -20,9 +20,19 @@
 
 package com.openlattice.pods;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.openlattice.authorization.AuthorizationManager;
+import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.ConductorElasticsearchApi;
+import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.kindling.search.ConductorElasticsearchImpl;
+import com.openlattice.mail.MailServiceClient;
+import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.search.PersistentSearchMessengerTask;
+import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
+import com.openlattice.search.SearchService;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,9 +45,52 @@ public class ConductorPostInitializationPod {
     @Inject
     private ConductorConfiguration conductorConfiguration;
 
+    @Inject
+    private MapboxConfiguration mapboxConfiguration;
+
+    @Inject
+    private HazelcastInstance hazelcastInstance;
+
+    @Inject
+    private HikariDataSource hikariDataSource;
+
+    @Inject
+    private SecurePrincipalsManager principalService;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    private EdmAuthorizationHelper edmAuthorizationHelper;
+
+    @Inject
+    private SearchService searchService;
+
+    @Inject
+    private MailServiceClient mailServiceClient;
+
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() throws IOException {
         return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
+    }
+
+    @Bean
+    public PersistentSearchMessengerTaskDependencies persistentSearchMessengerTaskDependencies() throws IOException {
+        return new PersistentSearchMessengerTaskDependencies(
+                hazelcastInstance,
+                hikariDataSource,
+                principalService,
+                authorizationManager,
+                edmAuthorizationHelper,
+                searchService,
+                mailServiceClient,
+                mapboxConfiguration.getMapboxToken()
+        );
+    }
+
+    @Bean
+    public PersistentSearchMessengerTask persistentSearchMessengerTask() throws IOException {
+        return new PersistentSearchMessengerTask();
     }
 
 }
