@@ -54,6 +54,8 @@ import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
+import com.openlattice.data.DataGraphManager;
+import com.openlattice.data.DataGraphService;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.*;
@@ -630,6 +632,18 @@ public class ConductorServicesPod {
     @Bean
     public SubscriptionNotificationTask subscriptionNotificationTask() {
         return new SubscriptionNotificationTask();
+    }
+
+    @Bean
+    public PostgresEntitySetSizesTask postgresEntitySetSizeCacheManager() {
+        return new PostgresEntitySetSizesTask();
+    }
+
+    @Bean
+    public DataGraphManager dataGraphService() {
+        return new DataGraphService(
+                graphService(), idService(), entityDatastore(), postgresEntitySetSizeCacheManager(), idCipherManager()
+        );
     }
 
     @PostConstruct
