@@ -477,7 +477,7 @@ public class ConductorServicesPod {
 
     @Bean
     public MailServiceRequirements mailServiceRequirements() {
-        return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
+        return () -> HazelcastQueue.EMAIL_SPOOL.getQueue( hazelcastInstance );
     }
 
     @Bean
@@ -578,7 +578,7 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchupDependency idgenCatchupDependency() {
         return new IdGenerationCatchupDependency(
-                HazelcastMap.ID_GENERATION.getMap(hazelcastClientProvider.getClient( HazelcastClient.IDS.name() )),
+                HazelcastMap.ID_GENERATION.getMap( hazelcastClientProvider.getClient( HazelcastClient.IDS.name())),
                 hikariDataSource );
     }
 
@@ -616,7 +616,8 @@ public class ConductorServicesPod {
                 mailServiceClient(),
                 subscriptionService(),
                 gqs(),
-                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ) );
+                HazelcastQueue.TWILIO.getQueue( hazelcastInstance )
+        );
     }
 
     @Bean
