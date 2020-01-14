@@ -318,7 +318,7 @@ public class ConductorServicesPod {
     public MaterializedEntitySetsDependencies materializedEntitySetsDependencies() {
         return new MaterializedEntitySetsDependencies(
                 assembler(),
-                hazelcastInstance.getMap( HazelcastMap.MATERIALIZED_ENTITY_SETS.name() ),
+                HazelcastMap.MATERIALIZED_ENTITY_SETS.getMap( hazelcastInstance ),
                 organizationsManager(),
                 dataModelService(),
                 authorizingComponent(),
@@ -587,8 +587,7 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchupDependency idgenCatchupDependency() {
         return new IdGenerationCatchupDependency(
-                hazelcastClientProvider.getClient( HazelcastClient.IDS.name() )
-                        .getMap( HazelcastMap.ID_GENERATION.name() ),
+                HazelcastMap.ID_GENERATION.getMap(hazelcastClientProvider.getClient( HazelcastClient.IDS.name() )),
                 hikariDataSource );
     }
 
