@@ -22,17 +22,15 @@ package com.openlattice;
 
 import com.dataloom.mappers.ObjectMappers;
 import com.kryptnostic.rhizome.core.RhizomeApplicationServer;
-import com.kryptnostic.rhizome.hazelcast.serializers.RhizomeUtils.Pods;
-import com.kryptnostic.rhizome.pods.hazelcast.RegistryBasedHazelcastInstanceConfigurationPod;
 import com.openlattice.auth0.Auth0Pod;
 import com.openlattice.aws.AwsS3Pod;
 import com.openlattice.data.serializers.FullQualifiedNameJacksonSerializer;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
+import com.openlattice.hazelcast.pods.HazelcastQueuePod;
 import com.openlattice.hazelcast.pods.MapstoresPod;
 import com.openlattice.hazelcast.pods.SharedStreamSerializersPod;
 import com.openlattice.jdbc.JdbcPod;
 import com.openlattice.mail.pods.MailServicePod;
-import com.openlattice.mail.services.MailService;
 import com.openlattice.pods.ConductorEdmSyncPod;
 import com.openlattice.pods.ConductorPostInitializationPod;
 import com.openlattice.pods.ConductorServicesPod;
@@ -44,12 +42,8 @@ import com.openlattice.tasks.pods.TaskSchedulerPod;
  * @author Matthew Tamayo-Rios &lt;matthew@openlattice.com&gt;
  */
 public class Conductor extends RhizomeApplicationServer {
-    static final Class<?>[] rhizomePods = new Class<?>[] {
-            RegistryBasedHazelcastInstanceConfigurationPod.class,
-            Auth0Pod.class
-    };
-
     static final Class<?>[] conductorPods = new Class<?>[] {
+            Auth0Pod.class,
             AwsS3Pod.class,
             ByteBlobServicePod.class,
             ConductorPostInitializationPod.class,
@@ -58,6 +52,7 @@ public class Conductor extends RhizomeApplicationServer {
             JdbcPod.class,
             MailServicePod.class,
             MapstoresPod.class,
+            HazelcastQueuePod.class,
             PlasmaCoupling.class,
             PostgresPod.class,
             PostgresTablesPod.class,
@@ -70,13 +65,12 @@ public class Conductor extends RhizomeApplicationServer {
     }
 
     public Conductor() {
-        super( Pods.concatenate( RhizomeApplicationServer.DEFAULT_PODS, rhizomePods, conductorPods ) );
+        super( conductorPods );
     }
 
     @Override
     public void sprout( String... activeProfiles ) {
         super.sprout( activeProfiles );
-        getContext().getBean( MailService.class ).processEmailRequestsQueue();
     }
 
     public static void main( String[] args ) {
