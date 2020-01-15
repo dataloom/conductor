@@ -50,7 +50,7 @@ import com.openlattice.auditing.AuditInitializationTask;
 import com.openlattice.auditing.AuditTaskDependencies;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
-import com.openlattice.auth0.Auth0TokenProvider;
+import com.openlattice.auth0.AwsAuth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
 import com.openlattice.authorization.AuthorizationManager;
 import com.openlattice.authorization.AuthorizationQueryService;
@@ -421,8 +421,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public Auth0TokenProvider auth0TokenProvider() {
-        return new Auth0TokenProvider( auth0Configuration );
+    public AwsAuth0TokenProvider auth0TokenProvider() {
+        return new AwsAuth0TokenProvider( auth0Configuration );
     }
 
     @Bean

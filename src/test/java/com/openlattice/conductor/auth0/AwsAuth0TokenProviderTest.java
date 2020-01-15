@@ -23,8 +23,7 @@ package com.openlattice.conductor.auth0;
 
 import com.google.common.collect.ImmutableSet;
 import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
-import com.kryptnostic.rhizome.pods.AwsConfigurationPod;
-import com.openlattice.auth0.Auth0TokenProvider;
+import com.openlattice.auth0.AwsAuth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
 import com.openlattice.conductor.ConductorBootstrap;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,7 @@ import org.junit.Test;
 /**
  * In order to pass this you must have an auth0.yaml file with correct information for client credentials grants.
  */
-public class Auth0TokenProviderTest extends ConductorBootstrap {
+public class AwsAuth0TokenProviderTest extends ConductorBootstrap {
     @Test
     @Ignore
     public void testAuth0TokenProvider() {
@@ -46,7 +45,7 @@ public class Auth0TokenProviderTest extends ConductorBootstrap {
             Assert.assertTrue( StringUtils.isNotBlank( configuration.getClientSecret() ) );
             Assert.assertTrue( StringUtils.isNotBlank( configuration.getManagementApiUrl() ) );
             Assert.assertTrue( StringUtils.isNotBlank( configuration.getClientId() ) );
-            Auth0TokenProvider provider = new Auth0TokenProvider( configuration );
+            AwsAuth0TokenProvider provider = new AwsAuth0TokenProvider( configuration );
             Assert.assertTrue( StringUtils.isNotBlank( provider.getToken() ) );
         }
     }
