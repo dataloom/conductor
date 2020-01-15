@@ -99,6 +99,7 @@ import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
 import com.openlattice.search.SearchService;
+import com.openlattice.search.graph.SearchGraphService;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
 import com.openlattice.subscriptions.SubscriptionNotificationTask;
@@ -451,6 +452,18 @@ public class ConductorServicesPod {
     @Bean
     public SearchService searchService() {
         return new SearchService( eventBus, metricRegistry );
+    }
+
+    @Bean
+    public SearchGraphService searchGraphService() {
+        return new SearchGraphService(
+                entityDatastore(),
+                graphService(),
+                dataModelService(),
+                entitySetManager(),
+                idCipherManager(),
+                authorizationManager()
+        );
     }
 
     @Bean

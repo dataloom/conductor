@@ -32,6 +32,7 @@ import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
+import com.openlattice.search.graph.SearchGraphService;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,6 +68,9 @@ public class ConductorPostInitializationPod {
     private SearchService searchService;
 
     @Inject
+    private SearchGraphService searchGraphService;
+
+    @Inject
     private MailServiceClient mailServiceClient;
 
     @Bean
@@ -83,6 +87,7 @@ public class ConductorPostInitializationPod {
                 authorizationManager,
                 edmAuthorizationHelper,
                 searchService,
+                searchGraphService,
                 mailServiceClient,
                 mapboxConfiguration.getMapboxToken()
         );
