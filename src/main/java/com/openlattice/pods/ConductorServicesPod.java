@@ -21,7 +21,6 @@
 package com.openlattice.pods;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.auth0.client.mgmt.ManagementAPI;
 import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +49,7 @@ import com.openlattice.auditing.AuditInitializationTask;
 import com.openlattice.auditing.AuditTaskDependencies;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
-import com.openlattice.auth0.AwsAuth0TokenProvider;
+import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
 import com.openlattice.authorization.AuthorizationManager;
 import com.openlattice.authorization.AuthorizationQueryService;
@@ -66,6 +65,7 @@ import com.openlattice.authorization.initializers.AuthorizationInitializationDep
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
+import com.openlattice.conductor.pods.ConductorPodUtilsKt;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
@@ -127,6 +127,7 @@ import com.openlattice.users.Auth0SyncInitializationTask;
 import com.openlattice.users.Auth0SyncService;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
+import com.openlattice.users.UserListingService;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
@@ -421,8 +422,8 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AwsAuth0TokenProvider auth0TokenProvider() {
-        return new AwsAuth0TokenProvider( auth0Configuration );
+    public Auth0TokenProvider auth0TokenProvider() {
+        return new Auth0TokenProvider( auth0Configuration );
     }
 
     @Bean
@@ -431,20 +432,13 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public ManagementAPI managementAPI() {
-        return new ManagementAPI( auth0Configuration.getDomain(), auth0TokenProvider().getToken() );
+    public UserListingService userListingService() {
+        return ConductorPodUtilsKt.getUserListingService( auth0Configuration, auth0TokenProvider() );
     }
 
     @Bean
     public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
-        return new Auth0SyncTaskDependencies( hazelcastInstance,
-                principalService(),
-                auth0SyncService(),
-                managementAPI(),
-                organizationsManager(),
-                dbcs(),
-                auth0TokenProvider(),
-                auth0Configuration );
+        return new Auth0SyncTaskDependencies( auth0SyncService(), userListingService() );
     }
 
     @Bean
