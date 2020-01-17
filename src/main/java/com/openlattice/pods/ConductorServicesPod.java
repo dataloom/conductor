@@ -21,6 +21,7 @@
 package com.openlattice.pods;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.auth0.client.mgmt.ManagementAPI;
 import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,7 +66,6 @@ import com.openlattice.authorization.initializers.AuthorizationInitializationDep
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
-import com.openlattice.conductor.pods.ConductorPodUtilsKt;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
@@ -82,6 +82,8 @@ import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
 import com.openlattice.datastore.services.EntitySetManager;
 import com.openlattice.datastore.services.EntitySetService;
+import com.openlattice.directory.Auth0UserDirectoryService;
+import com.openlattice.directory.LocalUserDirectoryService;
 import com.openlattice.directory.UserDirectoryService;
 import com.openlattice.edm.PostgresEdmManager;
 import com.openlattice.edm.properties.PostgresTypeManager;
@@ -127,6 +129,8 @@ import com.openlattice.users.Auth0SyncInitializationTask;
 import com.openlattice.users.Auth0SyncService;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
+import com.openlattice.users.Auth0UserListingService;
+import com.openlattice.users.LocalUserListingService;
 import com.openlattice.users.UserListingService;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
@@ -195,7 +199,7 @@ public class ConductorServicesPod {
 
     @Inject
     private ResolvedPrincipalTreesMapLoader rptml;
-    
+
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return ObjectMappers.getJsonMapper();
@@ -256,7 +260,10 @@ public class ConductorServicesPod {
 
     @Bean
     public UserDirectoryService userDirectoryService() {
-        return new UserDirectoryService( auth0TokenProvider(), hazelcastInstance );
+        if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
+            return new LocalUserDirectoryService( auth0Configuration );
+        }
+        return new Auth0UserDirectoryService( auth0TokenProvider(), hazelcastInstance );
     }
 
     @Bean
@@ -433,7 +440,12 @@ public class ConductorServicesPod {
 
     @Bean
     public UserListingService userListingService() {
-        return ConductorPodUtilsKt.getUserListingService( auth0Configuration, auth0TokenProvider() );
+        if ( auth0Configuration.getManagementApiUrl().contains( "localhost" ) ) {
+            return new LocalUserListingService( auth0Configuration );
+        }
+        return new Auth0UserListingService( new ManagementAPI( auth0Configuration.getDomain(),
+                auth0TokenProvider().getToken() ) );
+
     }
 
     @Bean
