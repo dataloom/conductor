@@ -33,14 +33,9 @@ import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
 import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.openlattice.ResourceConfigurationLoader;
-import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
-import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.AssemblerConnectionManager;
-import com.openlattice.assembler.AssemblerDependencies;
-import com.openlattice.assembler.AssemblerQueryService;
-import com.openlattice.assembler.MaterializedEntitySetsDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.MaterializePermissionSyncTask;
 import com.openlattice.assembler.tasks.MaterializedEntitySetsDataRefreshTask;
@@ -52,16 +47,7 @@ import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
-import com.openlattice.authorization.AuthorizationManager;
-import com.openlattice.authorization.AuthorizationQueryService;
-import com.openlattice.authorization.DbCredentialService;
-import com.openlattice.authorization.EdmAuthorizationHelper;
-import com.openlattice.authorization.HazelcastAclKeyReservationService;
-import com.openlattice.authorization.HazelcastAuthorizationService;
-import com.openlattice.authorization.HazelcastSecurableObjectResolveTypeService;
-import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.authorization.Principals;
-import com.openlattice.authorization.SecurableObjectResolveTypeService;
+import com.openlattice.authorization.*;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
@@ -70,12 +56,7 @@ import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
-import com.openlattice.data.storage.ByteBlobDataManager;
-import com.openlattice.data.storage.EntityDatastore;
-import com.openlattice.data.storage.IndexingMetadataManager;
-import com.openlattice.data.storage.PostgresEntityDataQueryService;
-import com.openlattice.data.storage.PostgresEntityDatastore;
-import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
+import com.openlattice.data.storage.*;
 import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
@@ -116,8 +97,6 @@ import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
-import com.openlattice.search.PersistentSearchMessengerTask;
-import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
@@ -133,9 +112,6 @@ import com.openlattice.users.Auth0UserListingService;
 import com.openlattice.users.LocalUserListingService;
 import com.openlattice.users.UserListingService;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.IOException;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +119,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.IOException;
 
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
@@ -226,8 +206,18 @@ public class ConductorServicesPod {
     }
 
     @Bean( name = "mapboxConfiguration" )
-    public MapboxConfiguration mapboxConfiguration() throws IOException {
+    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
+    public MapboxConfiguration getLocalMapboxConfiguration() throws IOException {
         return configurationService.getConfiguration( MapboxConfiguration.class );
+    }
+
+    @Bean( name = "mapboxConfiguration" )
+    @Profile( { Profiles.AWS_CONFIGURATION_PROFILE, Profiles.AWS_TESTING_PROFILE } )
+    public MapboxConfiguration getAwsMapboxConfiguration() throws IOException {
+        return ResourceConfigurationLoader.loadConfigurationFromS3( s3,
+                awsLaunchConfig.getBucket(),
+                awsLaunchConfig.getFolder(),
+                MapboxConfiguration.class );
     }
 
     @Bean
@@ -333,7 +323,7 @@ public class ConductorServicesPod {
     public MaterializedEntitySetsDependencies materializedEntitySetsDependencies() {
         return new MaterializedEntitySetsDependencies(
                 assembler(),
-                hazelcastInstance.getMap( HazelcastMap.MATERIALIZED_ENTITY_SETS.name() ),
+                HazelcastMap.MATERIALIZED_ENTITY_SETS.getMap( hazelcastInstance ),
                 organizationsManager(),
                 dataModelService(),
                 authorizingComponent(),
@@ -469,25 +459,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PersistentSearchMessengerTaskDependencies persistentSearchMessengerTaskDependencies() throws IOException {
-        return new PersistentSearchMessengerTaskDependencies(
-                hazelcastInstance,
-                hikariDataSource,
-                principalService(),
-                authorizationManager(),
-                authorizingComponent(),
-                searchService(),
-                mailServiceClient(),
-                mapboxConfiguration().getMapboxToken()
-        );
-    }
-
-    @Bean
-    public PersistentSearchMessengerTask persistentSearchMessengerTask() throws IOException {
-        return new PersistentSearchMessengerTask();
-    }
-
-    @Bean
     public SearchService searchService() {
         return new SearchService( eventBus, metricRegistry );
     }
@@ -519,7 +490,7 @@ public class ConductorServicesPod {
 
     @Bean
     public MailServiceRequirements mailServiceRequirements() {
-        return () -> hazelcastInstance.getQueue( HazelcastQueue.EMAIL_SPOOL.name() );
+        return () -> HazelcastQueue.EMAIL_SPOOL.getQueue( hazelcastInstance );
     }
 
     @Bean
@@ -620,8 +591,7 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchupDependency idgenCatchupDependency() {
         return new IdGenerationCatchupDependency(
-                hazelcastClientProvider.getClient( HazelcastClient.IDS.name() )
-                        .getMap( HazelcastMap.ID_GENERATION.name() ),
+                HazelcastMap.ID_GENERATION.getMap( hazelcastClientProvider.getClient( HazelcastClient.IDS.name())),
                 hikariDataSource );
     }
 
@@ -659,7 +629,8 @@ public class ConductorServicesPod {
                 mailServiceClient(),
                 subscriptionService(),
                 gqs(),
-                hazelcastInstance.getQueue( HazelcastQueue.TWILIO.name() ) );
+                HazelcastQueue.TWILIO.getQueue( hazelcastInstance )
+        );
     }
 
     @Bean
