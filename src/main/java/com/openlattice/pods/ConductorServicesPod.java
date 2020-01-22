@@ -431,7 +431,7 @@ public class ConductorServicesPod {
 
     @Bean
     public UserListingService userListingService() {
-        if ( auth0Configuration.getManagementApiUrl().contains( "localhost" ) ) {
+        if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
             return new LocalUserListingService( auth0Configuration );
         }
         return new Auth0UserListingService( new ManagementAPI( auth0Configuration.getDomain(),
