@@ -46,6 +46,7 @@ import com.openlattice.auditing.AuditTaskDependencies;
 import com.openlattice.auditing.AuditingConfiguration;
 import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
+import com.openlattice.auth0.AwsAuth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
 import com.openlattice.authorization.*;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
@@ -63,6 +64,8 @@ import com.openlattice.datastore.services.EdmManager;
 import com.openlattice.datastore.services.EdmService;
 import com.openlattice.datastore.services.EntitySetManager;
 import com.openlattice.datastore.services.EntitySetService;
+import com.openlattice.directory.Auth0UserDirectoryService;
+import com.openlattice.directory.LocalUserDirectoryService;
 import com.openlattice.directory.UserDirectoryService;
 import com.openlattice.edm.PostgresEdmManager;
 import com.openlattice.edm.properties.PostgresTypeManager;
@@ -106,6 +109,9 @@ import com.openlattice.users.Auth0SyncInitializationTask;
 import com.openlattice.users.Auth0SyncService;
 import com.openlattice.users.Auth0SyncTask;
 import com.openlattice.users.Auth0SyncTaskDependencies;
+import com.openlattice.users.Auth0UserListingService;
+import com.openlattice.users.LocalUserListingService;
+import com.openlattice.users.UserListingService;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,7 +251,10 @@ public class ConductorServicesPod {
 
     @Bean
     public UserDirectoryService userDirectoryService() {
-        return new UserDirectoryService( auth0TokenProvider(), hazelcastInstance );
+        if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
+            return new LocalUserDirectoryService( auth0Configuration );
+        }
+        return new Auth0UserDirectoryService( auth0TokenProvider(), hazelcastInstance );
     }
 
     @Bean
@@ -412,7 +421,7 @@ public class ConductorServicesPod {
 
     @Bean
     public Auth0TokenProvider auth0TokenProvider() {
-        return new Auth0TokenProvider( auth0Configuration );
+        return new AwsAuth0TokenProvider( auth0Configuration );
     }
 
     @Bean
@@ -421,13 +430,18 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public ManagementAPI managementAPI() {
-        return new ManagementAPI( auth0Configuration.getDomain(), auth0TokenProvider().getToken() );
+    public UserListingService userListingService() {
+        if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
+            return new LocalUserListingService( auth0Configuration );
+        }
+        return new Auth0UserListingService( new ManagementAPI( auth0Configuration.getDomain(),
+                auth0TokenProvider().getToken() ) );
+
     }
 
     @Bean
     public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
-        return new Auth0SyncTaskDependencies( auth0SyncService(), managementAPI() );
+        return new Auth0SyncTaskDependencies( auth0SyncService(), userListingService() );
     }
 
     @Bean
