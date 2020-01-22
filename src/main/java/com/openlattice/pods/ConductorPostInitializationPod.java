@@ -26,7 +26,7 @@ import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.ConductorElasticsearchApi;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
-import com.openlattice.kindling.search.ConductorElasticsearchImpl;
+import com.openlattice.scrunchie.search.ConductorElasticsearchImpl;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.search.PersistentSearchMessengerTask;
