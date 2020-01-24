@@ -438,14 +438,15 @@ public class ConductorServicesPod {
         if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
             return new LocalUserListingService( auth0Configuration );
         }
-        return new Auth0UserListingService( new ManagementAPI( auth0Configuration.getDomain(),
+        return new Auth0UserListingService(
+                new ManagementAPI( auth0Configuration.getDomain(),
                 auth0TokenProvider().getToken() ) );
 
     }
 
     @Bean
     public Auth0SyncTaskDependencies auth0SyncTaskDependencies() {
-        return new Auth0SyncTaskDependencies( auth0SyncService(), userListingService() );
+        return new Auth0SyncTaskDependencies( auth0SyncService(), userListingService(), executor );
     }
 
     @Bean
