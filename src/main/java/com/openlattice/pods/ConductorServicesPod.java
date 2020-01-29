@@ -39,7 +39,6 @@ import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.MaterializePermissionSyncTask;
 import com.openlattice.assembler.tasks.MaterializedEntitySetsDataRefreshTask;
-import com.openlattice.assembler.tasks.ProductionViewSchemaInitializationTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
 import com.openlattice.auditing.AuditTaskDependencies;
@@ -350,11 +349,6 @@ public class ConductorServicesPod {
     @Bean
     public UsersAndRolesInitializationTask assemblerInitializationTask() {
         return new UsersAndRolesInitializationTask();
-    }
-
-    @Bean
-    public ProductionViewSchemaInitializationTask productionViewSchemaInitializationTask() {
-        return new ProductionViewSchemaInitializationTask();
     }
 
     //    @Bean
