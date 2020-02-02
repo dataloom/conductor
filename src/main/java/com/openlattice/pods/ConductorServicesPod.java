@@ -37,8 +37,6 @@ import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
-import com.openlattice.assembler.tasks.MaterializePermissionSyncTask;
-import com.openlattice.assembler.tasks.MaterializedEntitySetsDataRefreshTask;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
 import com.openlattice.auditing.AuditTaskDependencies;
@@ -274,7 +272,6 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 authorizingComponent(),
                 principalService(),
-                partitionManager(),
                 metricRegistry,
                 hazelcastInstance,
                 eventBus
@@ -329,16 +326,6 @@ public class ConductorServicesPod {
                 authorizingComponent(),
                 hikariDataSource
         );
-    }
-
-    @Bean
-    public MaterializedEntitySetsDataRefreshTask materializedEntitySetsDataRefreshTask() {
-        return new MaterializedEntitySetsDataRefreshTask();
-    }
-
-    @Bean
-    public MaterializePermissionSyncTask materializePermissionSyncTask() {
-        return new MaterializePermissionSyncTask();
     }
 
     @Bean
