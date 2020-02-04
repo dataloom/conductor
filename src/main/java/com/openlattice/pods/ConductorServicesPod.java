@@ -20,7 +20,6 @@
 
 package com.openlattice.pods;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.auth0.client.mgmt.ManagementAPI;
 import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
@@ -29,10 +28,8 @@ import com.geekbeast.hazelcast.HazelcastClientProvider;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
-import com.kryptnostic.rhizome.configuration.ConfigurationConstants.Profiles;
-import com.kryptnostic.rhizome.configuration.amazon.AmazonLaunchConfiguration;
 import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
-import com.openlattice.ResourceConfigurationLoader;
+import com.kryptnostic.rhizome.pods.ConfigurationLoader;
 import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
@@ -112,11 +109,9 @@ import com.openlattice.users.UserListingService;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -160,11 +155,8 @@ public class ConductorServicesPod {
     @Inject
     private AssemblerConfiguration assemblerConfiguration;
 
-    @Autowired( required = false )
-    private AmazonS3 s3;
-
-    @Autowired( required = false )
-    private AmazonLaunchConfiguration awsLaunchConfig;
+    @Inject
+    private ConfigurationLoader configurationLoader;
 
     @Inject
     private MetricRegistry metricRegistry;
@@ -183,39 +175,14 @@ public class ConductorServicesPod {
         return ObjectMappers.getJsonMapper();
     }
 
-    @Bean( name = "conductorConfiguration" )
-    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
-    public ConductorConfiguration getLocalConductorConfiguration() throws IOException {
-        ConductorConfiguration config = configurationService.getConfiguration( ConductorConfiguration.class );
-        logger.info( "Using local conductor configuration: {}", config );
-        return config;
+    @Bean
+    public ConductorConfiguration conductorConfiguration() throws IOException {
+        return configurationLoader.logAndLoad( "conductor", ConductorConfiguration.class );
     }
 
-    @Bean( name = "conductorConfiguration" )
-    @Profile( { Profiles.AWS_CONFIGURATION_PROFILE, Profiles.AWS_TESTING_PROFILE } )
-    public ConductorConfiguration getAwsConductorConfiguration() throws IOException {
-        ConductorConfiguration config = ResourceConfigurationLoader.loadConfigurationFromS3( s3,
-                awsLaunchConfig.getBucket(),
-                awsLaunchConfig.getFolder(),
-                ConductorConfiguration.class );
-
-        logger.info( "Using aws conductor configuration: {}", config );
-        return config;
-    }
-
-    @Bean( name = "mapboxConfiguration" )
-    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
-    public MapboxConfiguration getLocalMapboxConfiguration() throws IOException {
-        return configurationService.getConfiguration( MapboxConfiguration.class );
-    }
-
-    @Bean( name = "mapboxConfiguration" )
-    @Profile( { Profiles.AWS_CONFIGURATION_PROFILE, Profiles.AWS_TESTING_PROFILE } )
-    public MapboxConfiguration getAwsMapboxConfiguration() throws IOException {
-        return ResourceConfigurationLoader.loadConfigurationFromS3( s3,
-                awsLaunchConfig.getBucket(),
-                awsLaunchConfig.getFolder(),
-                MapboxConfiguration.class );
+    @Bean
+    public MapboxConfiguration mapboxConfiguration() throws IOException {
+        return configurationLoader.load( MapboxConfiguration.class );
     }
 
     @Bean
@@ -279,19 +246,10 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    @Profile( Profiles.LOCAL_CONFIGURATION_PROFILE )
-    public OrganizationsInitializationDependencies organizationLocalBootstrapDependencies() throws IOException {
+    public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
         return new OrganizationsInitializationDependencies( organizationsManager(),
                 principalService(),
-                getLocalConductorConfiguration() );
-    }
-
-    @Bean
-    @Profile( { Profiles.AWS_CONFIGURATION_PROFILE, Profiles.AWS_TESTING_PROFILE } )
-    public OrganizationsInitializationDependencies organizationAwsBootstrapDependencies() throws IOException {
-        return new OrganizationsInitializationDependencies( organizationsManager(),
-                principalService(),
-                getAwsConductorConfiguration() );
+                conductorConfiguration() );
     }
 
     @Bean
