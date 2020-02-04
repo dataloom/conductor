@@ -1,5 +1,5 @@
 server:
-  jdbcUrl: "jdbc:postgresql://localhost:5433"
+  jdbcUrl: "jdbc:postgresql://localhost:5432"
   username: "oltest"
   password: "test"
   maximumPoolSize: 5
