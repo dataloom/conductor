@@ -592,7 +592,7 @@ public class ConductorServicesPod {
                 mailServiceClient(),
                 subscriptionService(),
                 gqs(),
-                HazelcastQueue.TWILIO.getQueue( hazelcastInstance )
+                HazelcastQueue.TWILIO_FEED.getQueue( hazelcastInstance )
         );
     }
 
