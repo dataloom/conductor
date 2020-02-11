@@ -47,6 +47,8 @@ import com.openlattice.authorization.initializers.AuthorizationInitializationDep
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
+import com.openlattice.codex.CodexInitializationTask;
+import com.openlattice.codex.CodexInitializationTaskDependencies;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
@@ -577,6 +579,16 @@ public class ConductorServicesPod {
     @Bean
     public SubscriptionNotificationTask subscriptionNotificationTask() {
         return new SubscriptionNotificationTask();
+    }
+
+    @Bean
+    public CodexInitializationTaskDependencies codexInitializationTaskDependencies() {
+        return new CodexInitializationTaskDependencies( aclKeyReservationService(), hazelcastInstance );
+    }
+
+    @Bean
+    public CodexInitializationTask codexInitializationTask() {
+        return new CodexInitializationTask();
     }
 
     @PostConstruct
