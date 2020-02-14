@@ -49,6 +49,7 @@ import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
 import com.openlattice.codex.CodexInitializationTask;
 import com.openlattice.codex.CodexInitializationTaskDependencies;
+import com.openlattice.collections.CollectionsManager;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
@@ -377,7 +378,7 @@ public class ConductorServicesPod {
         }
         return new Auth0UserListingService(
                 new ManagementAPI( auth0Configuration.getDomain(),
-                auth0TokenProvider().getToken() ) );
+                        auth0TokenProvider().getToken() ) );
 
     }
 
@@ -534,7 +535,7 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchupDependency idgenCatchupDependency() {
         return new IdGenerationCatchupDependency(
-                HazelcastMap.ID_GENERATION.getMap( hazelcastClientProvider.getClient( HazelcastClient.IDS.name())),
+                HazelcastMap.ID_GENERATION.getMap( hazelcastClientProvider.getClient( HazelcastClient.IDS.name() ) ),
                 hikariDataSource );
     }
 
@@ -582,8 +583,21 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public CollectionsManager collectionsManager() {
+        return new CollectionsManager(
+                hazelcastInstance,
+                dataModelService(),
+                entitySetManager(),
+                aclKeyReservationService(),
+                schemaManager(),
+                authorizationManager(),
+                eventBus
+        );
+    }
+
+    @Bean
     public CodexInitializationTaskDependencies codexInitializationTaskDependencies() {
-        return new CodexInitializationTaskDependencies( aclKeyReservationService(), hazelcastInstance );
+        return new CodexInitializationTaskDependencies( aclKeyReservationService(), collectionsManager() );
     }
 
     @Bean
