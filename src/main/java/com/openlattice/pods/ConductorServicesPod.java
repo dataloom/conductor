@@ -108,6 +108,7 @@ import com.openlattice.users.Auth0SyncTaskDependencies;
 import com.openlattice.users.Auth0UserListingService;
 import com.openlattice.users.LocalUserListingService;
 import com.openlattice.users.UserListingService;
+import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -376,8 +377,9 @@ public class ConductorServicesPod {
             return new LocalUserListingService( auth0Configuration );
         }
         return new Auth0UserListingService(
-                new ManagementAPI( auth0Configuration.getDomain(),
-                auth0TokenProvider().getToken() ) );
+                new ManagementAPI( auth0Configuration.getDomain(), auth0TokenProvider().getToken() ),
+                new Auth0ApiExtension( auth0Configuration.getDomain(), auth0TokenProvider().getToken() )
+        );
 
     }
 
