@@ -376,9 +376,11 @@ public class ConductorServicesPod {
         if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
             return new LocalUserListingService( auth0Configuration );
         }
+
+        var auth0Token = auth0TokenProvider().getToken();
         return new Auth0UserListingService(
-                new ManagementAPI( auth0Configuration.getDomain(), auth0TokenProvider().getToken() ),
-                new Auth0ApiExtension( auth0Configuration.getDomain(), auth0TokenProvider().getToken() )
+                new ManagementAPI( auth0Configuration.getDomain(), auth0Token ),
+                new Auth0ApiExtension( auth0Configuration.getDomain(), auth0Token )
         );
 
     }
