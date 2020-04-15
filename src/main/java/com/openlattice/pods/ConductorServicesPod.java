@@ -444,6 +444,7 @@ public class ConductorServicesPod {
     public PostgresEntityDataQueryService dataQueryService() {
         return new PostgresEntityDataQueryService(
                 hikariDataSource,
+                hikariDataSource,
                 byteBlobDataManager,
                 partitionManager()
         );
