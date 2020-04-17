@@ -484,7 +484,7 @@ public class ConductorServicesPod {
 
     @Bean
     public GraphService graphService() {
-        return new Graph( hikariDataSource, entitySetManager(), partitionManager() );
+        return new Graph( hikariDataSource, hikariDataSource, entitySetManager(), partitionManager() );
     }
 
     @Bean
@@ -539,7 +539,7 @@ public class ConductorServicesPod {
     @Bean
     public IdGenerationCatchupDependency idgenCatchupDependency() {
         return new IdGenerationCatchupDependency(
-                HazelcastMap.ID_GENERATION.getMap( hazelcastClientProvider.getClient( HazelcastClient.IDS.name())),
+                HazelcastMap.ID_GENERATION.getMap( hazelcastClientProvider.getClient( HazelcastClient.IDS.name() ) ),
                 hikariDataSource );
     }
 
