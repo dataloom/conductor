@@ -94,6 +94,8 @@ import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
+import com.openlattice.scheduling.ScheduledTaskService;
+import com.openlattice.scheduling.ScheduledTaskServiceDependencies;
 import com.openlattice.search.SearchService;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
@@ -594,6 +596,16 @@ public class ConductorServicesPod {
     @Bean
     public CodexInitializationTask codexInitializationTask() {
         return new CodexInitializationTask();
+    }
+
+    @Bean
+    public ScheduledTaskServiceDependencies scheduledTaskServiceDependencies() {
+        return new ScheduledTaskServiceDependencies( hazelcastInstance, executor );
+    }
+
+    @Bean
+    public ScheduledTaskService scheduledTaskService() {
+        return new ScheduledTaskService();
     }
 
     @PostConstruct
