@@ -496,7 +496,12 @@ public class ConductorServicesPod {
 
     @Bean
     public GraphService graphService() {
-        return new Graph( hikariDataSource, hikariDataSource, entitySetManager(), partitionManager() );
+        return new Graph( hikariDataSource,
+                hikariDataSource,
+                entitySetManager(),
+                partitionManager(),
+                dataQueryService(),
+                metricRegistry );
     }
 
     @Bean
