@@ -501,6 +501,7 @@ public class ConductorServicesPod {
                 entitySetManager(),
                 partitionManager(),
                 dataQueryService(),
+                idService(),
                 metricRegistry );
     }
 
