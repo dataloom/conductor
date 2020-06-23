@@ -29,14 +29,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.rhizome.pods.ConfigurationLoader;
-import com.openlattice.assembler.Assembler;
+import com.openlattice.assembler.*;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
-import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.AssemblerConnectionManager;
-import com.openlattice.assembler.AssemblerDependencies;
-import com.openlattice.assembler.AssemblerQueryService;
-import com.openlattice.assembler.MaterializedEntitySetsDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
@@ -46,16 +41,7 @@ import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.auth0.AwsAuth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
-import com.openlattice.authorization.AuthorizationManager;
-import com.openlattice.authorization.AuthorizationQueryService;
-import com.openlattice.authorization.DbCredentialService;
-import com.openlattice.authorization.EdmAuthorizationHelper;
-import com.openlattice.authorization.HazelcastAclKeyReservationService;
-import com.openlattice.authorization.HazelcastAuthorizationService;
-import com.openlattice.authorization.HazelcastSecurableObjectResolveTypeService;
-import com.openlattice.authorization.PostgresUserApi;
-import com.openlattice.authorization.Principals;
-import com.openlattice.authorization.SecurableObjectResolveTypeService;
+import com.openlattice.authorization.*;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
@@ -66,12 +52,7 @@ import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
-import com.openlattice.data.storage.ByteBlobDataManager;
-import com.openlattice.data.storage.EntityDatastore;
-import com.openlattice.data.storage.IndexingMetadataManager;
-import com.openlattice.data.storage.PostgresEntityDataQueryService;
-import com.openlattice.data.storage.PostgresEntityDatastore;
-import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
+import com.openlattice.data.storage.*;
 import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
@@ -81,7 +62,6 @@ import com.openlattice.datastore.services.EntitySetService;
 import com.openlattice.directory.Auth0UserDirectoryService;
 import com.openlattice.directory.LocalUserDirectoryService;
 import com.openlattice.directory.UserDirectoryService;
-import com.openlattice.edm.PostgresEdmManager;
 import com.openlattice.edm.properties.PostgresTypeManager;
 import com.openlattice.edm.schemas.SchemaQueryService;
 import com.openlattice.edm.schemas.manager.HazelcastSchemaManager;
@@ -121,13 +101,7 @@ import com.openlattice.subscriptions.SubscriptionNotificationTask;
 import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
-import com.openlattice.users.Auth0SyncInitializationTask;
-import com.openlattice.users.Auth0SyncService;
-import com.openlattice.users.Auth0SyncTask;
-import com.openlattice.users.Auth0SyncTaskDependencies;
-import com.openlattice.users.Auth0UserListingService;
-import com.openlattice.users.LocalUserListingService;
-import com.openlattice.users.UserListingService;
+import com.openlattice.users.*;
 import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -433,11 +407,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PostgresEdmManager pgEdmManager() {
-        return new PostgresEdmManager( hikariDataSource, hazelcastInstance );
-    }
-
-    @Bean
     public HazelcastSchemaManager schemaManager() {
         return new HazelcastSchemaManager( hazelcastInstance, schemaQueryService() );
     }
@@ -474,7 +443,6 @@ public class ConductorServicesPod {
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                pgEdmManager(),
                 entityTypeManager(),
                 schemaManager()
         );
@@ -485,7 +453,6 @@ public class ConductorServicesPod {
         return new EntitySetService(
                 hazelcastInstance,
                 eventBus,
-                pgEdmManager(),
                 aclKeyReservationService(),
                 authorizationManager(),
                 partitionManager(),
@@ -509,7 +476,7 @@ public class ConductorServicesPod {
     public EntityDatastore entityDatastore() {
         return new PostgresEntityDatastore(
                 dataQueryService(),
-                pgEdmManager(),
+                dataModelService(),
                 entitySetManager(),
                 metricRegistry,
                 eventBus,
