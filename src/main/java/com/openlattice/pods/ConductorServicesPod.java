@@ -269,6 +269,7 @@ public class ConductorServicesPod {
     public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
         return new OrganizationsInitializationDependencies( organizationsManager(),
                 principalService(),
+                partitionManager(),
                 conductorConfiguration() );
     }
 
