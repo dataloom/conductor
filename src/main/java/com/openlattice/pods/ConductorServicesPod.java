@@ -491,6 +491,7 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 partitionManager(),
                 dataModelService(),
+                hikariDataSource,
                 auditingConfiguration
         );
     }
