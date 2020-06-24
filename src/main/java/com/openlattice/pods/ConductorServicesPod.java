@@ -230,7 +230,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AuthorizationManager authorizationManager() {
-        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+        return new HazelcastAuthorizationService( hazelcastInstance, eventBus );
     }
 
     @Bean
