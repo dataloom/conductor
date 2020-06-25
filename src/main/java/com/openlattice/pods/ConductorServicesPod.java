@@ -195,11 +195,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public AuthorizationQueryService authorizationQueryService() {
-        return new AuthorizationQueryService( hikariDataSource, hazelcastInstance );
-    }
-
-    @Bean
     public HazelcastAclKeyReservationService aclKeyReservationService() {
         return new HazelcastAclKeyReservationService( hazelcastInstance );
     }
@@ -214,7 +209,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AuthorizationManager authorizationManager() {
-        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+        return new HazelcastAuthorizationService( hazelcastInstance, eventBus );
     }
 
     @Bean
@@ -253,6 +248,7 @@ public class ConductorServicesPod {
     public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
         return new OrganizationsInitializationDependencies( organizationsManager(),
                 principalService(),
+                partitionManager(),
                 conductorConfiguration() );
     }
 
@@ -467,6 +463,7 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 partitionManager(),
                 dataModelService(),
+                hikariDataSource,
                 auditingConfiguration
         );
     }
