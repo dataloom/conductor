@@ -28,6 +28,7 @@ import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.ConductorElasticsearchApi;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
+import com.openlattice.data.DataGraphManager;
 import com.openlattice.data.storage.EntityDatastore;
 import com.openlattice.data.storage.IndexingMetadataManager;
 import com.openlattice.data.storage.partitions.PartitionManager;
@@ -98,7 +99,7 @@ public class ConductorPostInitializationPod {
     private GraphService graphService;
 
     @Inject
-    private EntityDatastore entityDatastore;
+    private DataGraphManager dataGraphManager;
 
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() {
@@ -133,8 +134,8 @@ public class ConductorPostInitializationPod {
                 elasticsearchApi(),
                 edmManager,
                 entitySetManager,
+                dataGraphManager,
                 graphService,
-                entityDatastore,
                 indexingMetadataManager
         );
     }
