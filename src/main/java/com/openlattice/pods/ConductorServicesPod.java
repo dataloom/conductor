@@ -72,7 +72,6 @@ import com.openlattice.datastore.services.EntitySetService;
 import com.openlattice.directory.Auth0UserDirectoryService;
 import com.openlattice.directory.LocalUserDirectoryService;
 import com.openlattice.directory.UserDirectoryService;
-import com.openlattice.edm.PostgresEdmManager;
 import com.openlattice.edm.properties.PostgresTypeManager;
 import com.openlattice.edm.schemas.SchemaQueryService;
 import com.openlattice.edm.schemas.manager.HazelcastSchemaManager;
@@ -409,11 +408,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public PostgresEdmManager pgEdmManager() {
-        return new PostgresEdmManager( hikariDataSource, hazelcastInstance );
-    }
-
-    @Bean
     public HazelcastSchemaManager schemaManager() {
         return new HazelcastSchemaManager( hazelcastInstance, schemaQueryService() );
     }
@@ -449,7 +443,6 @@ public class ConductorServicesPod {
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                pgEdmManager(),
                 entityTypeManager(),
                 schemaManager()
         );
@@ -460,7 +453,6 @@ public class ConductorServicesPod {
         return new EntitySetService(
                 hazelcastInstance,
                 eventBus,
-                pgEdmManager(),
                 aclKeyReservationService(),
                 authorizationManager(),
                 partitionManager(),
@@ -485,7 +477,7 @@ public class ConductorServicesPod {
     public EntityDatastore entityDatastore() {
         return new PostgresEntityDatastore(
                 dataQueryService(),
-                pgEdmManager(),
+                dataModelService(),
                 entitySetManager(),
                 metricRegistry,
                 eventBus,
