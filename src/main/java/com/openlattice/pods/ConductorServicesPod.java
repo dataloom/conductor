@@ -399,11 +399,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public SearchService searchService() {
-        return new SearchService( eventBus, metricRegistry );
-    }
-
-    @Bean
     public SecurableObjectResolveTypeService securableObjectTypes() {
         return new HazelcastSecurableObjectResolveTypeService( hazelcastInstance );
     }
