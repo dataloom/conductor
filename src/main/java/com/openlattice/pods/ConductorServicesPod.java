@@ -398,11 +398,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public SearchService searchService() {
-        return new SearchService( eventBus, metricRegistry );
-    }
-
-    @Bean
     public SecurableObjectResolveTypeService securableObjectTypes() {
         return new HazelcastSecurableObjectResolveTypeService( hazelcastInstance );
     }
@@ -445,7 +440,6 @@ public class ConductorServicesPod {
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
-                hikariDataSource,
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
