@@ -55,6 +55,8 @@ import com.openlattice.codex.CodexInitializationTask;
 import com.openlattice.codex.CodexInitializationTaskDependencies;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
+import com.openlattice.data.DataGraphManager;
+import com.openlattice.data.DataGraphService;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.ByteBlobDataManager;
@@ -174,10 +176,8 @@ public class ConductorServicesPod {
     @Inject
     private ResolvedPrincipalTreesMapLoader rptml;
 
-    @Bean
-    public ObjectMapper defaultObjectMapper() {
-        return ObjectMappers.getJsonMapper();
-    }
+    @Inject
+    private ObjectMapper mapper;
 
     @Bean
     public ConductorConfiguration conductorConfiguration() throws IOException {
@@ -559,7 +559,7 @@ public class ConductorServicesPod {
 
     @Bean
     public SubscriptionService subscriptionService() {
-        return new PostgresSubscriptionService( hikariDataSource, defaultObjectMapper() );
+        return new PostgresSubscriptionService( hikariDataSource, mapper );
     }
 
     @Bean
@@ -573,6 +573,11 @@ public class ConductorServicesPod {
                 gqs(),
                 HazelcastQueue.TWILIO_FEED.getQueue( hazelcastInstance )
         );
+    }
+
+    @Bean
+    public DataGraphManager dgm() {
+        return new DataGraphService(graphService(), idService(), entityDatastore());
     }
 
     @Bean
