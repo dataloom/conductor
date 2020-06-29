@@ -84,9 +84,6 @@ public class ConductorPostInitializationPod {
     private EdmAuthorizationHelper edmAuthorizationHelper;
 
     @Inject
-    private SearchService searchService;
-
-    @Inject
     private MailServiceClient mailServiceClient;
 
     @Inject
@@ -114,7 +111,7 @@ public class ConductorPostInitializationPod {
                 principalService,
                 authorizationManager,
                 edmAuthorizationHelper,
-                searchService,
+                searchService(),
                 mailServiceClient,
                 mapboxConfiguration.getMapboxToken()
         );
