@@ -29,7 +29,7 @@ hazelcast-clients:
             - "localhost"
 
 postgres:
-    citus: false
+    citus: true
     initialize-indices: true
     hikari:
         jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
