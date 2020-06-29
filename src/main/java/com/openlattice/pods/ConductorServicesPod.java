@@ -148,9 +148,6 @@ public class ConductorServicesPod {
     private ByteBlobDataManager byteBlobDataManager;
 
     @Inject
-    private PostgresUserApi pgUserApi;
-
-    @Inject
     private EventBus eventBus;
 
     @Inject
