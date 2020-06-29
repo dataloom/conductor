@@ -29,7 +29,6 @@ import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.ConductorElasticsearchApi;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.DataGraphManager;
-import com.openlattice.data.storage.EntityDatastore;
 import com.openlattice.data.storage.IndexingMetadataManager;
 import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.services.EdmManager;
@@ -42,10 +41,9 @@ import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
 import com.zaxxer.hikari.HikariDataSource;
+import javax.inject.Inject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.inject.Inject;
 
 @Configuration
 public class ConductorPostInitializationPod {

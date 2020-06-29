@@ -29,6 +29,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.rhizome.pods.ConfigurationLoader;
+import com.openlattice.admin.BridgeAwareServices;
+import com.openlattice.admin.BridgeService;
+import com.openlattice.admin.ServiceDescription;
+import com.openlattice.admin.ServiceType;
 import com.openlattice.assembler.Assembler;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
@@ -574,7 +578,7 @@ public class ConductorServicesPod {
 
     @Bean
     public DataGraphManager dgm() {
-        return new DataGraphService(graphService(), idService(), entityDatastore());
+        return new DataGraphService( graphService(), idService(), entityDatastore() );
     }
 
     @Bean
@@ -600,6 +604,20 @@ public class ConductorServicesPod {
     @Bean
     public ScheduledTaskService scheduledTaskService() {
         return new ScheduledTaskService();
+    }
+
+    @Bean
+    public BridgeAwareServices bridgeAwareServices() {
+        return new BridgeAwareServices();
+    }
+
+    @Bean
+    public BridgeService bridgeService() {
+        return new BridgeService(
+                new ServiceDescription( ServiceType.CONDUCTOR ),
+                bridgeAwareServices(),
+                hazelcastInstance
+        );
     }
 
     @PostConstruct
