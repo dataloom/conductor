@@ -147,9 +147,6 @@ public class ConductorServicesPod {
     private ByteBlobDataManager byteBlobDataManager;
 
     @Inject
-    private PostgresUserApi pgUserApi;
-
-    @Inject
     private EventBus eventBus;
 
     @Inject
@@ -190,7 +187,7 @@ public class ConductorServicesPod {
 
     @Bean
     public DbCredentialService dbcs() {
-        return new DbCredentialService( hazelcastInstance, pgUserApi );
+        return new DbCredentialService( hazelcastInstance );
     }
 
     @Bean
