@@ -104,7 +104,6 @@ import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDe
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
 import com.openlattice.scheduling.ScheduledTaskService;
 import com.openlattice.scheduling.ScheduledTaskServiceDependencies;
-import com.openlattice.search.SearchService;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
 import com.openlattice.subscriptions.SubscriptionNotificationTask;
