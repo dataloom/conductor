@@ -25,6 +25,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.dataloom.mappers.ObjectMappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekbeast.hazelcast.HazelcastClientProvider;
+import com.geekbeast.rhizome.jobs.HazelcastJobService;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
@@ -575,8 +576,13 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public HazelcastJobService jobService() {
+        return new HazelcastJobService(hazelcastInstance);
+    }
+
+    @Bean
     public DataGraphManager dgm() {
-        return new DataGraphService( graphService(), idService(), entityDatastore() );
+        return new DataGraphService( graphService(), idService(), entityDatastore(), jobService() );
     }
 
     @Bean
