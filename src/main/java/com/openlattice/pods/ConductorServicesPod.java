@@ -110,7 +110,6 @@ import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDe
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
 import com.openlattice.scheduling.ScheduledTaskService;
 import com.openlattice.scheduling.ScheduledTaskServiceDependencies;
-import com.openlattice.search.SearchService;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
 import com.openlattice.subscriptions.SubscriptionNotificationTask;
@@ -489,13 +488,12 @@ public class ConductorServicesPod {
 
     @Bean
     public HazelcastIdGenerationService idGenerationService() {
-        return new HazelcastIdGenerationService( hazelcastClientProvider, executor );
+        return new HazelcastIdGenerationService( hazelcastClientProvider );
     }
 
     @Bean
     public EntityKeyIdService idService() {
-        return new PostgresEntityKeyIdService( hazelcastClientProvider,
-                executor,
+        return new PostgresEntityKeyIdService(
                 hikariDataSource,
                 idGenerationService(),
                 partitionManager() );
