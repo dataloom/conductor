@@ -28,11 +28,15 @@ import com.geekbeast.hazelcast.HazelcastClientProvider;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
-import com.kryptnostic.rhizome.configuration.service.ConfigurationService;
 import com.kryptnostic.rhizome.pods.ConfigurationLoader;
-import com.openlattice.assembler.*;
+import com.openlattice.assembler.Assembler;
 import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
 import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
+import com.openlattice.assembler.AssemblerConfiguration;
+import com.openlattice.assembler.AssemblerConnectionManager;
+import com.openlattice.assembler.AssemblerDependencies;
+import com.openlattice.assembler.AssemblerQueryService;
+import com.openlattice.assembler.MaterializedEntitySetsDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
@@ -54,7 +58,12 @@ import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
-import com.openlattice.data.storage.*;
+import com.openlattice.data.storage.ByteBlobDataManager;
+import com.openlattice.data.storage.EntityDatastore;
+import com.openlattice.data.storage.IndexingMetadataManager;
+import com.openlattice.data.storage.PostgresEntityDataQueryService;
+import com.openlattice.data.storage.PostgresEntityDatastore;
+import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
 import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
@@ -64,7 +73,6 @@ import com.openlattice.datastore.services.EntitySetService;
 import com.openlattice.directory.Auth0UserDirectoryService;
 import com.openlattice.directory.LocalUserDirectoryService;
 import com.openlattice.directory.UserDirectoryService;
-import com.openlattice.edm.PostgresEdmManager;
 import com.openlattice.edm.properties.PostgresTypeManager;
 import com.openlattice.edm.schemas.SchemaQueryService;
 import com.openlattice.edm.schemas.manager.HazelcastSchemaManager;
@@ -95,20 +103,16 @@ import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
-import com.openlattice.search.SearchService;
+import com.openlattice.scheduling.ScheduledTaskService;
+import com.openlattice.scheduling.ScheduledTaskServiceDependencies;
 import com.openlattice.subscriptions.PostgresSubscriptionService;
 import com.openlattice.subscriptions.SubscriptionNotificationDependencies;
 import com.openlattice.subscriptions.SubscriptionNotificationTask;
 import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
-import com.openlattice.users.Auth0SyncInitializationTask;
-import com.openlattice.users.Auth0SyncService;
-import com.openlattice.users.Auth0SyncTask;
-import com.openlattice.users.Auth0SyncTaskDependencies;
-import com.openlattice.users.Auth0UserListingService;
-import com.openlattice.users.LocalUserListingService;
-import com.openlattice.users.UserListingService;
+import com.openlattice.users.*;
+import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,9 +136,6 @@ public class ConductorServicesPod {
     private HazelcastInstance hazelcastInstance;
 
     @Inject
-    private ConfigurationService configurationService;
-
-    @Inject
     private Auth0Configuration auth0Configuration;
 
     @Inject
@@ -145,9 +146,6 @@ public class ConductorServicesPod {
 
     @Inject
     private ByteBlobDataManager byteBlobDataManager;
-
-    @Inject
-    private PostgresUserApi pgUserApi;
 
     @Inject
     private EventBus eventBus;
@@ -190,12 +188,7 @@ public class ConductorServicesPod {
 
     @Bean
     public DbCredentialService dbcs() {
-        return new DbCredentialService( hazelcastInstance, pgUserApi );
-    }
-
-    @Bean
-    public AuthorizationQueryService authorizationQueryService() {
-        return new AuthorizationQueryService( hikariDataSource, hazelcastInstance );
+        return new DbCredentialService( hazelcastInstance );
     }
 
     @Bean
@@ -213,7 +206,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AuthorizationManager authorizationManager() {
-        return new HazelcastAuthorizationService( hazelcastInstance, authorizationQueryService(), eventBus );
+        return new HazelcastAuthorizationService( hazelcastInstance, eventBus );
     }
 
     @Bean
@@ -252,6 +245,7 @@ public class ConductorServicesPod {
     public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
         return new OrganizationsInitializationDependencies( organizationsManager(),
                 principalService(),
+                partitionManager(),
                 conductorConfiguration() );
     }
 
@@ -298,11 +292,6 @@ public class ConductorServicesPod {
     public UsersAndRolesInitializationTask assemblerInitializationTask() {
         return new UsersAndRolesInitializationTask();
     }
-
-    //    @Bean
-    //    public CleanOutOldUsersInitializationTask cleanOutOldUsersInitializationTask() {
-    //        return new CleanOutOldUsersInitializationTask();
-    //    }
 
     @Bean
     public OrganizationAssembliesInitializerTask organizationAssembliesInitializerTask() {
@@ -376,10 +365,12 @@ public class ConductorServicesPod {
         if ( auth0Configuration.getManagementApiUrl().contains( Auth0Configuration.NO_SYNC_URL ) ) {
             return new LocalUserListingService( auth0Configuration );
         }
-        return new Auth0UserListingService(
-                new ManagementAPI( auth0Configuration.getDomain(),
-                        auth0TokenProvider().getToken() ) );
 
+        var auth0Token = auth0TokenProvider().getToken();
+        return new Auth0UserListingService(
+                new ManagementAPI( auth0Configuration.getDomain(), auth0Token ),
+                new Auth0ApiExtension( auth0Configuration.getDomain(), auth0Token )
+        );
     }
 
     @Bean
@@ -403,11 +394,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public SearchService searchService() {
-        return new SearchService( eventBus, metricRegistry );
-    }
-
-    @Bean
     public SecurableObjectResolveTypeService securableObjectTypes() {
         return new HazelcastSecurableObjectResolveTypeService( hazelcastInstance );
     }
@@ -415,11 +401,6 @@ public class ConductorServicesPod {
     @Bean
     public SchemaQueryService schemaQueryService() {
         return new PostgresSchemaQueryService( hikariDataSource );
-    }
-
-    @Bean
-    public PostgresEdmManager pgEdmManager() {
-        return new PostgresEdmManager( hikariDataSource, hazelcastInstance );
     }
 
     @Bean
@@ -441,6 +422,7 @@ public class ConductorServicesPod {
     public PostgresEntityDataQueryService dataQueryService() {
         return new PostgresEntityDataQueryService(
                 hikariDataSource,
+                hikariDataSource,
                 byteBlobDataManager,
                 partitionManager()
         );
@@ -454,11 +436,9 @@ public class ConductorServicesPod {
     @Bean
     public EdmManager dataModelService() {
         return new EdmService(
-                hikariDataSource,
                 hazelcastInstance,
                 aclKeyReservationService(),
                 authorizationManager(),
-                pgEdmManager(),
                 entityTypeManager(),
                 schemaManager()
         );
@@ -469,34 +449,47 @@ public class ConductorServicesPod {
         return new EntitySetService(
                 hazelcastInstance,
                 eventBus,
-                pgEdmManager(),
                 aclKeyReservationService(),
                 authorizationManager(),
                 partitionManager(),
                 dataModelService(),
+                hikariDataSource,
                 auditingConfiguration
         );
     }
 
     @Bean
     public GraphService graphService() {
-        return new Graph( hikariDataSource, entitySetManager(), partitionManager() );
+        return new Graph( hikariDataSource,
+                hikariDataSource,
+                entitySetManager(),
+                partitionManager(),
+                dataQueryService(),
+                idService(),
+                metricRegistry );
     }
 
     @Bean
     public EntityDatastore entityDatastore() {
-        return new PostgresEntityDatastore( dataQueryService(), pgEdmManager(), entitySetManager(), metricRegistry );
+        return new PostgresEntityDatastore(
+                dataQueryService(),
+                dataModelService(),
+                entitySetManager(),
+                metricRegistry,
+                eventBus,
+                postgresLinkingFeedbackQueryService(),
+                lqs()
+        );
     }
 
     @Bean
     public HazelcastIdGenerationService idGenerationService() {
-        return new HazelcastIdGenerationService( hazelcastClientProvider, executor );
+        return new HazelcastIdGenerationService( hazelcastClientProvider );
     }
 
     @Bean
     public EntityKeyIdService idService() {
-        return new PostgresEntityKeyIdService( hazelcastClientProvider,
-                executor,
+        return new PostgresEntityKeyIdService(
                 hikariDataSource,
                 idGenerationService(),
                 partitionManager() );
@@ -603,6 +596,16 @@ public class ConductorServicesPod {
     @Bean
     public CodexInitializationTask codexInitializationTask() {
         return new CodexInitializationTask();
+    }
+
+    @Bean
+    public ScheduledTaskServiceDependencies scheduledTaskServiceDependencies() {
+        return new ScheduledTaskServiceDependencies( hazelcastInstance, executor );
+    }
+
+    @Bean
+    public ScheduledTaskService scheduledTaskService() {
+        return new ScheduledTaskService();
     }
 
     @PostConstruct

@@ -20,15 +20,23 @@
 
 package com.openlattice.pods;
 
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.HazelcastInstance;
 import com.openlattice.authorization.AuthorizationManager;
 import com.openlattice.authorization.EdmAuthorizationHelper;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.ConductorElasticsearchApi;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
-import com.openlattice.scrunchie.search.ConductorElasticsearchImpl;
+import com.openlattice.data.storage.EntityDatastore;
+import com.openlattice.data.storage.IndexingMetadataManager;
+import com.openlattice.data.storage.partitions.PartitionManager;
+import com.openlattice.datastore.services.EdmManager;
+import com.openlattice.datastore.services.EntitySetManager;
+import com.openlattice.graph.core.GraphService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
+import com.openlattice.scrunchie.search.ConductorElasticsearchImpl;
 import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
@@ -37,10 +45,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 @Configuration
 public class ConductorPostInitializationPod {
+
+    @Inject
+    private EventBus eventBus;
+
+    @Inject
+    private MetricRegistry metricRegistry;
 
     @Inject
     private ConductorConfiguration conductorConfiguration;
@@ -61,36 +74,65 @@ public class ConductorPostInitializationPod {
     private AuthorizationManager authorizationManager;
 
     @Inject
-    private EdmAuthorizationHelper edmAuthorizationHelper;
+    private EntitySetManager entitySetManager;
 
     @Inject
-    private SearchService searchService;
+    private EdmManager edmManager;
+
+    @Inject
+    private EdmAuthorizationHelper edmAuthorizationHelper;
 
     @Inject
     private MailServiceClient mailServiceClient;
 
+    @Inject
+    private PartitionManager partitionManager;
+
+    @Inject
+    private IndexingMetadataManager indexingMetadataManager;
+
+    @Inject
+    private GraphService graphService;
+
+    @Inject
+    private EntityDatastore entityDatastore;
+
     @Bean
-    public ConductorElasticsearchApi elasticsearchApi() throws IOException {
+    public ConductorElasticsearchApi elasticsearchApi() {
         return new ConductorElasticsearchImpl( conductorConfiguration.getSearchConfiguration() );
     }
 
     @Bean
-    public PersistentSearchMessengerTaskDependencies persistentSearchMessengerTaskDependencies() throws IOException {
+    public PersistentSearchMessengerTaskDependencies persistentSearchMessengerTaskDependencies() {
         return new PersistentSearchMessengerTaskDependencies(
                 hazelcastInstance,
                 hikariDataSource,
                 principalService,
                 authorizationManager,
                 edmAuthorizationHelper,
-                searchService,
+                searchService(),
                 mailServiceClient,
                 mapboxConfiguration.getMapboxToken()
         );
     }
 
     @Bean
-    public PersistentSearchMessengerTask persistentSearchMessengerTask() throws IOException {
+    public PersistentSearchMessengerTask persistentSearchMessengerTask() {
         return new PersistentSearchMessengerTask();
     }
 
+    @Bean
+    public SearchService searchService() {
+        return new SearchService(
+                eventBus,
+                metricRegistry,
+                authorizationManager,
+                elasticsearchApi(),
+                edmManager,
+                entitySetManager,
+                graphService,
+                entityDatastore,
+                indexingMetadataManager
+        );
+    }
 }

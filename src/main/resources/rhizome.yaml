@@ -13,11 +13,16 @@ hazelcast:
     cp-member-count: 0
     seed-nodes:
         - "localhost"
-    scheduled-executor:
-        name: "hazelcast_scheduled_tasks"
-        pool-size: 2
-        capacity: 128
-        durability: 1
+    durable-executors:
+        - name: "_rhizome_job_service_"
+          pool-size: 2
+          capacity: 128
+          durability: 1
+    scheduled-executors:
+        - name: "hazelcast_scheduled_tasks"
+          pool-size: 2
+          capacity: 128
+          durability: 1
 
 hazelcast-clients:
     IDS:
@@ -29,7 +34,7 @@ hazelcast-clients:
             - "localhost"
 
 postgres:
-    citus: false
+    citus: true
     initialize-indices: true
     hikari:
         jdbcUrl: jdbc:postgresql://localhost:5432/openlattice
