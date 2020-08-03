@@ -70,6 +70,9 @@ import com.openlattice.data.storage.IndexingMetadataManager;
 import com.openlattice.data.storage.PostgresEntityDataQueryService;
 import com.openlattice.data.storage.PostgresEntityDatastore;
 import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
+import com.openlattice.data.storage.StorageManagementService;
+import com.openlattice.data.storage.StorageMigrationService;
+import com.openlattice.data.storage.StorageProviderFactory;
 import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
@@ -98,6 +101,8 @@ import com.openlattice.linking.PostgresLinkingFeedbackService;
 import com.openlattice.linking.graph.PostgresLinkingQueryService;
 import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
+import com.openlattice.metadata.MetadataManager;
+import com.openlattice.metadata.MetadataService;
 import com.openlattice.notifications.sms.PhoneNumberService;
 import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
@@ -577,12 +582,40 @@ public class ConductorServicesPod {
 
     @Bean
     public HazelcastJobService jobService() {
-        return new HazelcastJobService(hazelcastInstance);
+        return new HazelcastJobService( hazelcastInstance );
     }
 
     @Bean
-    public DataGraphManager dgm() {
-        return new DataGraphService( graphService(), idService(), entityDatastore(), jobService() );
+    public StorageProviderFactory storageProviderFactory() {
+        return new StorageProviderFactory( byteBlobDataManager, metricRegistry );
+    }
+
+    @Bean
+    public StorageManagementService storageManagementService() {
+        return new StorageManagementService( hazelcastInstance, storageProviderFactory(), hikariDataSource );
+    }
+
+    @Bean
+    public StorageMigrationService storageMigrationService() {
+        return new StorageMigrationService( hazelcastInstance,
+                storageManagementService(),
+                entitySetManager(),
+                hikariDataSource );
+    }
+
+    @Bean
+    public MetadataManager metadataManager() {
+        return new MetadataService( dataQueryService() );
+    }
+
+    @Bean
+    public DataGraphManager dataGraphService() {
+        return new DataGraphService( graphService(),
+                idService(),
+                storageManagementService(),
+                storageMigrationService(),
+                metadataManager(),
+                jobService() );
     }
 
     @Bean
