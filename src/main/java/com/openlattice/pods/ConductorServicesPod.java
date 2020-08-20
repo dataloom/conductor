@@ -29,14 +29,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.hazelcast.core.HazelcastInstance;
 import com.kryptnostic.rhizome.pods.ConfigurationLoader;
-import com.openlattice.assembler.Assembler;
-import com.openlattice.assembler.Assembler.EntitySetViewsInitializerTask;
-import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask;
-import com.openlattice.assembler.AssemblerConfiguration;
-import com.openlattice.assembler.AssemblerConnectionManager;
-import com.openlattice.assembler.AssemblerDependencies;
-import com.openlattice.assembler.AssemblerQueryService;
-import com.openlattice.assembler.MaterializedEntitySetsDependencies;
+import com.openlattice.assembler.*;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
 import com.openlattice.auditing.AuditInitializationTask;
@@ -113,8 +106,6 @@ import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstr
 import com.openlattice.users.*;
 import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -124,9 +115,11 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 @Configuration
-@Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
+@Import( {
+        ByteBlobServicePod.class,
+        AuditingConfigurationPod.class,
+        AssemblerConfigurationPod.class } )
 public class ConductorServicesPod {
-    private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
 
     @Inject
     private PostgresTableManager tableManager;
@@ -230,9 +223,7 @@ public class ConductorServicesPod {
     public Assembler assembler() {
         return new Assembler(
                 dbcs(),
-                hikariDataSource,
                 authorizationManager(),
-                authorizingComponent(),
                 principalService(),
                 metricRegistry,
                 hazelcastInstance,
