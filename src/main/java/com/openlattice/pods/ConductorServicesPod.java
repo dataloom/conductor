@@ -63,6 +63,7 @@ import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
 import com.openlattice.codex.CodexInitializationTask;
 import com.openlattice.codex.CodexInitializationTaskDependencies;
+import com.openlattice.collections.CollectionsManager;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
@@ -385,7 +386,6 @@ public class ConductorServicesPod {
                 new ManagementAPI( auth0Configuration.getDomain(), auth0Token ),
                 new Auth0ApiExtension( auth0Configuration.getDomain(), auth0Token )
         );
-
     }
 
     @Bean
@@ -606,8 +606,21 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public CollectionsManager collectionsManager() {
+        return new CollectionsManager(
+                hazelcastInstance,
+                dataModelService(),
+                entitySetManager(),
+                aclKeyReservationService(),
+                schemaManager(),
+                authorizationManager(),
+                eventBus
+        );
+    }
+
+    @Bean
     public CodexInitializationTaskDependencies codexInitializationTaskDependencies() {
-        return new CodexInitializationTaskDependencies( aclKeyReservationService(), hazelcastInstance );
+        return new CodexInitializationTaskDependencies( aclKeyReservationService(), collectionsManager() );
     }
 
     @Bean
