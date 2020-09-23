@@ -117,8 +117,6 @@ import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstr
 import com.openlattice.users.*;
 import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -130,8 +128,6 @@ import java.io.IOException;
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
 public class ConductorServicesPod {
-    private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
-
     @Inject
     private PostgresTableManager tableManager;
 
@@ -183,12 +179,12 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public ConductorConfiguration conductorConfiguration() throws IOException {
+    public ConductorConfiguration conductorConfiguration() {
         return configurationLoader.logAndLoad( "conductor", ConductorConfiguration.class );
     }
 
     @Bean
-    public MapboxConfiguration mapboxConfiguration() throws IOException {
+    public MapboxConfiguration mapboxConfiguration() {
         return configurationLoader.load( MapboxConfiguration.class );
     }
 
@@ -321,20 +317,13 @@ public class ConductorServicesPod {
     @Bean
     public AssemblerConnectionManager assemblerConnectionManager() {
         return new AssemblerConnectionManager( assemblerConfiguration,
-                externalDbConnManager(),
+                externalDbConnMan,
                 hikariDataSource,
                 principalService(),
                 organizationsManager(),
                 dbcs(),
                 eventBus,
                 metricRegistry );
-    }
-
-    @Bean
-    public ExternalDatabaseConnectionManager externalDbConnManager() {
-        return new ExternalDatabaseConnectionManager(
-                assemblerConfiguration
-        );
     }
 
     @Bean
