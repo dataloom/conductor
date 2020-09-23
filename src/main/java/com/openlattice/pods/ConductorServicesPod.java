@@ -123,7 +123,6 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.IOException;
 
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
@@ -189,7 +188,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public DbCredentialService dbcs() {
+    public DbCredentialService dbCredService() {
         return new DbCredentialService( hazelcastInstance );
     }
 
@@ -232,7 +231,7 @@ public class ConductorServicesPod {
     @Bean
     public Assembler assembler() {
         return new Assembler(
-                dbcs(),
+                dbCredService(),
                 hikariDataSource,
                 authorizationManager(),
                 authorizingComponent(),
@@ -244,7 +243,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
+    public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
         return new OrganizationsInitializationDependencies( organizationsManager(),
                 principalService(),
                 partitionManager(),
@@ -270,7 +269,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AssemblerDependencies assemblerDependencies() {
-        return new AssemblerDependencies( hikariDataSource, dbcs(), externalDbConnMan, assemblerConnectionManager() );
+        return new AssemblerDependencies( hikariDataSource, dbCredService(), externalDbConnMan, assemblerConnectionManager() );
     }
 
     @Bean
@@ -321,7 +320,7 @@ public class ConductorServicesPod {
                 hikariDataSource,
                 principalService(),
                 organizationsManager(),
-                dbcs(),
+                dbCredService(),
                 eventBus,
                 metricRegistry );
     }
