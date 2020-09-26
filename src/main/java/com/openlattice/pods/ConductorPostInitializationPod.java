@@ -40,7 +40,6 @@ import com.openlattice.scrunchie.search.ConductorElasticsearchImpl;
 import com.openlattice.search.PersistentSearchMessengerTask;
 import com.openlattice.search.PersistentSearchMessengerTaskDependencies;
 import com.openlattice.search.SearchService;
-import com.openlattice.transporter.types.TransporterDatastore;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -97,9 +96,6 @@ public class ConductorPostInitializationPod {
 
     @Inject
     private EntityDatastore entityDatastore;
-
-    @Inject
-    private TransporterDatastore transporterDatastore;
 
     @Bean
     public ConductorElasticsearchApi elasticsearchApi() {
