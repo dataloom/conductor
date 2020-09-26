@@ -87,6 +87,7 @@ import com.openlattice.hazelcast.HazelcastClient;
 import com.openlattice.hazelcast.HazelcastMap;
 import com.openlattice.hazelcast.HazelcastQueue;
 import com.openlattice.ids.HazelcastIdGenerationService;
+import com.openlattice.ids.HazelcastLongIdService;
 import com.openlattice.ids.tasks.IdGenerationCatchUpTask;
 import com.openlattice.ids.tasks.IdGenerationCatchupDependency;
 import com.openlattice.linking.LinkingQueryService;
@@ -188,8 +189,13 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public HazelcastLongIdService longIdService() {
+        return new HazelcastLongIdService( hazelcastClientProvider );
+    }
+
+    @Bean
     public DbCredentialService dbCredService() {
-        return new DbCredentialService( hazelcastInstance );
+        return new DbCredentialService( hazelcastInstance, longIdService() );
     }
 
     @Bean
