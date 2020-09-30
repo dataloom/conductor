@@ -336,11 +336,6 @@ public class ConductorServicesPod {
         return new PhoneNumberService( hazelcastInstance );
     }
 
-//    @Bean
-//    public AssemblerQueryService assemblerQueryService() {
-//        return new AssemblerQueryService( dataModelService() );
-//    }
-
     @Bean
     public HazelcastOrganizationService organizationsManager() {
         return new HazelcastOrganizationService(
