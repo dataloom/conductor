@@ -636,7 +636,7 @@ public class ConductorServicesPod {
 
     @Bean
     public TransporterRunSyncTask transporterRunSyncTask() {
-        LoggerFactory.getLogger( ConductorServicesPod.class ).info("Constructing TransporterRunSyncTask")
+        LoggerFactory.getLogger( ConductorServicesPod.class ).info("Constructing TransporterRunSyncTask");
         return new TransporterRunSyncTask();
     }
 }
