@@ -38,7 +38,6 @@ import com.openlattice.assembler.Assembler.OrganizationAssembliesInitializerTask
 import com.openlattice.assembler.AssemblerConfiguration;
 import com.openlattice.assembler.AssemblerConnectionManager;
 import com.openlattice.assembler.AssemblerDependencies;
-import com.openlattice.assembler.AssemblerQueryService;
 import com.openlattice.assembler.MaterializedEntitySetsDependencies;
 import com.openlattice.assembler.pods.AssemblerConfigurationPod;
 import com.openlattice.assembler.tasks.UsersAndRolesInitializationTask;
@@ -49,14 +48,7 @@ import com.openlattice.auditing.pods.AuditingConfigurationPod;
 import com.openlattice.auth0.Auth0TokenProvider;
 import com.openlattice.auth0.AwsAuth0TokenProvider;
 import com.openlattice.authentication.Auth0Configuration;
-import com.openlattice.authorization.AuthorizationManager;
-import com.openlattice.authorization.DbCredentialService;
-import com.openlattice.authorization.EdmAuthorizationHelper;
-import com.openlattice.authorization.HazelcastAclKeyReservationService;
-import com.openlattice.authorization.HazelcastAuthorizationService;
-import com.openlattice.authorization.HazelcastSecurableObjectResolveTypeService;
-import com.openlattice.authorization.Principals;
-import com.openlattice.authorization.SecurableObjectResolveTypeService;
+import com.openlattice.authorization.*;
 import com.openlattice.authorization.initializers.AuthorizationInitializationDependencies;
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
@@ -112,6 +104,7 @@ import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializat
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.PostgresTableManager;
+import com.openlattice.postgres.external.ExternalDatabaseConnectionManager;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
 import com.openlattice.scheduling.ScheduledTaskService;
@@ -122,29 +115,19 @@ import com.openlattice.subscriptions.SubscriptionNotificationTask;
 import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
-import com.openlattice.users.Auth0SyncInitializationTask;
-import com.openlattice.users.Auth0SyncService;
-import com.openlattice.users.Auth0SyncTask;
-import com.openlattice.users.Auth0SyncTaskDependencies;
-import com.openlattice.users.Auth0UserListingService;
-import com.openlattice.users.LocalUserListingService;
-import com.openlattice.users.UserListingService;
+import com.openlattice.users.*;
 import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.IOException;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
 public class ConductorServicesPod {
-    private static Logger logger = LoggerFactory.getLogger( ConductorServicesPod.class );
-
     @Inject
     private PostgresTableManager tableManager;
 
@@ -187,18 +170,21 @@ public class ConductorServicesPod {
     @Inject
     private ResolvedPrincipalTreesMapLoader rptml;
 
+    @Inject
+    private ExternalDatabaseConnectionManager externalDbConnMan;
+
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return ObjectMappers.getJsonMapper();
     }
 
     @Bean
-    public ConductorConfiguration conductorConfiguration() throws IOException {
+    public ConductorConfiguration conductorConfiguration() {
         return configurationLoader.logAndLoad( "conductor", ConductorConfiguration.class );
     }
 
     @Bean
-    public MapboxConfiguration mapboxConfiguration() throws IOException {
+    public MapboxConfiguration mapboxConfiguration() {
         return configurationLoader.load( MapboxConfiguration.class );
     }
 
@@ -208,7 +194,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public DbCredentialService dbcs() {
+    public DbCredentialService dbCredService() {
         return new DbCredentialService( hazelcastInstance, longIdService() );
     }
 
@@ -251,7 +237,7 @@ public class ConductorServicesPod {
     @Bean
     public Assembler assembler() {
         return new Assembler(
-                dbcs(),
+                dbCredService(),
                 hikariDataSource,
                 authorizationManager(),
                 authorizingComponent(),
@@ -263,7 +249,7 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationsInitializationDependencies organizationBootstrapDependencies() throws IOException {
+    public OrganizationsInitializationDependencies organizationBootstrapDependencies() {
         return new OrganizationsInitializationDependencies( organizationsManager(),
                 principalService(),
                 partitionManager(),
@@ -289,7 +275,7 @@ public class ConductorServicesPod {
 
     @Bean
     public AssemblerDependencies assemblerDependencies() {
-        return new AssemblerDependencies( hikariDataSource, dbcs(), assemblerConnectionManager() );
+        return new AssemblerDependencies( hikariDataSource, dbCredService(), externalDbConnMan, assemblerConnectionManager() );
     }
 
     @Bean
@@ -336,10 +322,11 @@ public class ConductorServicesPod {
     @Bean
     public AssemblerConnectionManager assemblerConnectionManager() {
         return new AssemblerConnectionManager( assemblerConfiguration,
+                externalDbConnMan,
                 hikariDataSource,
                 principalService(),
                 organizationsManager(),
-                dbcs(),
+                dbCredService(),
                 eventBus,
                 metricRegistry );
     }
@@ -347,11 +334,6 @@ public class ConductorServicesPod {
     @Bean
     public PhoneNumberService phoneNumberService() {
         return new PhoneNumberService( hazelcastInstance );
-    }
-
-    @Bean
-    public AssemblerQueryService assemblerQueryService() {
-        return new AssemblerQueryService( dataModelService() );
     }
 
     @Bean
