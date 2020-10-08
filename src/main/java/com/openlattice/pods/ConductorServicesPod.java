@@ -115,9 +115,12 @@ import com.openlattice.subscriptions.SubscriptionNotificationTask;
 import com.openlattice.subscriptions.SubscriptionService;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies;
 import com.openlattice.tasks.PostConstructInitializerTaskDependencies.PostConstructInitializerTask;
+import com.openlattice.transporter.pods.TransporterPod;
+import com.openlattice.transporter.tasks.TransporterRunSyncTask;
 import com.openlattice.users.*;
 import com.openlattice.users.export.Auth0ApiExtension;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -629,5 +632,11 @@ public class ConductorServicesPod {
     @PostConstruct
     void initPrincipals() {
         Principals.init( principalService(), hazelcastInstance );
+    }
+
+    @Bean
+    public TransporterRunSyncTask transporterRunSyncTask() {
+        LoggerFactory.getLogger( ConductorServicesPod.class ).info("Constructing TransporterRunSyncTask")
+        return new TransporterRunSyncTask();
     }
 }
