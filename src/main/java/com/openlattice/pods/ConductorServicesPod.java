@@ -53,14 +53,17 @@ import com.openlattice.authorization.initializers.AuthorizationInitializationDep
 import com.openlattice.authorization.initializers.AuthorizationInitializationTask;
 import com.openlattice.authorization.mapstores.ResolvedPrincipalTreesMapLoader;
 import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
-import com.openlattice.codex.CodexInitializationTask;
-import com.openlattice.codex.CodexInitializationTaskDependencies;
 import com.openlattice.collections.CollectionsManager;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
-import com.openlattice.data.storage.*;
+import com.openlattice.data.storage.ByteBlobDataManager;
+import com.openlattice.data.storage.EntityDatastore;
+import com.openlattice.data.storage.IndexingMetadataManager;
+import com.openlattice.data.storage.PostgresEntityDataQueryService;
+import com.openlattice.data.storage.PostgresEntityDatastore;
+import com.openlattice.data.storage.PostgresEntitySetSizesTaskDependency;
 import com.openlattice.data.storage.partitions.PartitionManager;
 import com.openlattice.datastore.pods.ByteBlobServicePod;
 import com.openlattice.datastore.services.EdmManager;
@@ -98,7 +101,6 @@ import com.openlattice.organizations.tasks.OrganizationMembersCleanupDependencie
 import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializationTask;
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
-import com.openlattice.postgres.PostgresTableManager;
 import com.openlattice.postgres.external.ExternalDatabaseConnectionManager;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationDependency;
 import com.openlattice.postgres.tasks.PostgresMetaDataPropertiesInitializationTask;
@@ -123,8 +125,6 @@ import javax.inject.Inject;
 @Configuration
 @Import( { ByteBlobServicePod.class, AuditingConfigurationPod.class, AssemblerConfigurationPod.class } )
 public class ConductorServicesPod {
-    @Inject
-    private PostgresTableManager tableManager;
 
     @Inject
     private HazelcastInstance hazelcastInstance;
@@ -598,16 +598,6 @@ public class ConductorServicesPod {
                 authorizationManager(),
                 eventBus
         );
-    }
-
-    @Bean
-    public CodexInitializationTaskDependencies codexInitializationTaskDependencies() {
-        return new CodexInitializationTaskDependencies( aclKeyReservationService(), collectionsManager() );
-    }
-
-    @Bean
-    public CodexInitializationTask codexInitializationTask() {
-        return new CodexInitializationTask();
     }
 
     @Bean
