@@ -56,6 +56,8 @@ import com.openlattice.authorization.mapstores.SecurablePrincipalsMapLoader;
 import com.openlattice.collections.CollectionsManager;
 import com.openlattice.conductor.rpc.ConductorConfiguration;
 import com.openlattice.conductor.rpc.MapboxConfiguration;
+import com.openlattice.data.DataGraphManager;
+import com.openlattice.data.DataGraphService;
 import com.openlattice.data.EntityKeyIdService;
 import com.openlattice.data.ids.PostgresEntityKeyIdService;
 import com.openlattice.data.storage.ByteBlobDataManager;
@@ -95,6 +97,7 @@ import com.openlattice.mail.MailServiceClient;
 import com.openlattice.mail.config.MailServiceRequirements;
 import com.openlattice.notifications.sms.PhoneNumberService;
 import com.openlattice.organizations.HazelcastOrganizationService;
+import com.openlattice.organizations.OrganizationMetadataEntitySetsService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
 import com.openlattice.organizations.tasks.OrganizationMembersCleanupDependencies;
@@ -269,7 +272,10 @@ public class ConductorServicesPod {
 
     @Bean
     public AssemblerDependencies assemblerDependencies() {
-        return new AssemblerDependencies( hikariDataSource, dbCredService(), externalDbConnMan, assemblerConnectionManager() );
+        return new AssemblerDependencies( hikariDataSource,
+                dbCredService(),
+                externalDbConnMan,
+                assemblerConnectionManager() );
     }
 
     @Bean
@@ -339,7 +345,8 @@ public class ConductorServicesPod {
                 principalService(),
                 phoneNumberService(),
                 partitionManager(),
-                assembler() );
+                assembler(),
+                organizationMetadataEntitySetsService() );
     }
 
     @Bean
@@ -442,6 +449,16 @@ public class ConductorServicesPod {
     }
 
     @Bean
+    public DataGraphManager dataGraphService() {
+        return new DataGraphService( graphService(), idService(), entityDatastore(), jobService() );
+    }
+
+    @Bean
+    public OrganizationMetadataEntitySetsService organizationMetadataEntitySetsService() {
+        return new OrganizationMetadataEntitySetsService( dataModelService() );
+    }
+
+    @Bean
     public EntitySetManager entitySetManager() {
         return new EntitySetService(
                 hazelcastInstance,
@@ -451,6 +468,7 @@ public class ConductorServicesPod {
                 partitionManager(),
                 dataModelService(),
                 hikariDataSource,
+                organizationMetadataEntitySetsService(),
                 auditingConfiguration
         );
     }
@@ -613,5 +631,6 @@ public class ConductorServicesPod {
     @PostConstruct
     void initPrincipals() {
         Principals.init( principalService(), hazelcastInstance );
+        organizationMetadataEntitySetsService().dataGraphManager = dataGraphService();
     }
 }
