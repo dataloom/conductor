@@ -345,7 +345,8 @@ public class ConductorServicesPod {
                 principalService(),
                 phoneNumberService(),
                 partitionManager(),
-                assembler() );
+                assembler(),
+                organizationMetadataEntitySetsService() );
     }
 
     @Bean
@@ -454,10 +455,7 @@ public class ConductorServicesPod {
 
     @Bean
     public OrganizationMetadataEntitySetsService organizationMetadataEntitySetsService() {
-        return new OrganizationMetadataEntitySetsService( dataModelService(),
-                entitySetManager(),
-                dataGraphService(),
-                organizationsManager() );
+        return new OrganizationMetadataEntitySetsService( dataModelService() );
     }
 
     @Bean
@@ -633,5 +631,6 @@ public class ConductorServicesPod {
     @PostConstruct
     void initPrincipals() {
         Principals.init( principalService(), hazelcastInstance );
+        organizationMetadataEntitySetsService().dataGraphManager = dataGraphService();
     }
 }
