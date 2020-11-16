@@ -100,8 +100,6 @@ import com.openlattice.organizations.HazelcastOrganizationService;
 import com.openlattice.organizations.OrganizationMetadataEntitySetsService;
 import com.openlattice.organizations.roles.HazelcastPrincipalService;
 import com.openlattice.organizations.roles.SecurePrincipalsManager;
-import com.openlattice.organizations.tasks.OrganizationMembersCleanupDependencies;
-import com.openlattice.organizations.tasks.OrganizationMembersCleanupInitializationTask;
 import com.openlattice.organizations.tasks.OrganizationsInitializationDependencies;
 import com.openlattice.organizations.tasks.OrganizationsInitializationTask;
 import com.openlattice.postgres.external.ExternalDatabaseConnectionManager;
@@ -254,18 +252,6 @@ public class ConductorServicesPod {
     }
 
     @Bean
-    public OrganizationMembersCleanupDependencies organizationMembersCleanupDependencies() {
-        return new OrganizationMembersCleanupDependencies( principalService(),
-                organizationsManager(),
-                securableObjectTypes() );
-    }
-
-    @Bean
-    public OrganizationMembersCleanupInitializationTask organizationMembersCleanupInitializationTask() {
-        return new OrganizationMembersCleanupInitializationTask();
-    }
-
-    @Bean
     public AuthorizationInitializationDependencies authorizationBootstrapDependencies() {
         return new AuthorizationInitializationDependencies( principalService() );
     }
@@ -316,7 +302,9 @@ public class ConductorServicesPod {
                 principalService(),
                 entitySetManager(),
                 authorizationManager(),
-                partitionManager() );
+                partitionManager(),
+                organizationsManager()
+        );
     }
 
     @Bean
